@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Row, Col, Pagination, Container } from 'react-bootstrap';
 import AgregarProductoForm from './AgregarProductoForm';
+import ModificarProductoForm from './ModificarProductoForm';
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [showAgregarModal, setShowAgregarModal] = useState(false);
+  const [showModificarModal, setShowModificarModal] = useState(false);
+  const [productoAEditar, setProductoAEditar] = useState(null);
 
   const pageSize = 10;
 
@@ -38,8 +41,23 @@ const Productos = () => {
     }
   };
 
+  const eliminarProducto = async (idProducto) => {
+    try {
+      await axios.delete(`http://localhost:8081/api/admin/productos/eliminar/${idProducto}`);
+      setProductos(productos.filter(producto => producto.id !== idProducto)); // Filtra el producto eliminado
+    } catch (error) {
+      console.error('Error al eliminar el producto:', error);
+      alert('Hubo un error al eliminar el producto.');
+    }
+  };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handleEditar = (producto) => {
+    setProductoAEditar(producto); // Guardar el producto para editarlo
+    setShowModificarModal(true);  // Mostrar el modal de modificación
   };
 
   return (
@@ -73,6 +91,19 @@ const Productos = () => {
                 <Card.Text style={{ fontSize: '13px', color: 'gray' }}>
                   Código: {producto.codigoActivosFijos || 'N/A'}
                 </Card.Text>
+                
+                {/* Mostrar el idProducto en la card */}
+                <Card.Text style={{ fontSize: '12px', color: '#007bff' }}>
+                  ID Producto: {producto.id}
+                </Card.Text>
+
+                {/* Botones de edición y eliminación */}
+                <Button variant="warning" onClick={() => handleEditar(producto)} className="mr-2">
+                  <i className="fas fa-edit"></i> Editar
+                </Button>
+                <Button variant="danger" onClick={() => eliminarProducto(producto.id)}>
+                  <i className="fas fa-trash"></i> Eliminar
+                </Button>
               </Card.Body>
             </Card>
           </Col>
@@ -97,11 +128,26 @@ const Productos = () => {
         onClose={() => setShowAgregarModal(false)}
         onSave={agregarProducto}
       />
+
+      {/* Modal para editar producto */}
+      <ModificarProductoForm
+        show={showModificarModal}
+        onClose={() => setShowModificarModal(false)}
+        onSave={(productoEditado) => {
+          setShowModificarModal(false);
+          cargarProductos(currentPage); // Recargar la lista después de editar
+        }}
+        producto={productoAEditar} // Pasamos el producto a editar
+      />
     </Container>
   );
 };
 
 export default Productos;
+
+
+
+
 
 
 
