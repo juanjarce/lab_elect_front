@@ -1,0 +1,199 @@
+import React, { useState } from 'react';
+import { FaEnvelope, FaLock, FaLockOpen } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+
+const ChangePassword = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+    verificationCode: '', // Campo para el código de verificación
+  });
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [isVerificationSent, setIsVerificationSent] = useState(false); // Controlar si se envió el código
+  const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Función para enviar el código de verificación
+  const sendVerificationCode = async () => {
+    try {
+      const idResponse = await fetch(`http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`);
+      if (!idResponse.ok) {
+        throw new Error('Error al obtener el ID del estudiante');
+      }
+      const { data } = await idResponse.json();
+      const estudianteId = data.id;
+
+      // Enviar el código de verificación usando POST
+        const response = await fetch(`http://localhost:8081/api/autenticacion/enviar-verificacion/${estudianteId}`, {
+        method: 'POST', // Asegúrate de que sea POST
+       });
+
+
+      setIsVerificationSent(true); // Indicar que el código se envió con éxito
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMessage(null);
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      setError('Las contraseñas nuevas no coinciden');
+      return;
+    }
+
+    try {
+      // Obtener el ID del estudiante
+      const idResponse = await fetch(`http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`);
+      if (!idResponse.ok) {
+        throw new Error('Error al obtener el ID del estudiante');
+      }
+      const { data } = await idResponse.json();
+      const estudianteId = data.id;
+
+      // Realizar la solicitud para cambiar la contraseña
+      const response = await fetch(`http://localhost:8081/api/autenticacion/cambiar-contraseña/${estudianteId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contraseñaActual: formData.currentPassword,
+          nuevaContraseña: formData.newPassword,
+          codigoVerificación: formData.verificationCode, // Incluir el código de verificación
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al cambiar la contraseña');
+      }
+
+      setSuccessMessage('Contraseña cambiada exitosamente');
+      setTimeout(() => navigate('/'), 3000); // Redirigir después de 3 segundos
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="d-flex justify-content-center align-items-center vh-100">
+      <div className="card p-4 shadow-lg" style={{ width: '100%', maxWidth: '500px', overflowY: 'auto' }}>
+        <h3 className="text-center mb-4">Cambio de Contraseña</h3>
+        {error && <div className="alert alert-danger text-center">{error}</div>}
+        {successMessage && <div className="alert alert-success text-center">{successMessage}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              <FaEnvelope /> Correo electrónico
+            </label>
+            <div className="d-flex">
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+              <button
+                type="button"
+                className="btn btn-outline-primary ms-2"
+                onClick={sendVerificationCode}
+                disabled={isVerificationSent} // Deshabilitar el botón si ya se envió el código
+              >
+                {isVerificationSent ? 'Código enviado' : 'Enviar código'}
+              </button>
+            </div>
+          </div>
+
+          {/* Mostrar el campo para el código de verificación solo después de que se haya enviado el código */}
+          {isVerificationSent && (
+            <div className="mb-3">
+              <label htmlFor="verificationCode" className="form-label">
+                Código de verificación
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="verificationCode"
+                name="verificationCode"
+                value={formData.verificationCode}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+          )}
+
+          <div className="mb-3">
+            <label htmlFor="currentPassword" className="form-label">
+              <FaLock /> Contraseña actual
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="currentPassword"
+              name="currentPassword"
+              value={formData.currentPassword}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="newPassword" className="form-label">
+              <FaLockOpen /> Nueva contraseña
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="newPassword"
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="confirmPassword" className="form-label">
+              <FaLockOpen /> Confirmar nueva contraseña
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn-primary w-100">
+            Cambiar contraseña
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default ChangePassword;
+
+
+
