@@ -26,7 +26,7 @@ const VerificarCodigo = () => {
       }
 
       setSuccessMessage('Cuenta activada exitosamente.');
-      setTimeout(() => navigate('/'), 3000);
+      setTimeout(() => navigate('/'), 300);
     } catch (err) {
       setError(err.message);
     }

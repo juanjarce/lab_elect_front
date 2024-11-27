@@ -78,7 +78,7 @@ const AdminDashboard = () => {
 
       {/* Contenido Principal */}
       <div className="p-4" style={{ width: '100%' }}>
-        <h1>Bienvenido al Dashboard del Administrador</h1>
+        <h1>Bienvenido al Sistema de Gestión de Laboratorio de Electrónica</h1>
         
         {/* Mostrar la vista seleccionada */}
         {selectedView === 'productos' && <Productos />} {/* Mostrar productos cuando se selecciona la opción */}
