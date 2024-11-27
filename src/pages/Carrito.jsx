@@ -1,46 +1,82 @@
-// src/pages/Carrito.jsx
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { Table, Button, Alert } from 'react-bootstrap';
+import { FaTrashAlt } from 'react-icons/fa';
+import DetalleFila from './DetalleFila'; // Importamos el componente de fila
 
 const Carrito = () => {
-  const [productosEnCarrito, setProductosEnCarrito] = useState([]);
+  const { id } = useParams(); // Obtenemos el id del estudiante de la URL
+  const [detalles, setDetalles] = useState([]); // Detalles de los productos en el carrito
+  const [loading, setLoading] = useState(true); // Indicador de carga
+  const [error, setError] = useState(''); // Mensaje de error
 
-  // Simulando la obtención de los productos en el carrito (puedes hacer una solicitud real para obtener los productos del carrito)
+  // Obtener los detalles de préstamo del estudiante
   useEffect(() => {
-    // Si tienes una API que devuelve los productos en el carrito, usa algo similar a esto:
-    // axios.get(`http://localhost:8081/api/estudiantes/${estudianteId}/carrito`)
-    //   .then(response => setProductosEnCarrito(response.data))
-    //   .catch(error => console.error("Error al cargar el carrito:", error));
+    setLoading(true); // Reiniciar el estado de carga cada vez que se haga una nueva solicitud
+    axios
+      .get(`http://localhost:8081/api/estudiantes/detalles/${id}`)
+      .then((response) => {
+        // Verifica que la respuesta tenga datos antes de actualizarlos
+        const detallesData = response.data.data || []; // Asegúrate de que sea un arreglo vacío si no hay datos
+        setDetalles(detallesData);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError('Error al cargar los detalles del préstamo');
+        setLoading(false);
+      });
+  }, [id]);
 
-    // Por ahora, usaremos datos de ejemplo:
-    setProductosEnCarrito([
-      { id: 1, nombre: 'Laptop HP', cantidad: 2, precio: 500 },
-      { id: 2, nombre: 'Laptop ASUS', cantidad: 1, precio: 700 }
-    ]);
-  }, []);
+  // Eliminar detalle de préstamo
+  const handleEliminar = (idDetalle) => {
+    axios
+      .delete(`http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`)
+      .then(() => {
+        setDetalles((prevDetalles) =>
+          prevDetalles.filter((detalle) => detalle.id !== idDetalle)
+        );
+      })
+      .catch(() => {
+        setError('Error al eliminar el detalle de préstamo');
+      });
+  };
 
-  const total = productosEnCarrito.reduce((acc, producto) => acc + (producto.cantidad * producto.precio), 0);
+  if (loading) return <p>Cargando...</p>; // Muestra el mensaje de carga
 
   return (
     <div>
-      <h2>Carrito de Compras</h2>
-      {productosEnCarrito.length === 0 ? (
-        <p>No tienes productos en el carrito.</p>
+      <h2>Carrito de Préstamo</h2>
+
+      {/* Verifica si el carrito está vacío */}
+      {detalles.length === 0 ? (
+        <Alert variant="info">El carrito está vacío.</Alert>
       ) : (
-        <div>
-          <ul>
-            {productosEnCarrito.map(producto => (
-              <li key={producto.id}>
-                <p>{producto.nombre} - Cantidad: {producto.cantidad} - Precio: ${producto.precio}</p>
-              </li>
+        <Table striped bordered hover responsive>
+          <thead>
+            <tr>
+              <th>ID Detalle</th>
+              <th>Fecha Solicitud</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {detalles.map((detalle) => (
+              <DetalleFila
+                key={detalle.id}
+                detalle={detalle}
+                onEliminar={handleEliminar}
+              />
             ))}
-          </ul>
-          <h3>Total: ${total}</h3>
-          <button>Proceder al pago</button>
-        </div>
+          </tbody>
+        </Table>
       )}
     </div>
   );
 };
 
 export default Carrito;
+
+
