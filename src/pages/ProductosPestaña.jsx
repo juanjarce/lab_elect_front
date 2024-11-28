@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Row, Col, Form, Container, Pagination } from 'react-bootstrap';
+import { Row, Col, Form, Container, Pagination, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Filter } from 'react-bootstrap-icons'; // Importamos el ícono de filtro
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
 
@@ -10,6 +11,7 @@ const ProductosPestaña = () => {
   const [productos, setProductos] = useState([]);
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [ubicacion, setUbicacion] = useState(''); // Estado para la ubicación seleccionada
   const [selectedProducto, setSelectedProducto] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -23,7 +25,7 @@ const ProductosPestaña = () => {
 
   useEffect(() => {
     filtrarProductos();
-  }, [searchTerm, productos]);
+  }, [searchTerm, productos, ubicacion]); // Agregar ubicacion al array de dependencias
 
   // Función para cargar productos
   const cargarProductos = async (page) => {
@@ -56,31 +58,31 @@ const ProductosPestaña = () => {
     }
   };
 
-  // Función para filtrar los productos según el término de búsqueda
+  // Función para filtrar los productos según el término de búsqueda y la ubicación
   const filtrarProductos = () => {
     const term = searchTerm.toLowerCase();
-    const filtered = productos.filter(
-      (producto) =>
-        producto.nombre.toLowerCase().includes(term) ||
-        producto.categoria.toLowerCase().includes(term)
-    );
+    const filtered = productos.filter((producto) => {
+      const matchesSearch = producto.nombre.toLowerCase().includes(term) || producto.categoria.toLowerCase().includes(term);
+      const matchesUbicacion = ubicacion ? producto.ubicacion === ubicacion : true; // Filtra por ubicación si está seleccionada
+      return matchesSearch && matchesUbicacion;
+    });
     setFilteredProductos(filtered);
   };
 
   const handleAgregarCarrito = async (productoId, cantidad) => {
     console.log(id);  // Asegúrate de que el id del estudiante se obtiene correctamente
     console.log(productoId);
-  
+
     try {
       // Realiza la solicitud POST para agregar el producto al carrito
       await axios.post(`http://localhost:8081/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`);
-  
+
       // Actualizamos la cantidad disponible del producto en el estado
       setCantidadDisponible((prevCantidad) => ({
         ...prevCantidad,
         [productoId]: prevCantidad[productoId] - cantidad, // Reducimos la cantidad disponible
       }));
-  
+
       // También actualizamos el estado de productos si es necesario
       setProductos((prevProductos) =>
         prevProductos.map((producto) =>
@@ -89,25 +91,51 @@ const ProductosPestaña = () => {
             : producto
         )
       );
-  
+
       alert('Producto agregado al carrito');
       window.location.reload(); // Recarga la página actual
     } catch (error) {
       console.error('Error al agregar al carrito:', error);
     }
   };
-  
 
   return (
     <Container fluid>
-      {/* Buscador */}
-      <Form.Control
-        type="text"
-        placeholder="Buscar por nombre o categoría"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-3"
-      />
+      {/* Barra de búsqueda */}
+      <div className="d-flex align-items-center mb-3">
+        <Form.Control
+          type="text"
+          placeholder="Buscar por nombre o categoría"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="me-2"
+        />
+        
+        {/* Ícono de filtro */}
+        <OverlayTrigger
+          trigger="click"
+          placement="bottom"
+          overlay={
+            <Popover id="popover-filter">
+              <Popover.Body>
+                <Form.Control
+                  as="select"
+                  value={ubicacion}
+                  onChange={(e) => setUbicacion(e.target.value)}
+                >
+                  <option value="">Todas las ubicaciones</option>
+                  <option value="LABORATORIO_ELECTRÓNICA">Laboratorio Electrónica</option>
+                  <option value="LABORATORIO_PROTOTIPADO">Laboratorio Prototipado</option>
+                  <option value="LABORATORIO_TELEMÁTICA">Laboratorio Telemática</option>
+                  <option value="BODEGA">Bodega</option>
+                </Form.Control>
+              </Popover.Body>
+            </Popover>
+          }
+        >
+          <Filter size={20} style={{ cursor: 'pointer' }} />
+        </OverlayTrigger>
+      </div>
 
       {/* Lista de productos */}
       <Row>
@@ -148,5 +176,8 @@ const ProductosPestaña = () => {
 };
 
 export default ProductosPestaña;
+
+
+
 
 

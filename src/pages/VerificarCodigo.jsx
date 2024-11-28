@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const VerificarCodigo = () => {
+  const navigate = useNavigate();
   const { id } = useParams();  // Extrae el ID desde los parámetros de la URL
   const [codigo, setCodigo] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +28,7 @@ const VerificarCodigo = () => {
       }
 
       setSuccessMessage('Cuenta activada exitosamente.');
-      setTimeout(() => navigate('/'), 300);
+      setTimeout(() => navigate('/'), 3000);
     } catch (err) {
       setError(err.message);
     }

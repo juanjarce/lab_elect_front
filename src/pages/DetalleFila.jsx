@@ -14,8 +14,9 @@ const DetalleFila = ({ detalle, onEliminar }) => {
           style={{ width: '50px', height: '50px', objectFit: 'cover' }}
         />
       </td>
-      <td>{detalle.producto.nombre}</td> {/* Nombre del producto en una columna separada */}
+      <td>{detalle.producto.nombre}</td> {/* Nombre del producto */}
       <td>{detalle.cantidad}</td>
+      <td>{detalle.producto.ubicacion}</td> {/* Nueva celda para la ubicación */}
       <td>
         <Button
           variant="danger"
@@ -30,4 +31,5 @@ const DetalleFila = ({ detalle, onEliminar }) => {
 };
 
 export default DetalleFila;
+
 

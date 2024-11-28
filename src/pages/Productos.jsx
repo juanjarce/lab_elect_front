@@ -30,17 +30,22 @@ const Productos = () => {
   };
 
   const agregarProducto = async (nuevoProducto) => {
+    console.log("Datos enviados al backend:", nuevoProducto); // Para verificar
     try {
-      await axios.post('http://localhost:8081/api/admin/productos/agregar', nuevoProducto, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      await axios.post(
+        'http://localhost:8081/api/admin/productos/agregar',
+        nuevoProducto,
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
       setShowAgregarModal(false);
       cargarProductos(currentPage); // Recargar la lista
     } catch (error) {
       console.error('Error al agregar producto:', error);
     }
   };
-
+  
   const eliminarProducto = async (idProducto) => {
     try {
       await axios.delete(`http://localhost:8081/api/admin/productos/eliminar/${idProducto}`);
@@ -81,30 +86,40 @@ const Productos = () => {
                 style={{ height: '120px', objectFit: 'cover' }}
               />
               <Card.Body>
-                <Card.Title style={{ fontSize: '16px', fontWeight: 'bold' }}>{producto.nombre}</Card.Title>
-                <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#6c757d' }}>
-                  {producto.descripcion}
-                </Card.Text>
-                <Card.Text style={{ fontSize: '14px', margin: '5px 0' }}>
-                  Cantidad: {producto.cantidad}
-                </Card.Text>
-                <Card.Text style={{ fontSize: '13px', color: 'gray' }}>
-                  Código: {producto.codigoActivosFijos || 'N/A'}
-                </Card.Text>
-                
-                {/* Mostrar el idProducto en la card */}
-                <Card.Text style={{ fontSize: '12px', color: '#007bff' }}>
-                  ID Producto: {producto.id}
-                </Card.Text>
+              <Card.Title style={{ fontSize: '16px', fontWeight: 'bold' }}>{producto.nombre}</Card.Title>
+              <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#6c757d' }}>
+                {producto.descripcion}
+              </Card.Text>
+              <Card.Text style={{ fontSize: '14px', margin: '5px 0' }}>
+               Cantidad: {producto.cantidad}
+              </Card.Text>
+              <Card.Text style={{ fontSize: '13px', color: 'gray' }}>
+                Código: {producto.codigoActivosFijos || 'N/A'}
+              </Card.Text>
 
-                {/* Botones de edición y eliminación */}
-                <Button variant="warning" onClick={() => handleEditar(producto)} className="mr-2">
-                  <i className="fas fa-edit"></i> Editar
-                </Button>
-                <Button variant="danger" onClick={() => eliminarProducto(producto.id)}>
-                  <i className="fas fa-trash"></i> Eliminar
-                </Button>
-              </Card.Body>
+             {/* Mostrar ubicación del laboratorio */}
+              <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#28a745' }}>
+                Ubicación: {producto.ubicacion.replace('_', ' ')} {/* Reemplaza _ por espacio */}
+              </Card.Text>
+
+              {/* Mostrar responsable */}
+              <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#dc3545' }}>
+                Responsable: {producto.responsable}
+              </Card.Text>
+
+             {/* Mostrar el idProducto en la card */}
+              <Card.Text style={{ fontSize: '12px', color: '#007bff' }}>
+               ID Producto: {producto.id}
+              </Card.Text>
+
+             {/* Botones de edición y eliminación */}
+              <Button variant="warning" onClick={() => handleEditar(producto)} className="mr-2">
+               <i className="fas fa-edit"></i> Editar
+              </Button>
+              <Button variant="danger" onClick={() => eliminarProducto(producto.id)}>
+                <i className="fas fa-trash"></i> Eliminar
+              </Button>
+            </Card.Body>
             </Card>
           </Col>
         ))}

@@ -9,8 +9,10 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
     disponibleParaPrestamo: true,
     imagen: null,
     categoria: 'EQUIPOS',
-    codigoActivosFijos: '',
-    linkDataSheet: '',
+    codigoActivosFijos: '', // Opcional
+    linkDataSheet: '', // Opcional
+    ubicacion: 'LABORATORIO_ELECTRÓNICA',
+    responsable: '', // Campo obligatorio
   });
 
   const [error, setError] = useState(''); // Estado para manejar los errores de validación
@@ -23,26 +25,34 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Verifica si el archivo excede los 64 KB (64 * 1024 bytes)
       if (file.size > 64 * 1024) {
         setError("La imagen no debe exceder los 64 KB.");
-        setFormData({ ...formData, imagen: null }); // Limpiar el valor de la imagen
+        setFormData({ ...formData, imagen: null });
       } else {
-        setError(''); // Limpiar el mensaje de error si la imagen es válida
+        setError(""); // Limpiar error si la imagen es válida
         const reader = new FileReader();
         reader.onloadend = () => {
-          setFormData({ ...formData, imagen: reader.result.split(',')[1] });
+          setFormData({ ...formData, imagen: reader.result.split(",")[1] });
         };
         reader.readAsDataURL(file);
       }
     }
-  };
+  };  
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (error) {
       return; // Si hay un error, no se envía el formulario
     }
+
+    // Validar que los campos obligatorios no estén vacíos
+    if (!formData.imagen) {
+      setError('Debe subir una imagen del producto.');
+      return;
+    }
+
+    // Limpiar errores y enviar los datos
+    setError('');
     onSave(formData);
   };
 
@@ -70,6 +80,7 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
               name="descripcion"
               value={formData.descripcion}
               onChange={handleInputChange}
+              required
             />
           </Form.Group>
           <Form.Group>
@@ -89,6 +100,7 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
               name="categoria"
               value={formData.categoria}
               onChange={handleInputChange}
+              required
             >
               <option value="EQUIPOS">EQUIPOS</option>
               <option value="COMPONENTES">COMPONENTES</option>
@@ -98,7 +110,6 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
           <Form.Group>
             <Form.Label>Imagen</Form.Label>
             <Form.Control type="file" onChange={handleImageUpload} />
-            {error && <Alert variant="danger" className="mt-2">{error}</Alert>} {/* Muestra el error si existe */}
           </Form.Group>
           <Form.Group>
             <Form.Label>Código de Activos Fijos</Form.Label>
@@ -118,9 +129,33 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
               onChange={handleInputChange}
             />
           </Form.Group>
-          <Button variant="primary" type="submit" className="mt-3" disabled={!!error}>
+          <Form.Group>
+            <Form.Label>Ubicación del Laboratorio</Form.Label>
+            <Form.Select
+              name="ubicacion"
+              value={formData.ubicacion}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="LABORATORIO_ELECTRÓNICA">Laboratorio Electrónica</option>
+              <option value="LABORATORIO_PROTOTIPADO">Laboratorio Prototipado</option>
+              <option value="LABORATORIO_TELEMÁTICA">Laboratorio Telemática</option>
+              <option value="BODEGA">Bodega</option>
+            </Form.Select>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Responsable</Form.Label>
+            <Form.Control
+              type="text"
+              name="responsable"
+              value={formData.responsable}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
+          <Button variant="primary" type="submit" className="mt-3">
             Guardar
           </Button>
+          {error && <Alert variant="danger" className="mt-2">{error}</Alert>} {/* Muestra el error si existe */}
         </Form>
       </Modal.Body>
     </Modal>
@@ -128,5 +163,7 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
 };
 
 export default AgregarProductoForm;
+
+
 
 

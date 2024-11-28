@@ -9,9 +9,10 @@ const TablaDetalles = ({ detalles, onEliminar }) => {
         <tr>
           <th>ID Detalle</th>
           <th>Fecha Solicitud</th>
-          <th>Imagen</th> {/* Nueva columna para la imagen */}
-          <th>Producto</th> {/* Nueva columna para el nombre del producto */}
+          <th>Imagen</th> {/* Columna de imagen */}
+          <th>Producto</th> {/* Columna del nombre del producto */}
           <th>Cantidad</th>
+          <th>Ubicación</th> {/* Nueva columna para la ubicación */}
           <th>Acción</th>
         </tr>
       </thead>
@@ -29,4 +30,5 @@ const TablaDetalles = ({ detalles, onEliminar }) => {
 };
 
 export default TablaDetalles;
+
 

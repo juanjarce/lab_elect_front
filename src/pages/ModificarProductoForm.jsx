@@ -12,7 +12,9 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
     imagen: null,
     categoria: '',
     codigoActivosFijos: '',
-    linkDataSheet: ''
+    linkDataSheet: '',
+    ubicacion: '', // Nuevo campo
+    responsable: '' // Nuevo campo
   });
 
   const [imageError, setImageError] = useState('');
@@ -28,7 +30,9 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
         imagen: null, // Si no deseas cambiar la imagen, mantenla como null
         categoria: producto.categoria,
         codigoActivosFijos: producto.codigoActivosFijos,
-        linkDataSheet: producto.linkDataSheet || ''
+        linkDataSheet: producto.linkDataSheet || '',
+        ubicacion: producto.ubicacion || '', // Cargar el nuevo campo
+        responsable: producto.responsable || '' // Cargar el nuevo campo
       });
     }
   }, [producto]);
@@ -48,7 +52,9 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
         imagen: formData.imagen || null, // Solo enviamos la imagen si es modificada
         categoria: formData.categoria,
         codigoActivosFijos: formData.codigoActivosFijos,
-        linkDataSheet: formData.linkDataSheet || '' // Enviar como string vacío si no hay valor
+        linkDataSheet: formData.linkDataSheet || '', // Enviar como string vacío si no hay valor
+        ubicacion: formData.ubicacion, // Nuevo campo
+        responsable: formData.responsable // Nuevo campo
       };
 
       await axios.put(`http://localhost:8081/api/admin/productos/actualizar/${formData.id}`, formDataToSend, {
@@ -118,16 +124,6 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
             />
           </Form.Group>
 
-          {/* Campo Disponible para Préstamo */}
-          <Form.Group controlId="disponibleParaPrestamo">
-            <Form.Label>Disponible para Préstamo</Form.Label>
-            <Form.Check
-              type="checkbox"
-              checked={formData.disponibleParaPrestamo}
-              onChange={(e) => setFormData({ ...formData, disponibleParaPrestamo: e.target.checked })}
-            />
-          </Form.Group>
-
           {/* Campo Cantidad */}
           <Form.Group controlId="cantidad">
             <Form.Label>Cantidad</Form.Label>
@@ -186,9 +182,35 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
             />
           </Form.Group>
 
-          <Button variant="primary" type="submit" disabled={imageError}>
+          {/* Campo Ubicación */}
+          <Form.Group controlId="ubicacion">
+            <Form.Label>Ubicación</Form.Label>
+            <Form.Control
+              as="select"
+              value={formData.ubicacion}
+              onChange={(e) => setFormData({ ...formData, ubicacion: e.target.value })}
+            >
+              <option value="LABORATORIO_ELECTRÓNICA">Laboratorio Electrónica</option>
+              <option value="LABORATORIO_PROTOTIPADO">Laboratorio Prototipado</option>
+              <option value="LABORATORIO_TELEMÁTICA">Laboratorio Telemática</option>
+              <option value="BODEGA">Bodega</option>
+            </Form.Control>
+          </Form.Group>
+
+          {/* Campo Responsable */}
+          <Form.Group controlId="responsable">
+            <Form.Label>Responsable</Form.Label>
+            <Form.Control
+              type="text"
+              value={formData.responsable}
+              onChange={(e) => setFormData({ ...formData, responsable: e.target.value })}
+            />
+          </Form.Group>
+
+          <Button variant="primary" type="submit" disabled={imageError} className="mt-3">
             Guardar Cambios
           </Button>
+
         </Form>
       </Modal.Body>
     </Modal>
@@ -196,3 +218,4 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
 };
 
 export default ModificarProductoForm;
+
