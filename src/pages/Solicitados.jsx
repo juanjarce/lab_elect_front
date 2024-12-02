@@ -104,10 +104,11 @@ const Solicitados = () => {
       <div className="row">
         {filteredPrestamos.length > 0 ? (
           filteredPrestamos.map((prestamo, index) => (
-            <PrestamoCard 
-              key={index} 
-              prestamo={prestamo} 
+            <PrestamoCard
+              key={index}
+              prestamo={prestamo}
               onVerDetalles={handleVerDetalles} // Pasamos la función para ver detalles
+              onAprobar={() => fetchPrestamos(currentPage)} // Recargar préstamos tras aprobar
             />
           ))
         ) : (

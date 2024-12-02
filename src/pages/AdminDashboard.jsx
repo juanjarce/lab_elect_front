@@ -1,16 +1,20 @@
 import React from 'react';
-import { Link, Outlet, useParams } from 'react-router-dom';
+import { Link, Outlet, useParams, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AdminDashboard = () => {
   const { id } = useParams(); // Obtén el id del admin
   const navigate = useNavigate();
+  const location = useLocation(); // Obtener la ubicación actual
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     navigate('/');
   };
+
+  // Verificar si la URL es exactamente '/admin-dashboard/{idAdmin}'
+  const isDashboardHome = location.pathname === `/admin-dashboard/${id}`;
 
   return (
     <div className="d-flex">
@@ -60,7 +64,19 @@ const AdminDashboard = () => {
 
       {/* Contenido Principal */}
       <div className="p-4" style={{ width: '100%' }}>
-        <h1>Bienvenido al Sistema de Gestión de Laboratorio de Electrónica</h1>
+
+        <h1>Sistema de Gestión de Laboratorio de Electrónica</h1>
+
+          {/* Mostrar la imagen solo si estamos en '/admin-dashboard/{idAdmin}' */}
+          {isDashboardHome && (
+          <div className="text-center mb-4">
+            <img
+              src="/src/recursos/ingelect.jpg" // Ruta relativa de la imagen
+              alt="Laboratorio Electrónica"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
+          </div>
+        )}
 
         {/* Mostrar las rutas seleccionadas */}
         <Outlet />
@@ -70,3 +86,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
