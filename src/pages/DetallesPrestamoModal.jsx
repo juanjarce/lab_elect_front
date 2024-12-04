@@ -13,7 +13,23 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
       const fetchDetalles = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(`http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`);
+          // Obtener el token del localStorage
+          const token = localStorage.getItem('token'); 
+          console.log(token);
+    
+          // Verificar si el token existe
+          if (!token) {
+            console.error('Token no encontrado');
+            return;
+          }
+
+          const response = await axios.get(`http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+              },
+            }
+          );
           if (response.data.status === 'Exito') {
             setDetalles(response.data.data || []);
           } else {
@@ -33,7 +49,23 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
   const handleEliminarDetalle = async (idDetallePrestamo) => {
     if (window.confirm(`¿Estás seguro de que deseas eliminar el detalle con ID ${idDetallePrestamo}?`)) {
       try {
-        await axios.delete(`http://localhost:8081/api/admin/detalles/eliminar/${idDetallePrestamo}`);
+        // Obtener el token del localStorage
+        const token = localStorage.getItem('token'); 
+        console.log(token);
+    
+        // Verificar si el token existe
+        if (!token) {
+          console.error('Token no encontrado');
+          return;
+        }
+        
+        await axios.delete(`http://localhost:8081/api/admin/detalles/eliminar/${idDetallePrestamo}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            },
+          }
+        );
         setDetalles((prevDetalles) => prevDetalles.filter((detalle) => detalle.id !== idDetallePrestamo));
       } catch (err) {
         alert(`Error al eliminar el detalle: ${err.response?.data?.message || err.message}`);

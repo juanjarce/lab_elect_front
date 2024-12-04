@@ -29,8 +29,23 @@ const Productos = () => {
 
   const cargarProductos = async (page) => {
     try {
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
+      // Verificar si el token existe
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }
+
       const response = await axios.get(
-        `http://localhost:8081/api/admin/productos/paginated?page=${page}&size=${pageSize}`
+        `http://localhost:8081/api/admin/productos/paginated?page=${page}&size=${pageSize}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
       );
       const { content, totalPages } = response.data.data;
       setProductos(content);
@@ -61,7 +76,23 @@ const Productos = () => {
 
   const eliminarProducto = async (idProducto) => {
     try {
-      await axios.delete(`http://localhost:8081/api/admin/productos/eliminar/${idProducto}`);
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
+      // Verificar si el token existe
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }
+      
+      await axios.delete(`http://localhost:8081/api/admin/productos/eliminar/${idProducto}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
+      );
       setProductos(productos.filter((producto) => producto.id !== idProducto));
     } catch (error) {
       console.error('Error al eliminar el producto:', error);

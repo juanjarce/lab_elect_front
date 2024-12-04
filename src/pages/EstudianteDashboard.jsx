@@ -9,7 +9,7 @@ const EstudianteDashboard = () => {
   const location = useLocation(); // Obtener la ubicación actual
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken'); // Limpiar el token o cualquier información de autenticación
+    localStorage.removeItem('token'); // Limpiar el token o cualquier información de autenticación
     navigate('/'); // Redirigir al login
   };
 

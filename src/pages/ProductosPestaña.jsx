@@ -29,8 +29,25 @@ const ProductosPestaña = () => {
 
   // Función para cargar productos
   const cargarProductos = async (page) => {
+
+    // Obtener el token del localStorage
+    const token = localStorage.getItem('token'); // Asegúrate de que el nombre coincide con el nombre usado al guardar el token
+    console.log(token);
+
+    // Verificar si el token existe
+    if (!token) {
+      console.error('Token no encontrado');
+      return;
+    }
+
     try {
-      const response = await axios.get(`http://localhost:8081/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`);
+      const response = await axios.get(`http://localhost:8081/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
+      );
       const { content, totalPages } = response.data.data;
       setProductos(content);
       setTotalPages(totalPages);
@@ -74,8 +91,25 @@ const ProductosPestaña = () => {
     console.log(productoId);
 
     try {
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
+      // Verificar si el token existe
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }  
+
       // Realiza la solicitud POST para agregar el producto al carrito
-      await axios.post(`http://localhost:8081/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`);
+      await axios.post(`http://localhost:8081/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
+      );
 
       // Actualizamos la cantidad disponible del producto en el estado
       setCantidadDisponible((prevCantidad) => ({

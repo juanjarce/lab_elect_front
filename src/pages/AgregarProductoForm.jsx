@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
+import axios from 'axios';
 
 const AgregarProductoForm = ({ show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -39,22 +40,57 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
     }
   };  
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (error) {
       return; // Si hay un error, no se envía el formulario
     }
-
+  
     // Validar que los campos obligatorios no estén vacíos
     if (!formData.imagen) {
       setError('Debe subir una imagen del producto.');
       return;
     }
-
-    // Limpiar errores y enviar los datos
+  
+    // Obtener el token del localStorage
+    const token = localStorage.getItem('token');
+  
+    if (!token) {
+      setError('No se encontró el token de autenticación.');
+      return;
+    }
+  
+    // Limpiar errores y preparar los datos
     setError('');
-    onSave(formData);
-  };
+  
+    // Preparar los datos a enviar, por ejemplo, la imagen está en base64
+    const formDataToSend = {
+      ...formData, // Incluir todos los datos del formulario
+      imagen: formData.imagen, // Asegúrate de que la imagen esté correctamente configurada
+    };
+  
+    // Realizar la solicitud POST con el token en los encabezados
+    try {
+      const response = await axios.post(
+        'http://localhost:8081/api/admin/productos/agregar', // URL de la API
+        formDataToSend, // Enviar los datos del formulario
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`, // Incluir el token en el encabezado
+            'Content-Type': 'application/json', // El tipo de contenido es JSON
+          },
+        }
+      );
+  
+      console.log('Producto agregado:', response.data);
+      // Aquí puedes realizar alguna acción tras un éxito, por ejemplo, cerrar el modal o mostrar un mensaje
+      onSave(response.data);
+    } catch (error) {
+      console.error('Error al agregar el producto:', error);
+      setError('Error al agregar el producto. Intenta nuevamente.');
+    }
+  };  
 
   return (
     <Modal show={show} onHide={onClose}>

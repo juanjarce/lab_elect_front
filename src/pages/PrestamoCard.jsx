@@ -20,8 +20,26 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
 
   const handleAprobar = async () => {
     try {
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
+      // Verificar si el token existe
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }
+
+      console.log(token);
+      
       const response = await axios.put(
-        `http://localhost:8081/api/admin/prestamos/aprobar/${prestamo.id}`
+        `http://localhost:8081/api/admin/prestamos/aprobar/${prestamo.id}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
       );
       if (response.data.status === 'Exito') {
         alert('Préstamo aprobado exitosamente.');

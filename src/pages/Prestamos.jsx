@@ -17,10 +17,20 @@ const Prestamos = () => {
   const [showModal, setShowModal] = useState(false); // Estado del modal
 
   useEffect(() => {
+    // Obtener el token del localStorage
+    const token = localStorage.getItem('token'); 
+    console.log(token);
+
+    // Verificar si el token existe
+    if (!token) {
+      console.error('Token no encontrado');
+      return;
+    }
+
     const fetchPrestamos = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8081/api/estudiantes/${id}/prestamos?page=${currentPage}&size=5`);
+        const response = await axios.get(`http://localhost:8081/api/estudiantes/${id}/prestamos?page=${currentPage}&size=5&token=${token}`);
         setPrestamos(response.data.content || []); // Ajustar según la estructura de la respuesta
         setTotalPages(response.data.totalPages); // Total de páginas
       } catch (error) {

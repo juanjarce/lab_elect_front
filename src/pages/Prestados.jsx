@@ -20,7 +20,23 @@ const Prestados = () => {
   const fetchPrestamos = async (page = 0) => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=5`);
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
+      // Verificar si el token existe
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }
+      
+      const response = await axios.get(`http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=5`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
+      );
       if (response.data.status === 'Exito') {
         const prestamosWithNames = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
@@ -54,7 +70,24 @@ const Prestados = () => {
   // Manejar la entrega del préstamo
   const handleEntregaPrestamo = async (idPrestamo) => {
     try {
-      const response = await axios.put(`http://localhost:8081/api/admin/prestamos/devolver/${idPrestamo}`);
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
+      // Verificar si el token existe
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }
+      
+      const response = await axios.put(`http://localhost:8081/api/admin/prestamos/devolver/${idPrestamo}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
+      );
       alert(response.data.message || 'Préstamo entregado con éxito.');
       fetchPrestamos(currentPage); // Recargar la lista tras entregar
     } catch (err) {

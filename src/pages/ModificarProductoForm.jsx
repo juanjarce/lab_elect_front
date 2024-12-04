@@ -57,8 +57,20 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
         responsable: formData.responsable // Nuevo campo
       };
 
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
+      // Verificar si el token existe
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }
+
       await axios.put(`http://localhost:8081/api/admin/productos/actualizar/${formData.id}`, formDataToSend, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+         },
       });
       onSave(formDataToSend); // Pasar los datos guardados al componente padre
     } catch (error) {

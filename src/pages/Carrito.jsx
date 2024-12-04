@@ -13,9 +13,25 @@ const Carrito = () => {
 
   // Obtener los detalles de préstamo del estudiante
   useEffect(() => {
+    // Obtener el token del localStorage
+    const token = localStorage.getItem('token'); 
+    console.log(token);
+
+    // Verificar si el token existe
+    if (!token) {
+      console.error('Token no encontrado');
+      return;
+    }
+
     setLoading(true); // Reiniciar el estado de carga cada vez que se haga una nueva solicitud
     axios
-      .get(`http://localhost:8081/api/estudiantes/detalles/${id}`)
+      .get(`http://localhost:8081/api/estudiantes/detalles/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
+      )
       .then((response) => {
         // Verifica que la respuesta tenga datos antes de actualizarlos
         const detallesData = response.data.data || []; // Asegúrate de que sea un arreglo vacío si no hay datos
@@ -30,8 +46,24 @@ const Carrito = () => {
 
   // Eliminar detalle de préstamo
   const handleEliminar = (idDetalle) => {
+    // Obtener el token del localStorage
+    const token = localStorage.getItem('token'); 
+    console.log(token);
+
+    // Verificar si el token existe
+    if (!token) {
+      console.error('Token no encontrado');
+      return;
+    }
+
     axios
-      .delete(`http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`)
+      .delete(`http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
+      )
       .then(() => {
         setDetalles((prevDetalles) =>
           prevDetalles.filter((detalle) => detalle.id !== idDetalle)

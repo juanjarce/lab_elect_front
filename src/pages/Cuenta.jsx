@@ -20,8 +20,24 @@ const Cuenta = () => {
   });
 
   useEffect(() => {
+    // Obtener el token del localStorage
+    const token = localStorage.getItem('token'); 
+    console.log(token);
+
+    // Verificar si el token existe
+    if (!token) {
+      console.error('Token no encontrado');
+      return;
+    }
+
     // Obtener la información de la cuenta del estudiante
-    axios.get(`http://localhost:8081/api/estudiantes/informacion-cuenta/${id}`)
+    axios.get(`http://localhost:8081/api/estudiantes/informacion-cuenta/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+        },
+      }
+    )
       .then(response => {
         setCuenta(response.data.data);
         setFormData(response.data.data); // Prellenar el formulario con los datos obtenidos
@@ -41,8 +57,24 @@ const Cuenta = () => {
     setError(''); // Limpiar cualquier mensaje de error previo
     setSuccessMessage(''); // Limpiar cualquier mensaje de éxito previo
 
+    // Obtener el token del localStorage
+    const token = localStorage.getItem('token'); 
+    console.log(token);
+
+    // Verificar si el token existe
+    if (!token) {
+      console.error('Token no encontrado');
+      return;
+    }
+
     try {
-      const response = await axios.put(`http://localhost:8081/api/estudiantes/actualizar/${id}`, formData);
+      const response = await axios.put(`http://localhost:8081/api/estudiantes/actualizar/${id}`, 
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        });
       setSuccessMessage(response.data.message); // Mostrar el mensaje de éxito
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Error al actualizar la información');
@@ -55,10 +87,25 @@ const Cuenta = () => {
     setSuccessMessage(''); // Limpiar cualquier mensaje de éxito previo
 
     try {
-      const response = await axios.delete(`http://localhost:8081/api/estudiantes/eliminar/${id}`);
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
+      // Verificar si el token existe
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }
+      const response = await axios.delete(`http://localhost:8081/api/estudiantes/eliminar/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          },
+        }
+      );
       setSuccessMessage(response.data.message); // Mostrar el mensaje de éxito
 
-      localStorage.removeItem('authToken'); // Limpiar el token o cualquier información de autenticación
+      localStorage.removeItem('token'); // Limpiar el token o cualquier información de autenticación
       navigate('/'); // Redirige al Login
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Error al eliminar la cuenta');

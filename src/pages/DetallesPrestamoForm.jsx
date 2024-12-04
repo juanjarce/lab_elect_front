@@ -12,7 +12,23 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
       const fetchDetalles = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(`http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`);
+          // Obtener el token del localStorage
+          const token = localStorage.getItem('token'); 
+          console.log(token);
+
+          // Verificar si el token existe
+          if (!token) {
+            console.error('Token no encontrado');
+            return;
+          }    
+
+          const response = await axios.get(`http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+              },
+            }
+          );
           if (response.data.status === 'Exito') {
             setDetalles(response.data.data || []);
           } else {

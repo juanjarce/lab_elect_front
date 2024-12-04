@@ -45,13 +45,20 @@ const Login = () => {
       }
 
       const data = await response.json();
+      const token = data.data; // El token JWT
+
+      // Guardar el token en localStorage
+      localStorage.setItem('token', token);
+
       console.log('Login exitoso:', data);
 
-      let id;
-
       // Obtener el ID dependiendo si es admin o estudiante
+      let id;
       if (isAdmin) {
-        const idResponse = await fetch(`http://localhost:8081/api/admin/id?username=${formData.username}`);
+        const idResponse = await fetch(
+          `http://localhost:8081/api/admin/id?username=${formData.username}`,
+          { headers: { Authorization: `Bearer ${token}` } } // Incluir token
+        );
         if (!idResponse.ok) {
           throw new Error('Error al obtener el ID del administrador');
         }
@@ -59,7 +66,10 @@ const Login = () => {
         id = adminData.id;
         navigate(`/admin-dashboard/${id}`); // Redirigir al dashboard de admin con el ID
       } else {
-        const idResponse = await fetch(`http://localhost:8081/api/estudiantes/id-by-email?email=${formData.username}`);
+        const idResponse = await fetch(
+          `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.username}`,
+          { headers: { Authorization: `Bearer ${token}` } } // Incluir token
+        );
         if (!idResponse.ok) {
           throw new Error('Error al obtener el ID del estudiante');
         }
@@ -145,9 +155,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
-
-
-
-

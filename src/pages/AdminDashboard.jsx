@@ -9,7 +9,7 @@ const AdminDashboard = () => {
   const location = useLocation(); // Obtener la ubicación actual
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
     navigate('/');
   };
 
