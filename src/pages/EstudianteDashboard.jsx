@@ -2,15 +2,32 @@ import React from 'react';
 import { Link, Outlet, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { FaSignOutAlt } from 'react-icons/fa'; // Ícono de cierre de sesión
+import axios from 'axios'; // Importamos axios
 
 const EstudianteDashboard = () => {
   const { id } = useParams(); // Captura el id de la URL
   const navigate = useNavigate();
   const location = useLocation(); // Obtener la ubicación actual
 
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Limpiar el token o cualquier información de autenticación
-    navigate('/'); // Redirigir al login
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Obtener el token de localStorage
+      if (token) {
+        // Realizar la solicitud para cerrar sesión
+        const response = await axios.put(
+          `http://localhost:8081/api/estudiantes/logout/${id}`, 
+          null, // Si es necesario, puedes enviar un objeto vacío o cualquier dato adicional
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log('Logout exitoso:', response.data);
+      }
+
+      // Limpiar el token y redirigir al login
+      localStorage.removeItem('token');
+      navigate('/'); // Redirigir al login
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   // Verificar si la URL es exactamente '/estudiante-dashboard/{idEstudiante}'

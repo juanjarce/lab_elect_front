@@ -17,7 +17,7 @@ const Productos = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUbicacion, setSelectedUbicacion] = useState('');
 
-  const pageSize = 10;
+  const pageSize = 8;
 
   useEffect(() => {
     cargarProductos(currentPage);

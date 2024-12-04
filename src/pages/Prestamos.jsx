@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 import { Modal, Button } from 'react-bootstrap'; // Importamos los componentes de Bootstrap
-import DetallesPrestamoForm from './DetallesPrestamoForm'; // Importamos el componente DetallesPrestamoForm
+import DetallesPrestamoFormSinEntrega from './DetallesPrestamoFormSinEntrega'; // Importamos el componente DetallesPrestamoFormSinEntrega
 
 const Prestamos = () => {
   const { id } = useParams();
@@ -146,7 +146,7 @@ const Prestamos = () => {
           </div>
 
           {/* Modal con los detalles del préstamo */}
-          <DetallesPrestamoForm
+          <DetallesPrestamoFormSinEntrega
             show={showModal}
             onClose={handleCloseModal}
             prestamoId={selectedPrestamo?.id} // Pasamos el id del préstamo

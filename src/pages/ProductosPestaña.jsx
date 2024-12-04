@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Row, Col, Form, Container, Pagination, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Row, Col, Form, Container, Pagination, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
 import { Filter } from 'react-bootstrap-icons'; // Importamos el ícono de filtro
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
@@ -16,8 +16,10 @@ const ProductosPestaña = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [cantidadDisponible, setCantidadDisponible] = useState({}); // Para almacenar la cantidad disponible de cada producto
+  const [error, setError] = useState(null); // Estado para el mensaje de error
+  const [successMessage, setSuccessMessage] = useState(null); // Estado para el mensaje de éxito
 
-  const pageSize = 10;
+  const pageSize = 8;
 
   useEffect(() => {
     cargarProductos(currentPage);
@@ -25,34 +27,24 @@ const ProductosPestaña = () => {
 
   useEffect(() => {
     filtrarProductos();
-  }, [searchTerm, productos, ubicacion]); // Agregar ubicacion al array de dependencias
+  }, [searchTerm, productos, ubicacion]);
 
-  // Función para cargar productos
   const cargarProductos = async (page) => {
-
-    // Obtener el token del localStorage
-    const token = localStorage.getItem('token'); // Asegúrate de que el nombre coincide con el nombre usado al guardar el token
-    console.log(token);
-
-    // Verificar si el token existe
+    const token = localStorage.getItem('token');
     if (!token) {
-      console.error('Token no encontrado');
+      setError('Token no encontrado.');
       return;
     }
 
     try {
-      const response = await axios.get(`http://localhost:8081/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
-          },
-        }
-      );
+      const response = await axios.get(`http://localhost:8081/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       const { content, totalPages } = response.data.data;
       setProductos(content);
       setTotalPages(totalPages);
 
-      // Cargar la cantidad disponible para cada producto
       const cantidadDisponibles = {};
       for (const producto of content) {
         const cantidadResponse = await obtenerCantidadDisponible(producto.id);
@@ -60,82 +52,79 @@ const ProductosPestaña = () => {
       }
       setCantidadDisponible(cantidadDisponibles);
     } catch (error) {
-      console.error('Error al cargar productos:', error);
+      setError('Error al cargar los productos.');
     }
   };
 
-  // Función para obtener la cantidad disponible de un producto
   const obtenerCantidadDisponible = async (productoId) => {
     try {
       const response = await axios.get(`http://localhost:8081/api/estudiantes/productos/${productoId}/cantidad-disponible`);
       return response.data.data.cantDisponible;
     } catch (error) {
-      console.error('Error al obtener la cantidad disponible:', error);
-      return 0; // Si hay un error, devolvemos 0 como cantidad disponible
+      return 0;
     }
   };
 
-  // Función para filtrar los productos según el término de búsqueda y la ubicación
   const filtrarProductos = () => {
     const term = searchTerm.toLowerCase();
     const filtered = productos.filter((producto) => {
       const matchesSearch = producto.nombre.toLowerCase().includes(term) || producto.categoria.toLowerCase().includes(term);
-      const matchesUbicacion = ubicacion ? producto.ubicacion === ubicacion : true; // Filtra por ubicación si está seleccionada
+      const matchesUbicacion = ubicacion ? producto.ubicacion === ubicacion : true;
       return matchesSearch && matchesUbicacion;
     });
     setFilteredProductos(filtered);
   };
 
   const handleAgregarCarrito = async (productoId, cantidad) => {
-    console.log(id);  // Asegúrate de que el id del estudiante se obtiene correctamente
-    console.log(productoId);
-
-    try {
-      // Obtener el token del localStorage
-      const token = localStorage.getItem('token'); 
-      console.log(token);
+    setError(null);
+    setSuccessMessage(null);
   
-      // Verificar si el token existe
-      if (!token) {
-        console.error('Token no encontrado');
-        return;
-      }  
-
-      // Realiza la solicitud POST para agregar el producto al carrito
-      await axios.post(`http://localhost:8081/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`,
-        null,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
-          },
-        }
-      );
-
-      // Actualizamos la cantidad disponible del producto en el estado
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Token no encontrado.');
+      return;
+    }
+  
+    try {
+      // Realizar la solicitud para agregar el producto al carrito
+      await axios.post(`http://localhost:8081/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      // Actualizar la cantidad disponible del producto
       setCantidadDisponible((prevCantidad) => ({
         ...prevCantidad,
-        [productoId]: prevCantidad[productoId] - cantidad, // Reducimos la cantidad disponible
+        [productoId]: (prevCantidad[productoId] || 0) - cantidad, // Reducir la cantidad disponible
       }));
-
-      // También actualizamos el estado de productos si es necesario
+  
+      // Restablecer la cantidad de todos los productos a 0 después de agregar el producto
       setProductos((prevProductos) =>
         prevProductos.map((producto) =>
           producto.id === productoId
-            ? { ...producto, cantidad: prevCantidad[productoId] - cantidad }
+            ? { ...producto, cantidad: 0 } // Poner la cantidad de este producto en 0
             : producto
         )
       );
-
-      alert('Producto agregado al carrito');
-      window.location.reload(); // Recarga la página actual
+  
+      setSuccessMessage('Producto agregado al carrito con éxito.');
     } catch (error) {
-      console.error('Error al agregar al carrito:', error);
+      setError(error.response?.data?.message || 'Error al agregar el producto al carrito.');
     }
-  };
+  };  
 
   return (
     <Container fluid>
-      {/* Barra de búsqueda */}
+      {error && (
+        <Alert variant="danger" onClose={() => setError(null)} dismissible>
+          {error}
+        </Alert>
+      )}
+      {successMessage && (
+        <Alert variant="success" onClose={() => setSuccessMessage(null)} dismissible>
+          {successMessage}
+        </Alert>
+      )}
+
       <div className="d-flex align-items-center mb-3">
         <Form.Control
           type="text"
@@ -144,8 +133,6 @@ const ProductosPestaña = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="me-2"
         />
-        
-        {/* Ícono de filtro */}
         <OverlayTrigger
           trigger="click"
           placement="bottom"
@@ -171,47 +158,33 @@ const ProductosPestaña = () => {
         </OverlayTrigger>
       </div>
 
-      {/* Lista de productos */}
       <Row>
         {filteredProductos.map((producto) => (
           <Col key={producto.id} md={3} sm={6} xs={12} className="mb-4">
             <ProductoCard
               producto={producto}
               onAgregarCarrito={handleAgregarCarrito}
-              cantidadDisponible={cantidadDisponible[producto.id]} // Pasa la cantidad disponible al card
+              cantidadDisponible={cantidadDisponible[producto.id]}
               onClick={() => setSelectedProducto(producto)}
             />
           </Col>
         ))}
       </Row>
 
-      {/* Paginación */}
       <Pagination className="justify-content-center mt-3">
         {[...Array(totalPages).keys()].map((page) => (
-          <Pagination.Item
-            key={page}
-            active={page === currentPage}
-            onClick={() => setCurrentPage(page)}
-          >
+          <Pagination.Item key={page} active={page === currentPage} onClick={() => setCurrentPage(page)}>
             {page + 1}
           </Pagination.Item>
         ))}
       </Pagination>
 
-      {/* Modal de detalles */}
       {selectedProducto && (
-        <ProductoDetalleModal
-          producto={selectedProducto}
-          onClose={() => setSelectedProducto(null)}
-        />
+        <ProductoDetalleModal producto={selectedProducto} onClose={() => setSelectedProducto(null)} />
       )}
     </Container>
   );
 };
 
 export default ProductosPestaña;
-
-
-
-
 

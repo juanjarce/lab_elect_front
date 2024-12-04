@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Outlet, useParams, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AdminDashboard = () => {
@@ -8,9 +9,25 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation(); // Obtener la ubicación actual
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Obtener el token de localStorage
+      if (token) {
+        // Realizar la solicitud para cerrar sesión
+        const response = await axios.put(
+          `http://localhost:8081/api/admin/logout/${id}`, 
+          null, // Si es necesario, puedes enviar un objeto vacío o cualquier dato adicional
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log('Logout exitoso:', response.data);
+      }
+
+      // Limpiar el token y redirigir al login
+      localStorage.removeItem('token');
+      navigate('/');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   // Verificar si la URL es exactamente '/admin-dashboard/{idAdmin}'
@@ -67,8 +84,8 @@ const AdminDashboard = () => {
 
         <h1>Sistema de Gestión de Laboratorio de Electrónica</h1>
 
-          {/* Mostrar la imagen solo si estamos en '/admin-dashboard/{idAdmin}' */}
-          {isDashboardHome && (
+        {/* Mostrar la imagen solo si estamos en '/admin-dashboard/{idAdmin}' */}
+        {isDashboardHome && (
           <div className="text-center mb-4">
             <img
               src="/src/recursos/ingelect.jpg" // Ruta relativa de la imagen
@@ -86,4 +103,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

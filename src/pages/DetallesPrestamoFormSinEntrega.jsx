@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Alert, Spinner } from 'react-bootstrap';
-import { FaCheckCircle } from 'react-icons/fa';  // Importamos el ícono de "check-circle"
 
-const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
+const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
   const [detalles, setDetalles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showConfirm, setShowConfirm] = useState(false); // Panel de confirmación
-  const [detalleAConfirmar, setDetalleAConfirmar] = useState(null); // Detalle que será confirmado
-  const [isSubmitting, setIsSubmitting] = useState(false); // Indicador de envío de solicitud
 
   useEffect(() => {
     if (prestamoId) {
@@ -45,38 +41,6 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
     }
   }, [prestamoId]);
 
-  const handleConfirmarEntrega = async () => {
-    setIsSubmitting(true);
-    try {
-      const response = await axios.put(
-        `http://localhost:8081/api/admin/detalle/devolver/${detalleAConfirmar.id}`,
-        null,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
-
-      if (response.data.status === 'Exito') {
-        setDetalles((prevDetalles) =>
-          prevDetalles.map((detalle) =>
-            detalle.id === detalleAConfirmar.id
-              ? { ...detalle, estado: 'DEVUELTO' }
-              : detalle
-          )
-        );
-        setShowConfirm(false);
-      } else {
-        setError('Error al marcar como entregado.');
-      }
-    } catch (err) {
-      setError(`Error al entregar el detalle: ${err.message}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   if (loading) {
     return <div><Spinner animation="border" role="status" /></div>;
   }
@@ -91,23 +55,6 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
         <Modal.Title>Detalles del Préstamo</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* Panel de confirmación */}
-        {showConfirm && (
-          <Alert variant="warning">
-            <p>¿Estás seguro de que deseas marcar este detalle como entregado?</p>
-            <Button variant="danger" onClick={() => setShowConfirm(false)}>
-              Cancelar
-            </Button>
-            <Button
-              variant="success"
-              onClick={handleConfirmarEntrega}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Enviando...' : 'Confirmar Entrega'}
-            </Button>
-          </Alert>
-        )}
-        
         {/* Tabla de detalles */}
         <div className="table-responsive">
           <table className="table table-bordered">
@@ -119,7 +66,6 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
                 <th>Categoría</th>
                 <th>Link DataSheet</th>
                 <th>Estado</th>
-                <th>Acción</th> {/* Columna para el botón de entrega */}
               </tr>
             </thead>
             <tbody>
@@ -149,20 +95,6 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
                     )}
                   </td>
                   <td>{detalle.estado}</td>
-                  <td>
-                    {detalle.estado !== 'DEVUELTO' && (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => {
-                          setDetalleAConfirmar(detalle);
-                          setShowConfirm(true);
-                        }}
-                      >
-                        <FaCheckCircle /> {/* Ícono de "check-circle" */}
-                      </Button>
-                    )}
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -176,4 +108,4 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
   );
 };
 
-export default DetallesPrestamoForm;
+export default DetallesPrestamoFormSinEntrega;

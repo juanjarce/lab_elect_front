@@ -91,7 +91,7 @@ const Prestados = () => {
       alert(response.data.message || 'Préstamo entregado con éxito.');
       fetchPrestamos(currentPage); // Recargar la lista tras entregar
     } catch (err) {
-      alert(`Error al entregar el préstamo: ${err.response?.data?.message || err.message}`);
+      alert(`${err.response?.data?.message}`);
     }
   };
 
