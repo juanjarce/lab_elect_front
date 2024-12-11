@@ -33,7 +33,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
       }
 
       const response = await axios.put(
-        `http://localhost:8081/api/admin/prestamos/aprobar/${prestamo.id}`,
+        `http://localhost:8081/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}`,
         null,
         {
           headers: {
