@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, Outlet, useParams, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { CSSTransition } from 'react-transition-group'; // Importamos para transiciones
+import './css/AdminDashboard.css'; // Estilos para las transiciones
 
 const AdminDashboard = () => {
   const { id } = useParams(); // Obtén el id del admin
   const navigate = useNavigate();
   const location = useLocation(); // Obtener la ubicación actual
+  const [loading, setLoading] = useState(false); // Para gestionar la carga de los botones
 
   const handleLogout = async () => {
+    setLoading(true); // Activar el efecto de carga en el botón
     try {
       const token = localStorage.getItem('token'); // Obtener el token de localStorage
       if (token) {
@@ -27,6 +31,8 @@ const AdminDashboard = () => {
       navigate('/');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
+    } finally {
+      setLoading(false); // Desactivar el efecto de carga
     }
   };
 
@@ -72,8 +78,13 @@ const AdminDashboard = () => {
 
           {/* Cerrar Sesión */}
           <li className="nav-item mt-4">
-            <button className="btn btn-danger w-100" onClick={handleLogout}>
-              <i className="fas fa-sign-out-alt"></i> Cerrar sesión
+            <button
+              className={`btn btn-danger w-100 ${loading ? 'disabled' : ''}`} 
+              onClick={handleLogout}
+              disabled={loading} // Deshabilitar el botón mientras se está procesando
+            >
+              <i className="fas fa-sign-out-alt"></i> 
+              {loading ? 'Cerrando sesión...' : 'Cerrar sesión'}
             </button>
           </li>
         </ul>
@@ -84,8 +95,13 @@ const AdminDashboard = () => {
 
         <h1>Sistema de Gestión de Laboratorio de Electrónica</h1>
 
-        {/* Mostrar la imagen solo si estamos en '/admin-dashboard/{idAdmin}' */}
-        {isDashboardHome && (
+        {/* Transición de la imagen */}
+        <CSSTransition
+          in={isDashboardHome}
+          timeout={500}
+          classNames="fade"
+          unmountOnExit
+        >
           <div className="text-center mb-4">
             <img
               src="/src/recursos/ingelect.jpg" // Ruta relativa de la imagen
@@ -93,7 +109,7 @@ const AdminDashboard = () => {
               style={{ maxWidth: '100%', height: 'auto' }}
             />
           </div>
-        )}
+        </CSSTransition>
 
         {/* Mostrar las rutas seleccionadas */}
         <Outlet />

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const Login = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [error, setError] = useState(null); // Para manejar mensajes de error
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Estado para el botón de carga
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -22,7 +24,8 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Reiniciar el estado del error al intentar loguear
+    setError(null);
+    setIsLoading(true); // Mostrar animación de carga
 
     const url = isAdmin
       ? 'http://localhost:8081/api/autenticacion/login-admin'
@@ -45,46 +48,54 @@ const Login = () => {
       }
 
       const data = await response.json();
-      const token = data.data; // El token JWT
-
-      // Guardar el token en localStorage
+      const token = data.data;
       localStorage.setItem('token', token);
-
-      console.log('Login exitoso:', data);
 
       // Obtener el ID dependiendo si es admin o estudiante
       let id;
       if (isAdmin) {
         const idResponse = await fetch(
           `http://localhost:8081/api/admin/id?username=${formData.username}`,
-          { headers: { Authorization: `Bearer ${token}` } } // Incluir token
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         if (!idResponse.ok) {
           throw new Error('Error al obtener el ID del administrador');
         }
         const { data: adminData } = await idResponse.json();
         id = adminData.id;
-        navigate(`/admin-dashboard/${id}`); // Redirigir al dashboard de admin con el ID
+
+        // Redirigir con transición
+        navigate(`/admin-dashboard/${id}`);
       } else {
         const idResponse = await fetch(
           `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.username}`,
-          { headers: { Authorization: `Bearer ${token}` } } // Incluir token
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         if (!idResponse.ok) {
           throw new Error('Error al obtener el ID del estudiante');
         }
         const { data: studentData } = await idResponse.json();
         id = studentData.id;
-        navigate(`/estudiante-dashboard/${id}`); // Redirigir al dashboard de estudiante con el ID
+
+        // Redirigir con transición
+        navigate(`/estudiante-dashboard/${id}`);
       }
     } catch (err) {
       console.error('Error en el login:', err.message);
-      setError(err.message); // Mostrar el mensaje de error en pantalla
+      setError(err.message);
+    } finally {
+      setIsLoading(false); // Ocultar animación de carga
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <motion.div
+      className="d-flex justify-content-center align-items-center vh-100"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 1.1 }}
+      transition={{ duration: 0.6 }}
+    >
       <div className="card p-4 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
         <h3 className="text-center mb-4">Iniciar sesión</h3>
         {error && <div className="alert alert-danger text-center">{error}</div>}
@@ -142,7 +153,17 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">Iniciar sesión</button>
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={isLoading} // Deshabilitar botón mientras carga
+          >
+            {isLoading ? (
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            ) : (
+              'Iniciar sesión'
+            )}
+          </button>
         </form>
 
         <div className="mt-3 text-center">
@@ -150,7 +171,7 @@ const Login = () => {
           <a href="/recuperar-contraseña" className="d-block">¿Olvidaste tu contraseña?</a>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaLock, FaLockOpen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,8 @@ const ChangePassword = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [isVerificationSent, setIsVerificationSent] = useState(false); // Controlar si se envió el código
+  const [isLoadingCode, setIsLoadingCode] = useState(false); // Estado de carga del botón de código
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false); // Estado de carga del botón de cambio de contraseña
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -25,8 +28,11 @@ const ChangePassword = () => {
 
   // Función para enviar el código de verificación
   const sendVerificationCode = async () => {
+    setIsLoadingCode(true); // Activar estado de carga del botón de código
     try {
-      const idResponse = await fetch(`http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`);
+      const idResponse = await fetch(
+        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`
+      );
       if (!idResponse.ok) {
         throw new Error('Error al obtener el ID del estudiante');
       }
@@ -34,14 +40,16 @@ const ChangePassword = () => {
       const estudianteId = data.id;
 
       // Enviar el código de verificación usando POST
-        const response = await fetch(`http://localhost:8081/api/autenticacion/enviar-verificacion/${estudianteId}`, {
-        method: 'POST', // Asegúrate de que sea POST
-       });
-
+      await fetch(
+        `http://localhost:8081/api/autenticacion/enviar-verificacion/${estudianteId}`,
+        { method: 'POST' }
+      );
 
       setIsVerificationSent(true); // Indicar que el código se envió con éxito
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoadingCode(false); // Desactivar estado de carga del botón de código
     }
   };
 
@@ -55,9 +63,12 @@ const ChangePassword = () => {
       return;
     }
 
+    setIsLoadingSubmit(true); // Activar estado de carga del botón de cambio de contraseña
     try {
       // Obtener el ID del estudiante
-      const idResponse = await fetch(`http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`);
+      const idResponse = await fetch(
+        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`
+      );
       if (!idResponse.ok) {
         throw new Error('Error al obtener el ID del estudiante');
       }
@@ -65,17 +76,20 @@ const ChangePassword = () => {
       const estudianteId = data.id;
 
       // Realizar la solicitud para cambiar la contraseña
-      const response = await fetch(`http://localhost:8081/api/autenticacion/cambiar-contraseña/${estudianteId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contraseñaActual: formData.currentPassword,
-          nuevaContraseña: formData.newPassword,
-          codigoVerificación: formData.verificationCode, // Incluir el código de verificación
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:8081/api/autenticacion/cambiar-contraseña/${estudianteId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contraseñaActual: formData.currentPassword,
+            nuevaContraseña: formData.newPassword,
+            codigoVerificación: formData.verificationCode, // Incluir el código de verificación
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -86,15 +100,32 @@ const ChangePassword = () => {
       setTimeout(() => navigate('/'), 3000); // Redirigir después de 3 segundos
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoadingSubmit(false); // Desactivar estado de carga del botón de cambio de contraseña
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4 shadow-lg" style={{ width: '100%', maxWidth: '500px', overflowY: 'auto' }}>
+    <motion.div
+      className="d-flex justify-content-center align-items-center vh-100"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="card p-4 shadow-lg"
+        style={{ width: '100%', maxWidth: '500px', overflowY: 'auto' }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <h3 className="text-center mb-4">Cambio de Contraseña</h3>
         {error && <div className="alert alert-danger text-center">{error}</div>}
-        {successMessage && <div className="alert alert-success text-center">{successMessage}</div>}
+        {successMessage && (
+          <div className="alert alert-success text-center">
+            {successMessage}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
@@ -114,14 +145,22 @@ const ChangePassword = () => {
                 type="button"
                 className="btn btn-outline-primary ms-2"
                 onClick={sendVerificationCode}
-                disabled={isVerificationSent} // Deshabilitar el botón si ya se envió el código
+                disabled={isVerificationSent || isLoadingCode}
               >
-                {isVerificationSent ? 'Código enviado' : 'Enviar código'}
+                {isLoadingCode ? (
+                  <div
+                    className="spinner-border spinner-border-sm text-primary"
+                    role="status"
+                  />
+                ) : isVerificationSent ? (
+                  'Código enviado'
+                ) : (
+                  'Enviar código'
+                )}
               </button>
             </div>
           </div>
 
-          {/* Mostrar el campo para el código de verificación solo después de que se haya enviado el código */}
           {isVerificationSent && (
             <div className="mb-3">
               <label htmlFor="verificationCode" className="form-label">
@@ -184,16 +223,24 @@ const ChangePassword = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Cambiar contraseña
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={isLoadingSubmit}
+          >
+            {isLoadingSubmit ? (
+              <div
+                className="spinner-border spinner-border-sm text-light"
+                role="status"
+              />
+            ) : (
+              'Cambiar contraseña'
+            )}
           </button>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
 export default ChangePassword;
-
-
-

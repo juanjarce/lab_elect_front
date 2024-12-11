@@ -4,6 +4,7 @@ import { Form, Row, Col, Button } from 'react-bootstrap';
 import PrestamoCard from './PrestamoCard'; // Importar el componente PrestamoCard
 import DetallesPrestamoModal from './DetallesPrestamoModal'; // Importar el modal de detalles
 import { debounce } from 'lodash'; // Usar lodash para debounce
+import { TransitionGroup, CSSTransition } from 'react-transition-group'; // Importar TransitionGroup y CSSTransition
 
 const Solicitados = () => {
   const [prestamos, setPrestamos] = useState([]);
@@ -19,30 +20,22 @@ const Solicitados = () => {
   const fetchPrestamos = async (page = 0) => {
     setLoading(true);
     try {
-      // Obtener el token del localStorage
       const token = localStorage.getItem('token'); 
       console.log(token);
   
-      // Verificar si el token existe
       if (!token) {
         console.error('Token no encontrado');
         return;
       }
       
-      const response = await axios.get(`http://localhost:8081/api/admin/prestamos/solicitados?page=${page}&size=5`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
-          },
-        }
-      );
+      const response = await axios.get(`http://localhost:8081/api/admin/prestamos/solicitados?page=${page}&size=5`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.data.status === 'Exito') {
         const prestamosWithNames = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
             try {
-              const estudianteResponse = await axios.get(
-                `http://localhost:8081/api/admin/estudiante/nombre?id=${prestamo.idEstudiante}`
-              );
+              const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/nombre?id=${prestamo.idEstudiante}`);
               return { ...prestamo, nombreEstudiante: estudianteResponse.data.data.nombre };
             } catch {
               return { ...prestamo, nombreEstudiante: 'Nombre no disponible' };
@@ -66,7 +59,6 @@ const Solicitados = () => {
     fetchPrestamos(currentPage);
   }, [currentPage]);
 
-  // Función para manejar la vista de detalles
   const handleVerDetalles = (prestamoId) => {
     setSelectedPrestamoId(prestamoId);
     setShowModal(true); // Mostrar el modal
@@ -118,18 +110,21 @@ const Solicitados = () => {
       </Form>
 
       <div className="row">
-        {filteredPrestamos.length > 0 ? (
-          filteredPrestamos.map((prestamo, index) => (
-            <PrestamoCard
-              key={index}
-              prestamo={prestamo}
-              onVerDetalles={handleVerDetalles} // Pasamos la función para ver detalles
-              onAprobar={() => fetchPrestamos(currentPage)} // Recargar préstamos tras aprobar
-            />
-          ))
-        ) : (
-          <p>No hay préstamos que coincidan con la búsqueda.</p>
-        )}
+        <TransitionGroup className="row">
+          {filteredPrestamos.length > 0 ? (
+            filteredPrestamos.map((prestamo, index) => (
+              <CSSTransition key={prestamo.id} timeout={500} classNames="card-transition">
+                <PrestamoCard
+                  prestamo={prestamo}
+                  onVerDetalles={handleVerDetalles} // Pasamos la función para ver detalles
+                  onAprobar={() => fetchPrestamos(currentPage)} // Recargar préstamos tras aprobar
+                />
+              </CSSTransition>
+            ))
+          ) : (
+            <p></p>
+          )}
+        </TransitionGroup>
       </div>
 
       {/* Paginación */}

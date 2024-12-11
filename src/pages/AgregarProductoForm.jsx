@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form, Alert } from 'react-bootstrap';
+import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 const AgregarProductoForm = ({ show, onClose, onSave }) => {
@@ -16,7 +16,8 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
     responsable: '', // Campo obligatorio
   });
 
-  const [error, setError] = useState(''); // Estado para manejar los errores de validación
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Estado para manejar la animación de carga
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,7 +31,7 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
         setError("La imagen no debe exceder los 64 KB.");
         setFormData({ ...formData, imagen: null });
       } else {
-        setError(""); // Limpiar error si la imagen es válida
+        setError("");
         const reader = new FileReader();
         reader.onloadend = () => {
           setFormData({ ...formData, imagen: reader.result.split(",")[1] });
@@ -38,59 +39,59 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
         reader.readAsDataURL(file);
       }
     }
-  };  
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (error) {
-      return; // Si hay un error, no se envía el formulario
-    }
-  
-    // Validar que los campos obligatorios no estén vacíos
+    if (error) return;
     if (!formData.imagen) {
       setError('Debe subir una imagen del producto.');
       return;
     }
-  
-    // Obtener el token del localStorage
+
     const token = localStorage.getItem('token');
-  
     if (!token) {
       setError('No se encontró el token de autenticación.');
       return;
     }
-  
-    // Limpiar errores y preparar los datos
+
     setError('');
-  
-    // Preparar los datos a enviar, por ejemplo, la imagen está en base64
-    const formDataToSend = {
-      ...formData, // Incluir todos los datos del formulario
-      imagen: formData.imagen, // Asegúrate de que la imagen esté correctamente configurada
-    };
-  
-    // Realizar la solicitud POST con el token en los encabezados
+    setIsLoading(true); // Activar la animación de carga
+
+    const formDataToSend = { ...formData, imagen: formData.imagen };
+
     try {
       const response = await axios.post(
-        'http://localhost:8081/api/admin/productos/agregar', // URL de la API
-        formDataToSend, // Enviar los datos del formulario
+        'http://localhost:8081/api/admin/productos/agregar',
+        formDataToSend,
         {
           headers: {
-            'Authorization': `Bearer ${token}`, // Incluir el token en el encabezado
-            'Content-Type': 'application/json', // El tipo de contenido es JSON
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         }
       );
-  
       console.log('Producto agregado:', response.data);
-      // Aquí puedes realizar alguna acción tras un éxito, por ejemplo, cerrar el modal o mostrar un mensaje
       onSave(response.data);
+      setFormData({
+        nombre: '',
+        descripcion: '',
+        cantidad: 0,
+        disponibleParaPrestamo: true,
+        imagen: null,
+        categoria: 'EQUIPOS',
+        codigoActivosFijos: '',
+        linkDataSheet: '',
+        ubicacion: 'LABORATORIO_ELECTRÓNICA',
+        responsable: '',
+      }); // Reiniciar campos tras éxito
     } catch (error) {
       console.error('Error al agregar el producto:', error);
       setError('Error al agregar el producto. Intenta nuevamente.');
+    } finally {
+      setIsLoading(false); // Desactivar la animación de carga
     }
-  };  
+  };
 
   return (
     <Modal show={show} onHide={onClose}>
@@ -188,10 +189,23 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
               onChange={handleInputChange}
             />
           </Form.Group>
-          <Button variant="primary" type="submit" className="mt-3">
-            Guardar
+          <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />{' '}
+                Guardando...
+              </>
+            ) : (
+              'Guardar'
+            )}
           </Button>
-          {error && <Alert variant="danger" className="mt-2">{error}</Alert>} {/* Muestra el error si existe */}
+          {error && <Alert variant="danger" className="mt-2">{error}</Alert>}
         </Form>
       </Modal.Body>
     </Modal>
@@ -199,7 +213,3 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
 };
 
 export default AgregarProductoForm;
-
-
-
-

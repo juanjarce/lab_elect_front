@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import { Button, Card, Container, Form } from 'react-bootstrap';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Card, Container, Form, Spinner } from 'react-bootstrap';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit, FaTrashAlt } from 'react-icons/fa';
 import axios from 'axios';
+import { CSSTransition } from 'react-transition-group';  // Importar CSSTransition para las animaciones
+import './css/Cuenta.css';  // Asegúrate de tener el archivo CSS para las animaciones
 
 const Cuenta = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Obtener el id del estudiante desde la URL
+  const { id } = useParams();
   const [cuenta, setCuenta] = useState(null);
-  const [error, setError] = useState(''); // Para almacenar errores
-  const [successMessage, setSuccessMessage] = useState(''); // Para almacenar mensajes de éxito
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [formData, setFormData] = useState({
     cedula: '',
     name: '',
@@ -19,32 +20,30 @@ const Cuenta = () => {
     email: ''
   });
 
-  useEffect(() => {
-    // Obtener el token del localStorage
-    const token = localStorage.getItem('token'); 
-    console.log(token);
+  const [isLoading, setIsLoading] = useState(false);  // Estado para cargar los botones
 
-    // Verificar si el token existe
+  useEffect(() => {
+    const token = localStorage.getItem('token');
     if (!token) {
       console.error('Token no encontrado');
       return;
     }
 
-    // Obtener la información de la cuenta del estudiante
-    axios.get(`http://localhost:8081/api/estudiantes/informacion-cuenta/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Agregar el token al encabezado
-        },
-      }
-    )
+    setIsLoading(true); // Activar el estado de carga
+    axios.get(`http://localhost:8081/api/estudiantes/informacion-cuenta/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(response => {
         setCuenta(response.data.data);
-        setFormData(response.data.data); // Prellenar el formulario con los datos obtenidos
+        setFormData(response.data.data);
+        setIsLoading(false); // Desactivar el estado de carga
       })
       .catch(error => {
         setError('Error al obtener la información de la cuenta');
         console.error(error);
+        setIsLoading(false); // Desactivar el estado de carga
       });
   }, [id]);
 
@@ -54,14 +53,11 @@ const Cuenta = () => {
   };
 
   const handleUpdateAccount = async () => {
-    setError(''); // Limpiar cualquier mensaje de error previo
-    setSuccessMessage(''); // Limpiar cualquier mensaje de éxito previo
+    setError('');
+    setSuccessMessage('');
+    setIsLoading(true);  // Activar el estado de carga cuando se presiona el botón
 
-    // Obtener el token del localStorage
-    const token = localStorage.getItem('token'); 
-    console.log(token);
-
-    // Verificar si el token existe
+    const token = localStorage.getItem('token');
     if (!token) {
       console.error('Token no encontrado');
       return;
@@ -72,44 +68,42 @@ const Cuenta = () => {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            Authorization: `Bearer ${token}`,
           },
         });
-      setSuccessMessage(response.data.message); // Mostrar el mensaje de éxito
+      setSuccessMessage(response.data.message);
+      setIsLoading(false); // Desactivar el estado de carga
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Error al actualizar la información');
       console.error(error);
+      setIsLoading(false); // Desactivar el estado de carga
     }
   };
 
   const handleDeleteAccount = async () => {
-    setError(''); // Limpiar cualquier mensaje de error previo
-    setSuccessMessage(''); // Limpiar cualquier mensaje de éxito previo
+    setError('');
+    setSuccessMessage('');
+    setIsLoading(true);  // Activar el estado de carga cuando se presiona el botón
 
     try {
-      // Obtener el token del localStorage
-      const token = localStorage.getItem('token'); 
-      console.log(token);
-  
-      // Verificar si el token existe
+      const token = localStorage.getItem('token');
       if (!token) {
         console.error('Token no encontrado');
         return;
       }
-      const response = await axios.delete(`http://localhost:8081/api/estudiantes/eliminar/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
-          },
-        }
-      );
-      setSuccessMessage(response.data.message); // Mostrar el mensaje de éxito
-
-      localStorage.removeItem('token'); // Limpiar el token o cualquier información de autenticación
-      navigate('/'); // Redirige al Login
+      const response = await axios.delete(`http://localhost:8081/api/estudiantes/eliminar/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setSuccessMessage(response.data.message);
+      localStorage.removeItem('token');
+      navigate('/');
+      setIsLoading(false); // Desactivar el estado de carga
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Error al eliminar la cuenta');
       console.error(error);
+      setIsLoading(false); // Desactivar el estado de carga
     }
   };
 
@@ -117,82 +111,83 @@ const Cuenta = () => {
     <Container className="mt-4">
       <h2>Mi Cuenta</h2>
 
-      {/* Mostrar mensaje de error si hay */}
       {error && <div className="alert alert-danger">{error}</div>}
-
-      {/* Mostrar mensaje de éxito si hay */}
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
-      {cuenta ? (
-        <Card>
-          <Card.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label><FaUser /> Nombre</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
+      <CSSTransition in={cuenta !== null} timeout={500} classNames="fade" unmountOnExit>
+        <div>
+          {cuenta ? (
+            <Card>
+              <Card.Body>
+                <Form>
+                  <Form.Group className="mb-3">
+                    <Form.Label><FaUser /> Nombre</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label><FaEnvelope /> Correo Electrónico</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label><FaEnvelope /> Correo Electrónico</Form.Label>
+                    <Form.Control
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label><FaPhone /> Teléfono</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="numeroTelefono"
-                  value={formData.numeroTelefono}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label><FaPhone /> Teléfono</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="numeroTelefono"
+                      value={formData.numeroTelefono}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label><FaMapMarkerAlt /> Dirección</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label><FaMapMarkerAlt /> Dirección</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label><FaUser /> Cédula</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="cedula"
-                  value={formData.cedula}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label><FaUser /> Cédula</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="cedula"
+                      value={formData.cedula}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Group>
 
-              <Button variant="primary" onClick={handleUpdateAccount}>
-                <FaEdit /> Actualizar Información
-              </Button>
-              <Button variant="danger" onClick={handleDeleteAccount} className="ms-3">
-                <FaTrashAlt /> Eliminar Cuenta
-              </Button>
-            </Form>
-          </Card.Body>
-        </Card>
-      ) : (
-        <p>Cargando información...</p>
-      )}
+                  <Button variant="primary" onClick={handleUpdateAccount} disabled={isLoading}>
+                    {isLoading ? <Spinner animation="border" size="sm" /> : <FaEdit />}
+                    {isLoading ? ' Cargando...' : 'Actualizar Información'}
+                  </Button>
+                  <Button variant="danger" onClick={handleDeleteAccount} className="ms-3" disabled={isLoading}>
+                    {isLoading ? <Spinner animation="border" size="sm" /> : <FaTrashAlt />}
+                    {isLoading ? ' Cargando...' : 'Eliminar Cuenta'}
+                  </Button>
+                </Form>
+              </Card.Body>
+            </Card>
+          ) : (
+            <p>Cargando información...</p>
+          )}
+        </div>
+      </CSSTransition>
     </Container>
   );
 };
 
 export default Cuenta;
-
-

@@ -1,0 +1,43 @@
+/* Fade transition styles */
+.fade-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.fade-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+.fade-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+.fade-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Hover para dispositivos no táctiles */
+@media (hover: hover) and (pointer: fine) {
+  .producto-card {
+    transition: box-shadow 0.3s ease, border 0.3s ease;
+  }
+
+  .producto-card:hover {
+    border: 2px solid #888; /* Borde gris */
+    box-shadow: 0 0 10px rgba(136, 136, 136, 0.5); /* Sombra gris */
+  }
+}
+
+/* Alternativa para dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .producto-card {
+    /* Sin hover, pero puedes aplicar un estilo adicional si lo deseas */
+    border: 1px solid #ccc;
+  }
+}
+
+
+
+  

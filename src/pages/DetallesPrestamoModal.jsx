@@ -73,10 +73,6 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
     }
   };
 
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
-
   if (error) {
     return <div>{error}</div>;
   }

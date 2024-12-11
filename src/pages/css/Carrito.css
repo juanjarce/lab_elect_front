@@ -1,0 +1,35 @@
+/* En Carrito.css */
+
+/* Animación de desvanecimiento */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 500ms ease-in;
+}
+
+/* Añadir animación a las filas */
+.fade-enter, .fade-exit {
+  opacity: 0;
+}
+.fade-enter-active, .fade-exit-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+/* Efecto de carga sobre el botón de eliminar */
+button[disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+}

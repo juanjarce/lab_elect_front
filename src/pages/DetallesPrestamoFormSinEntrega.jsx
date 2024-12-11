@@ -41,10 +41,6 @@ const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
     }
   }, [prestamoId]);
 
-  if (loading) {
-    return <div><Spinner animation="border" role="status" /></div>;
-  }
-
   if (error) {
     return <div>{error}</div>;
   }

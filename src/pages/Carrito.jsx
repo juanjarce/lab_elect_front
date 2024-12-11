@@ -1,40 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Table, Button, Alert } from 'react-bootstrap';
-import { FaTrashAlt } from 'react-icons/fa';
-import DetalleFila from './DetalleFila'; // Importamos el componente de fila
+import { Table, Alert } from 'react-bootstrap';
+import DetalleFila from './DetalleFila'; 
+import { CSSTransition, TransitionGroup } from 'react-transition-group'; 
+import './css/Carrito.css'; 
 
 const Carrito = () => {
-  const { id } = useParams(); // Obtenemos el id del estudiante de la URL
-  const [detalles, setDetalles] = useState([]); // Detalles de los productos en el carrito
-  const [loading, setLoading] = useState(true); // Indicador de carga
-  const [error, setError] = useState(''); // Mensaje de error
+  const { id } = useParams(); 
+  const [detalles, setDetalles] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(''); 
 
   // Obtener los detalles de préstamo del estudiante
   useEffect(() => {
-    // Obtener el token del localStorage
-    const token = localStorage.getItem('token'); 
-    console.log(token);
-
-    // Verificar si el token existe
+    const token = localStorage.getItem('token');
     if (!token) {
       console.error('Token no encontrado');
       return;
     }
 
-    setLoading(true); // Reiniciar el estado de carga cada vez que se haga una nueva solicitud
+    setLoading(true);
     axios
-      .get(`http://localhost:8081/api/estudiantes/detalles/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
-          },
-        }
-      )
+      .get(`http://localhost:8081/api/estudiantes/detalles/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
-        // Verifica que la respuesta tenga datos antes de actualizarlos
-        const detallesData = response.data.data || []; // Asegúrate de que sea un arreglo vacío si no hay datos
+        const detallesData = response.data.data || [];
         setDetalles(detallesData);
         setLoading(false);
       })
@@ -46,24 +38,16 @@ const Carrito = () => {
 
   // Eliminar detalle de préstamo
   const handleEliminar = (idDetalle) => {
-    // Obtener el token del localStorage
-    const token = localStorage.getItem('token'); 
-    console.log(token);
-
-    // Verificar si el token existe
+    const token = localStorage.getItem('token');
     if (!token) {
       console.error('Token no encontrado');
       return;
     }
 
     axios
-      .delete(`http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
-          },
-        }
-      )
+      .delete(`http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then(() => {
         setDetalles((prevDetalles) =>
           prevDetalles.filter((detalle) => detalle.id !== idDetalle)
@@ -74,41 +58,49 @@ const Carrito = () => {
       });
   };
 
-  if (loading) return <p>Cargando...</p>; // Muestra el mensaje de carga
+  if (loading) return null;
 
   return (
     <div>
       <h2>Carrito de Préstamo</h2>
 
-      {/* Verifica si el carrito está vacío */}
       {detalles.length === 0 ? (
         <Alert variant="info">El carrito está vacío.</Alert>
       ) : (
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>ID Detalle</th>
-              <th>Fecha Solicitud</th>
-              <th>Producto</th>
-              <th>Cantidad</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {detalles.map((detalle) => (
-              <DetalleFila
-                key={detalle.id}
-                detalle={detalle}
-                onEliminar={handleEliminar}
-              />
-            ))}
-          </tbody>
-        </Table>
+        <TransitionGroup component="div">
+          <CSSTransition in={true} timeout={500} classNames="fade" unmountOnExit>
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  <th>ID Detalle</th>
+                  <th>Fecha Solicitud</th>
+                  <th>Imagen</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Ubicación</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detalles.map((detalle) => (
+                  <CSSTransition
+                    key={detalle.id}
+                    timeout={500}
+                    classNames="fade"
+                  >
+                    <DetalleFila
+                      detalle={detalle}
+                      onEliminar={handleEliminar}
+                    />
+                  </CSSTransition>
+                ))}
+              </tbody>
+            </Table>
+          </CSSTransition>
+        </TransitionGroup>
       )}
     </div>
   );
 };
 
 export default Carrito;
-
-

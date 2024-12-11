@@ -1,0 +1,39 @@
+/* Animación de fade-in para el componente principal */
+.fade-enter {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 500ms, transform 500ms;
+  }
+  
+  .fade-exit {
+    opacity: 1;
+  }
+  
+  .fade-exit-active {
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  
+  /* Estilo del card de préstamo */
+  .producto-card {
+    transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  
+  .producto-card:hover {
+    border: 2px solid #888; /* Borde gris */
+    box-shadow: 0 0 10px rgba(136, 136, 136, 0.5); /* Sombra gris */
+  }
+  
+  /* Alternativa para dispositivos táctiles */
+  @media (hover: none) and (pointer: coarse) {
+    .producto-card {
+      border: 1px solid #ccc;
+    }
+  }
+  
+  

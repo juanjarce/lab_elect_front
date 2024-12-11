@@ -77,10 +77,6 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
     }
   };
 
-  if (loading) {
-    return <div><Spinner animation="border" role="status" /></div>;
-  }
-
   if (error) {
     return <div>{error}</div>;
   }
@@ -103,7 +99,15 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
               onClick={handleConfirmarEntrega}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Enviando...' : 'Confirmar Entrega'}
+              {/* Mostrar spinner si está enviando */}
+              {isSubmitting ? (
+                <>
+                  <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                  {' Enviando...'}
+                </>
+              ) : (
+                'Confirmar Entrega'
+              )}
             </Button>
           </Alert>
         )}
@@ -177,3 +181,4 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
 };
 
 export default DetallesPrestamoForm;
+

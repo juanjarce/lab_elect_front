@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import PrestamoCardDevueltos from './PrestamoCardDevueltos'; // Importar el mismo card, solo que mostrará los préstamos devueltos
-import DetallesPrestamoForm from './DetallesPrestamoForm'; // Importar el formulario de detalles
+import PrestamoCardDevueltos from './PrestamoCardDevueltos'; // El card que muestra los préstamos devueltos
+import DetallesPrestamoForm from './DetallesPrestamoForm';
 import { debounce } from 'lodash';
+import { TransitionGroup, CSSTransition } from 'react-transition-group'; // Importar TransitionGroup y CSSTransition
+import './css/PrestamoCardDevueltos.css'; // Asegúrate de tener las clases CSS necesarias
 
 const Devueltos = () => {
   const [prestamos, setPrestamos] = useState([]);
@@ -16,24 +18,20 @@ const Devueltos = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPrestamoId, setSelectedPrestamoId] = useState(null);
 
-  // Cargar los préstamos en estado DEVUELTO
   const fetchPrestamos = async (page = 0) => {
     setLoading(true);
     try {
-      // Obtener el token del localStorage
-      const token = localStorage.getItem('token'); 
-      console.log(token);
-  
-      // Verificar si el token existe
+      const token = localStorage.getItem('token');
       if (!token) {
         console.error('Token no encontrado');
         return;
       }
-      
-      const response = await axios.get(`http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=5`,
+
+      const response = await axios.get(
+        `http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=5`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -67,7 +65,6 @@ const Devueltos = () => {
     fetchPrestamos(currentPage);
   }, [currentPage]);
 
-  // Función para manejar la vista de detalles
   const handleVerDetalles = (prestamoId) => {
     setSelectedPrestamoId(prestamoId);
     setShowModal(true);
@@ -78,7 +75,6 @@ const Devueltos = () => {
     setSelectedPrestamoId(null);
   };
 
-  // Función para manejar el cambio de búsqueda
   const handleSearchChange = debounce((value) => {
     setSearch(value);
     if (value === '') {
@@ -93,10 +89,6 @@ const Devueltos = () => {
       setFilteredPrestamos(filtered);
     }
   }, 300);
-
-  if (loading && !prestamos.length) {
-    return <div>Cargando...</div>;
-  }
 
   if (error) {
     return <div>{error}</div>;
@@ -119,19 +111,25 @@ const Devueltos = () => {
         </Row>
       </Form>
 
-      <div className="row">
+      <TransitionGroup className="row">
         {filteredPrestamos.length > 0 ? (
           filteredPrestamos.map((prestamo) => (
-            <PrestamoCardDevueltos
+            <CSSTransition
               key={prestamo.id}
-              prestamo={prestamo}
-              onVerDetalles={handleVerDetalles}
-            />
+              timeout={500}
+              classNames="card-transition"
+              unmountOnExit
+            >
+              <PrestamoCardDevueltos
+                prestamo={prestamo}
+                onVerDetalles={handleVerDetalles}
+              />
+            </CSSTransition>
           ))
         ) : (
-          <p>No hay préstamos que coincidan con la búsqueda.</p>
+          <p></p>
         )}
-      </div>
+      </TransitionGroup>
 
       {/* Paginación */}
       <div className="d-flex justify-content-center mt-4">
@@ -161,4 +159,5 @@ const Devueltos = () => {
 };
 
 export default Devueltos;
+
 

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import PrestamoCardEntregado from './PrestamoCardEntregado'; // Nueva importación
-import DetallesPrestamoForm from './DetallesPrestamoForm'; // Importar el formulario de detalles
+import PrestamoCardEntregado from './PrestamoCardEntregado';
+import DetallesPrestamoForm from './DetallesPrestamoForm';
 import { debounce } from 'lodash';
+import { TransitionGroup, CSSTransition } from 'react-transition-group'; // Importa TransitionGroup y CSSTransition
+import './css/PrestamoCardEntregado.css'; // Asegúrate de tener las clases CSS necesarias
 
 const Prestados = () => {
   const [prestamos, setPrestamos] = useState([]);
@@ -16,24 +18,20 @@ const Prestados = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPrestamoId, setSelectedPrestamoId] = useState(null);
 
-  // Cargar los préstamos en estado PRESTADO
   const fetchPrestamos = async (page = 0) => {
     setLoading(true);
     try {
-      // Obtener el token del localStorage
-      const token = localStorage.getItem('token'); 
-      console.log(token);
-  
-      // Verificar si el token existe
+      const token = localStorage.getItem('token');
       if (!token) {
         console.error('Token no encontrado');
         return;
       }
-      
-      const response = await axios.get(`http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=5`,
+
+      const response = await axios.get(
+        `http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=5`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -67,24 +65,20 @@ const Prestados = () => {
     fetchPrestamos(currentPage);
   }, [currentPage]);
 
-  // Manejar la entrega del préstamo
   const handleEntregaPrestamo = async (idPrestamo) => {
     try {
-      // Obtener el token del localStorage
-      const token = localStorage.getItem('token'); 
-      console.log(token);
-  
-      // Verificar si el token existe
+      const token = localStorage.getItem('token');
       if (!token) {
         console.error('Token no encontrado');
         return;
       }
-      
-      const response = await axios.put(`http://localhost:8081/api/admin/prestamos/devolver/${idPrestamo}`,
+
+      const response = await axios.put(
+        `http://localhost:8081/api/admin/prestamos/devolver/${idPrestamo}`,
         null,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -95,7 +89,6 @@ const Prestados = () => {
     }
   };
 
-  // Función para manejar la vista de detalles
   const handleVerDetalles = (prestamoId) => {
     setSelectedPrestamoId(prestamoId);
     setShowModal(true);
@@ -121,10 +114,6 @@ const Prestados = () => {
     }
   }, 300);
 
-  if (loading && !prestamos.length) {
-    return <div>Cargando...</div>;
-  }
-
   if (error) {
     return <div>{error}</div>;
   }
@@ -146,20 +135,26 @@ const Prestados = () => {
         </Row>
       </Form>
 
-      <div className="row">
+      <TransitionGroup className="row">
         {filteredPrestamos.length > 0 ? (
           filteredPrestamos.map((prestamo) => (
-            <PrestamoCardEntregado
+            <CSSTransition
               key={prestamo.id}
-              prestamo={prestamo}
-              onVerDetalles={handleVerDetalles}
-              onEntregar={handleEntregaPrestamo}
-            />
+              timeout={500}
+              classNames="card-transition"
+              unmountOnExit
+            >
+              <PrestamoCardEntregado
+                prestamo={prestamo}
+                onVerDetalles={handleVerDetalles}
+                onEntregar={handleEntregaPrestamo}
+              />
+            </CSSTransition>
           ))
         ) : (
-          <p>No hay préstamos que coincidan con la búsqueda.</p>
+          <p></p>
         )}
-      </div>
+      </TransitionGroup>
 
       {/* Paginación */}
       <div className="d-flex justify-content-center mt-4">
@@ -189,4 +184,3 @@ const Prestados = () => {
 };
 
 export default Prestados;
-

@@ -1,0 +1,32 @@
+/* Animación de desvanecimiento para las tarjetas */
+.fade-in {
+    opacity: 0;
+    animation: fadeInAnimation 0.5s ease-out forwards;
+  }
+  
+  @keyframes fadeInAnimation {
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Hover para dispositivos no táctiles */
+  @media (hover: hover) and (pointer: fine) {
+    .producto-card {
+      transition: box-shadow 0.3s ease, border 0.3s ease;
+    }
+  
+    .producto-card:hover {
+      border: 2px solid #888; /* Borde gris */
+      box-shadow: 0 0 10px rgba(136, 136, 136, 0.5); /* Sombra gris */
+    }
+  }
+  
+/* Alternativa para dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+    .producto-card {
+      /* Sin hover, pero puedes aplicar un estilo adicional si lo deseas */
+      border: 1px solid #ccc;
+    }
+}
+  

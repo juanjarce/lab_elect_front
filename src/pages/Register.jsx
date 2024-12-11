@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion'; // Importación para las transiciones
 import { FaUser, FaIdCard, FaHome, FaPhone, FaEnvelope, FaLock } from 'react-icons/fa';
 
 const Register = () => {
@@ -14,6 +15,7 @@ const Register = () => {
   });
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Estado para la animación de carga
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -28,9 +30,11 @@ const Register = () => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
+    setIsLoading(true); // Activar el spinner del botón
 
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
+      setIsLoading(false); // Desactivar el spinner
       return;
     }
 
@@ -53,19 +57,13 @@ const Register = () => {
         throw new Error(errorData.message || 'Error al registrar al estudiante');
       }
 
-      console.log('Registro exitoso');
-
-      // Obtener el ID del estudiante
       const idResponse = await fetch(`http://localhost:8081/api/estudiantes/id?cedula=${formData.cedula}`);
       if (!idResponse.ok) {
         throw new Error('Error al obtener el ID del estudiante');
       }
 
-      // Extraer el ID correctamente
       const idData = await idResponse.json();
       const id = idData.data.id;
-
-      console.log(id);
 
       const verifyResponse = await fetch(`http://localhost:8081/api/autenticacion/enviar-verificacion/${id}`, {
         method: 'POST',
@@ -76,18 +74,23 @@ const Register = () => {
 
       setSuccessMessage('Registro exitoso. Revisa tu correo para activar tu cuenta.');
       setTimeout(() => {
-        // Redirige a la página de verificación con el ID del estudiante en la URL
         navigate(`/verificar-codigo/${id}`);
       }, 3000);
-      
     } catch (err) {
-      console.error(err);
       setError(err.message);
+    } finally {
+      setIsLoading(false); // Desactivar el spinner
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <motion.div
+      className="d-flex justify-content-center align-items-center vh-100"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 1.1 }}
+      transition={{ duration: 0.6 }}
+    >
       <div
         className="card p-4 shadow-lg"
         style={{
@@ -199,18 +202,17 @@ const Register = () => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100">Registrarse</button>
+          <button type="submit" className="btn btn-primary w-100" disabled={isLoading}>
+            {isLoading ? (
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            ) : (
+              'Registrarse'
+            )}
+          </button>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 export default Register;
-
-
-
-
-
-
-

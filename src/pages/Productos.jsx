@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, Button, Row, Col, Pagination, Container, Form } from 'react-bootstrap';
+import { Card, Button, Row, Col, Pagination, Container, Form, Spinner, Modal } from 'react-bootstrap';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import AgregarProductoForm from './AgregarProductoForm';
 import ModificarProductoForm from './ModificarProductoForm';
+import './css/Productos.css';
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
-  const [filteredProductos, setFilteredProductos] = useState([]); // Estado para productos filtrados
+  const [filteredProductos, setFilteredProductos] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [showAgregarModal, setShowAgregarModal] = useState(false);
   const [showModificarModal, setShowModificarModal] = useState(false);
   const [productoAEditar, setProductoAEditar] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [productoAEliminar, setProductoAEliminar] = useState(null);
 
   // Estados para búsqueda y filtro
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUbicacion, setSelectedUbicacion] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const pageSize = 8;
 
@@ -28,12 +33,9 @@ const Productos = () => {
   }, [searchTerm, selectedUbicacion, productos]);
 
   const cargarProductos = async (page) => {
+    setLoading(true);
     try {
-      // Obtener el token del localStorage
-      const token = localStorage.getItem('token'); 
-      console.log(token);
-  
-      // Verificar si el token existe
+      const token = localStorage.getItem('token');
       if (!token) {
         console.error('Token no encontrado');
         return;
@@ -43,7 +45,7 @@ const Productos = () => {
         `http://localhost:8081/api/admin/productos/paginated?page=${page}&size=${pageSize}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -52,6 +54,8 @@ const Productos = () => {
       setTotalPages(totalPages);
     } catch (error) {
       console.error('Error al cargar productos:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,29 +78,37 @@ const Productos = () => {
     setFilteredProductos(filtrados);
   };
 
-  const eliminarProducto = async (idProducto) => {
+  const confirmarEliminacion = (producto) => {
+    setProductoAEliminar(producto);
+    setShowConfirmModal(true);
+  };
+
+  const eliminarProducto = async () => {
+    if (!productoAEliminar) return;
+    setLoading(true);
     try {
-      // Obtener el token del localStorage
-      const token = localStorage.getItem('token'); 
-      console.log(token);
-  
-      // Verificar si el token existe
+      const token = localStorage.getItem('token');
       if (!token) {
         console.error('Token no encontrado');
         return;
       }
-      
-      await axios.delete(`http://localhost:8081/api/admin/productos/eliminar/${idProducto}`,
+
+      await axios.delete(
+        `http://localhost:8081/api/admin/productos/eliminar/${productoAEliminar.id}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      setProductos(productos.filter((producto) => producto.id !== idProducto));
+      setProductos(productos.filter((producto) => producto.id !== productoAEliminar.id));
+      setShowConfirmModal(false);
+      setProductoAEliminar(null);
     } catch (error) {
       console.error('Error al eliminar el producto:', error);
       alert('Hubo un error al eliminar el producto.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,7 +123,6 @@ const Productos = () => {
 
   return (
     <Container fluid>
-      {/* Buscador y filtro */}
       <Row className="mb-3 align-items-center">
         <Col md={8}>
           <Form.Control
@@ -144,46 +155,72 @@ const Productos = () => {
       </Button>
 
       <Row>
-        {filteredProductos.map((producto) => (
-          <Col key={producto.id} md={3} sm={6} xs={12} className="mb-3">
-            <Card style={{ height: '100%', textAlign: 'center', padding: '10px' }}>
-              <Card.Img
-                variant="top"
-                src={`data:image/png;base64,${producto.imagen}`}
-                alt={producto.nombre}
-                style={{ height: '120px', objectFit: 'cover' }}
-              />
-              <Card.Body>
-                <Card.Title style={{ fontSize: '16px', fontWeight: 'bold' }}>{producto.nombre}</Card.Title>
-                <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#6c757d' }}>
-                  {producto.descripcion}
-                </Card.Text>
-                <Card.Text style={{ fontSize: '14px', margin: '5px 0' }}>
-                  Cantidad: {producto.cantidad}
-                </Card.Text>
-                <Card.Text style={{ fontSize: '13px', color: 'gray' }}>
-                  Código: {producto.codigoActivosFijos || 'N/A'}
-                </Card.Text>
-                <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#28a745' }}>
-                  Ubicación: {producto.ubicacion.replace('_', ' ')}
-                </Card.Text>
-                <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#dc3545' }}>
-                  Responsable: {producto.responsable}
-                </Card.Text>
-                <Card.Text style={{ fontSize: '12px', color: '#007bff' }}>
-                  ID Producto: {producto.id}
-                </Card.Text>
-                <Button variant="warning" onClick={() => handleEditar(producto)} className="mr-2">
-                  <i className="fas fa-edit"></i> Editar
-                </Button>
-                <Button variant="danger" onClick={() => eliminarProducto(producto.id)}>
-                  <i className="fas fa-trash"></i> Eliminar
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
+        <TransitionGroup component={null}>
+          {filteredProductos.map((producto) => (
+            <CSSTransition key={producto.id} timeout={300} classNames="fade">
+              <Col md={3} sm={6} xs={12} className="mb-3">
+                <Card
+                  className="producto-card fade-in"
+                  style={{
+                    height: '100%',
+                    textAlign: 'center',
+                    padding: '10px',
+                  }}
+                >
+                  <Card.Img
+                    variant="top"
+                    src={`data:image/png;base64,${producto.imagen}`}
+                    alt={producto.nombre}
+                    style={{ height: '120px', objectFit: 'cover' }}
+                  />
+                  <Card.Body>
+                    <Card.Title style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                      {producto.nombre}
+                    </Card.Title>
+                    <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#6c757d' }}>
+                      {producto.descripcion}
+                    </Card.Text>
+                    <Card.Text style={{ fontSize: '14px', margin: '5px 0' }}>
+                      Cantidad: {producto.cantidad}
+                    </Card.Text>
+                    <Card.Text style={{ fontSize: '13px', color: 'gray' }}>
+                      Código: {producto.codigoActivosFijos || 'N/A'}
+                    </Card.Text>
+                    <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#28a745' }}>
+                      Ubicación: {producto.ubicacion.replace('_', ' ')}
+                    </Card.Text>
+                    <Card.Text style={{ fontSize: '14px', margin: '5px 0', color: '#dc3545' }}>
+                      Responsable: {producto.responsable}
+                    </Card.Text>
+                    <Card.Text style={{ fontSize: '12px', color: '#007bff' }}>
+                      ID Producto: {producto.id}
+                    </Card.Text>
+                    <Button
+                      variant="warning"
+                      onClick={() => handleEditar(producto)}
+                      className="mr-2"
+                    >
+                      <i className="fas fa-edit"></i> Editar
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => confirmarEliminacion(producto)}
+                    >
+                      <i className="fas fa-trash"></i> Eliminar
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </CSSTransition>
+          ))}
+        </TransitionGroup>
       </Row>
+
+      {loading && (
+        <div className="d-flex justify-content-center mt-3">
+          <Spinner animation="border" />
+        </div>
+      )}
 
       <Pagination className="justify-content-center mt-3">
         {[...Array(totalPages).keys()].map((page) => (
@@ -202,7 +239,7 @@ const Productos = () => {
         onClose={() => setShowAgregarModal(false)}
         onSave={(nuevoProducto) => {
           setShowAgregarModal(false);
-          cargarProductos(currentPage); // Recargar la lista
+          cargarProductos(currentPage);
         }}
       />
 
@@ -211,10 +248,27 @@ const Productos = () => {
         onClose={() => setShowModificarModal(false)}
         onSave={() => {
           setShowModificarModal(false);
-          cargarProductos(currentPage); // Recargar la lista
+          cargarProductos(currentPage);
         }}
         producto={productoAEditar}
       />
+
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que deseas eliminar el producto "{productoAEliminar?.nombre}"?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={eliminarProducto}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

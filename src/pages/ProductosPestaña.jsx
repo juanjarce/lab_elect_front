@@ -2,22 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Row, Col, Form, Container, Pagination, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
-import { Filter } from 'react-bootstrap-icons'; // Importamos el ícono de filtro
+import { Filter } from 'react-bootstrap-icons';
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import './css/Transitions.css';
 
 const ProductosPestaña = () => {
-  const { id } = useParams(); // Obtén el estudianteId desde la URL
+  const { id } = useParams();
   const [productos, setProductos] = useState([]);
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [ubicacion, setUbicacion] = useState(''); // Estado para la ubicación seleccionada
+  const [ubicacion, setUbicacion] = useState('');
   const [selectedProducto, setSelectedProducto] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [cantidadDisponible, setCantidadDisponible] = useState({}); // Para almacenar la cantidad disponible de cada producto
-  const [error, setError] = useState(null); // Estado para el mensaje de error
-  const [successMessage, setSuccessMessage] = useState(null); // Estado para el mensaje de éxito
+  const [cantidadDisponible, setCantidadDisponible] = useState({});
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const pageSize = 8;
 
@@ -78,39 +80,34 @@ const ProductosPestaña = () => {
   const handleAgregarCarrito = async (productoId, cantidad) => {
     setError(null);
     setSuccessMessage(null);
-  
+
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado.');
       return;
     }
-  
+
     try {
-      // Realizar la solicitud para agregar el producto al carrito
       await axios.post(`http://localhost:8081/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
-      // Actualizar la cantidad disponible del producto
+
       setCantidadDisponible((prevCantidad) => ({
         ...prevCantidad,
-        [productoId]: (prevCantidad[productoId] || 0) - cantidad, // Reducir la cantidad disponible
+        [productoId]: (prevCantidad[productoId] || 0) - cantidad,
       }));
-  
-      // Restablecer la cantidad de todos los productos a 0 después de agregar el producto
+
       setProductos((prevProductos) =>
         prevProductos.map((producto) =>
-          producto.id === productoId
-            ? { ...producto, cantidad: 0 } // Poner la cantidad de este producto en 0
-            : producto
+          producto.id === productoId ? { ...producto, cantidad: 0 } : producto
         )
       );
-  
+
       setSuccessMessage('Producto agregado al carrito con éxito.');
     } catch (error) {
       setError(error.response?.data?.message || 'Error al agregar el producto al carrito.');
     }
-  };  
+  };
 
   return (
     <Container fluid>
@@ -158,18 +155,20 @@ const ProductosPestaña = () => {
         </OverlayTrigger>
       </div>
 
-      <Row>
+      <TransitionGroup component={Row}>
         {filteredProductos.map((producto) => (
-          <Col key={producto.id} md={3} sm={6} xs={12} className="mb-4">
-            <ProductoCard
-              producto={producto}
-              onAgregarCarrito={handleAgregarCarrito}
-              cantidadDisponible={cantidadDisponible[producto.id]}
-              onClick={() => setSelectedProducto(producto)}
-            />
-          </Col>
+          <CSSTransition key={producto.id} timeout={300} classNames="fade">
+            <Col md={3} sm={6} xs={12} className="mb-4">
+              <ProductoCard
+                producto={producto}
+                onAgregarCarrito={handleAgregarCarrito}
+                cantidadDisponible={cantidadDisponible[producto.id]}
+                onClick={() => setSelectedProducto(producto)}
+              />
+            </Col>
+          </CSSTransition>
         ))}
-      </Row>
+      </TransitionGroup>
 
       <Pagination className="justify-content-center mt-3">
         {[...Array(totalPages).keys()].map((page) => (

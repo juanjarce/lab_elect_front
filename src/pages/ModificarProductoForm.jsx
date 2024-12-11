@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Alert } from 'react-bootstrap';
+import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
@@ -18,6 +18,7 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
   });
 
   const [imageError, setImageError] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Estado para controlar la animación de carga
 
   useEffect(() => {
     if (producto) {
@@ -43,6 +44,7 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
       return; // No enviar el formulario si hay un error de imagen
     }
 
+    setIsLoading(true); // Activar animación de carga
     try {
       const formDataToSend = {
         nombre: formData.nombre,
@@ -64,17 +66,22 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
       // Verificar si el token existe
       if (!token) {
         console.error('Token no encontrado');
+        setIsLoading(false); // Desactivar animación de carga en caso de error
         return;
       }
 
       await axios.put(`http://localhost:8081/api/admin/productos/actualizar/${formData.id}`, formDataToSend, {
-        headers: { 'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`, // Agregar el token al encabezado
-         },
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+        },
       });
       onSave(formDataToSend); // Pasar los datos guardados al componente padre
+      onClose(); // Cerrar el modal
     } catch (error) {
       console.error('Error al modificar el producto:', error);
+    } finally {
+      setIsLoading(false); // Desactivar animación de carga
     }
   };
 
@@ -219,10 +226,16 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
             />
           </Form.Group>
 
-          <Button variant="primary" type="submit" disabled={imageError} className="mt-3">
-            Guardar Cambios
+          <Button variant="primary" type="submit" disabled={isLoading || imageError} className="mt-3">
+            {isLoading ? (
+              <>
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                {' Guardando...'}
+              </>
+            ) : (
+              'Guardar Cambios'
+            )}
           </Button>
-
         </Form>
       </Modal.Body>
     </Modal>

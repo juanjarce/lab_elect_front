@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaTrashAlt, FaSpinner } from 'react-icons/fa';
 
 const DetalleFila = ({ detalle, onEliminar }) => {
+  const [loadingEliminar, setLoadingEliminar] = useState(false); // Estado de carga
+
+  // Función para manejar la eliminación
+  const handleEliminar = () => {
+    setLoadingEliminar(true); // Activamos el estado de carga
+    onEliminar(detalle.id) // Llamamos a la función onEliminar
+      .finally(() => setLoadingEliminar(false)); // Desactivamos el estado de carga después de la eliminación
+  };
+
   return (
     <tr>
       <td>{detalle.id}</td>
@@ -16,14 +25,15 @@ const DetalleFila = ({ detalle, onEliminar }) => {
       </td>
       <td>{detalle.producto.nombre}</td> {/* Nombre del producto */}
       <td>{detalle.cantidad}</td>
-      <td>{detalle.producto.ubicacion}</td> {/* Nueva celda para la ubicación */}
+      <td>{detalle.producto.ubicacion}</td> {/* Ubicación */}
       <td>
         <Button
           variant="danger"
           size="sm"
-          onClick={() => onEliminar(detalle.id)}
+          onClick={handleEliminar}
+          disabled={loadingEliminar} // Desactivamos el botón mientras se está eliminando
         >
-          <FaTrashAlt />
+          {loadingEliminar ? <FaSpinner className="fa-spin" /> : <FaTrashAlt />} {/* Muestra el spinner mientras se carga */}
         </Button>
       </td>
     </tr>
@@ -31,5 +41,4 @@ const DetalleFila = ({ detalle, onEliminar }) => {
 };
 
 export default DetalleFila;
-
 
