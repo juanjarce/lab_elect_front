@@ -14,11 +14,9 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
   useEffect(() => {
     const fetchEstudianteName = async () => {
       try {
-        const response = await axios.get(`http://localhost:8081/api/admin/estudiante/nombre?id=${prestamo.idEstudiante}`);
+        const response = await axios.get(`http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
         setEstudianteNombre(response.data.data.nombre);
-
-        const responsecc = await axios.get(`http://localhost:8081/api/admin/estudiante/cedula?id=${prestamo.idEstudiante}`);
-        setEstudianteCedula(responsecc.data.data.cedula);
+        setEstudianteCedula(response.data.data.cedula);
       } catch (err) {
         setEstudianteNombre('Nombre no disponible');
         setEstudianteCedula('Cedula no disponible');

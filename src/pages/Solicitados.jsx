@@ -35,13 +35,10 @@ const Solicitados = () => {
         const prestamosWithDetails = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
             try {
-              // Obtener nombre
-              const estudianteNombreResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/nombre?id=${prestamo.idEstudiante}`);
-              const nombre = estudianteNombreResponse.data.data.nombre;
-  
-              // Obtener cédula
-              const estudianteCedulaResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/cedula?id=${prestamo.idEstudiante}`);
-              const cedula = estudianteCedulaResponse.data.data.cedula;
+              // Obtener nombre y cedula
+              const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
+              const nombre = estudianteResponse.data.data.nombre;
+              const cedula = estudianteResponse.data.data.cedula;
   
               return { 
                 ...prestamo, 

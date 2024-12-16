@@ -104,7 +104,7 @@ const AdminDashboard = () => {
         >
           <div className="text-center mb-4">
             <img
-              src="/src/recursos/ingelect.jpg" // Ruta relativa de la imagen
+              src="/public/images/ingelect.jpg" // Ruta relativa de la imagen
               alt="Laboratorio Electrónica"
               style={{ maxWidth: '100%', height: 'auto' }}
             />
