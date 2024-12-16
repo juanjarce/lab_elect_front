@@ -42,7 +42,7 @@ const PrestamoCardEntregado = ({ prestamo, onVerDetalles, onEntregar }) => {
           <Card.Body className="d-flex justify-content-between align-items-center">
             <div>
               <Card.Title className="mb-1">Préstamo #{prestamo.id}</Card.Title>
-              <Card.Subtitle className="text-muted">Estudiante: {prestamo.nombreEstudiante || 'No disponible'}</Card.Subtitle>
+              <Card.Subtitle className="text-muted">Estudiante: {prestamo.nombreEstudiante}</Card.Subtitle>
               <Card.Text className="mt-2">
                 Fecha de Préstamo: {new Date(prestamo.fechaPrestamo).toLocaleDateString()} <br />
                 Estado: <span className="badge bg-primary text-white">{prestamo.estado}</span>

@@ -6,6 +6,7 @@ import './css/PrestamoCardDevueltos.css'; // Importa el archivo CSS para animaci
 
 const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
   const [estudianteNombre, setEstudianteNombre] = useState('');
+  const [estudianteCedula, setEstudianteCedula] = useState('');
   const [inProp, setInProp] = useState(false); // Control de la animación de entrada
 
   useEffect(() => {
@@ -15,8 +16,15 @@ const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
           `http://localhost:8081/api/admin/estudiante/nombre?id=${prestamo.idEstudiante}`
         );
         setEstudianteNombre(response.data.data.nombre);
+
+        const responsecc = await axios.get(
+          `http://localhost:8081/api/admin/estudiante/cedula?id=${prestamo.idEstudiante}`
+        );
+        setEstudianteCedula(responsecc.data.data.nombre);
+        
       } catch (err) {
         setEstudianteNombre('Nombre no disponible');
+        setEstudianteCedula('Cedula no disponible');
       }
     };
     fetchEstudianteName();
@@ -35,7 +43,7 @@ const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
           <Card.Body className="d-flex justify-content-between align-items-center">
             <div>
               <Card.Title className="mb-1">Préstamo #{prestamo.id}</Card.Title>
-              <Card.Subtitle className="text-muted">Estudiante: {estudianteNombre || 'No disponible'}</Card.Subtitle>
+              <Card.Subtitle className="text-muted">Estudiante: {estudianteNombre}</Card.Subtitle>
               <Card.Text className="mt-2">
                 Fecha de Solicitud: {new Date(prestamo.fechaSolicitud).toLocaleDateString()} <br />
                 Estado: <span className="badge bg-success">{prestamo.estado}</span>

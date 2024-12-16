@@ -32,18 +32,33 @@ const Solicitados = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.status === 'Exito') {
-        const prestamosWithNames = await Promise.all(
+        const prestamosWithDetails = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
             try {
-              const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/nombre?id=${prestamo.idEstudiante}`);
-              return { ...prestamo, nombreEstudiante: estudianteResponse.data.data.nombre };
+              // Obtener nombre
+              const estudianteNombreResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/nombre?id=${prestamo.idEstudiante}`);
+              const nombre = estudianteNombreResponse.data.data.nombre;
+  
+              // Obtener cédula
+              const estudianteCedulaResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/cedula?id=${prestamo.idEstudiante}`);
+              const cedula = estudianteCedulaResponse.data.data.cedula;
+  
+              return { 
+                ...prestamo, 
+                nombreEstudiante: nombre,
+                cedulaEstudiante: cedula,
+              };
             } catch {
-              return { ...prestamo, nombreEstudiante: 'Nombre no disponible' };
+              return { 
+                ...prestamo, 
+                nombreEstudiante: 'Nombre no disponible',
+                cedulaEstudiante: 'Cédula no disponible',
+              };
             }
           })
         );
-        setPrestamos(prestamosWithNames);
-        setFilteredPrestamos(prestamosWithNames); // Mostrar todos inicialmente
+        setPrestamos(prestamosWithDetails);
+        setFilteredPrestamos(prestamosWithDetails); // Mostrar todos inicialmente
         setTotalPages(response.data.data.totalPages);
       } else {
         setError('No hay préstamos solicitados.');
@@ -54,6 +69,7 @@ const Solicitados = () => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchPrestamos(currentPage);
@@ -78,7 +94,8 @@ const Solicitados = () => {
       const filtered = prestamos.filter(
         (prestamo) =>
           prestamo.id.toString().includes(lowercasedSearch) ||
-          prestamo.nombreEstudiante?.toLowerCase().includes(lowercasedSearch)
+          prestamo.nombreEstudiante?.toLowerCase().includes(lowercasedSearch) ||
+          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch)
       );
       setFilteredPrestamos(filtered);
     }
@@ -101,7 +118,7 @@ const Solicitados = () => {
           <Col xs={12}>
             <Form.Control
               type="text"
-              placeholder="Buscar por ID o Estudiante"
+              placeholder="Buscar por ID, Nombre del Estudiante o Documento"
               onChange={(e) => handleSearchChange(e.target.value)}
               className="w-100"
             />

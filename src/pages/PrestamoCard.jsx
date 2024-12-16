@@ -7,6 +7,7 @@ import './css/PrestamoCard.css'; // Importa el archivo CSS
 
 const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
   const [estudianteNombre, setEstudianteNombre] = useState('');
+  const [estudianteCedula, setEstudianteCedula] = useState('');
   const [inProp, setInProp] = useState(false); // Controlar la animación de aparición
   const [loading, setLoading] = useState(false); // Estado de carga para el botón de aprobar
 
@@ -15,8 +16,12 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
       try {
         const response = await axios.get(`http://localhost:8081/api/admin/estudiante/nombre?id=${prestamo.idEstudiante}`);
         setEstudianteNombre(response.data.data.nombre);
+
+        const responsecc = await axios.get(`http://localhost:8081/api/admin/estudiante/cedula?id=${prestamo.idEstudiante}`);
+        setEstudianteCedula(responsecc.data.data.cedula);
       } catch (err) {
         setEstudianteNombre('Nombre no disponible');
+        setEstudianteCedula('Cedula no disponible');
       }
     };
     fetchEstudianteName();
@@ -62,7 +67,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
           <Card.Body className="d-flex justify-content-between align-items-center">
             <div>
               <Card.Title className="mb-1">Préstamo #{prestamo.id}</Card.Title>
-              <Card.Subtitle className="text-muted">Estudiante: {estudianteNombre || 'No disponible'}</Card.Subtitle>
+              <Card.Subtitle className="text-muted">Estudiante: {estudianteNombre}</Card.Subtitle>
               <Card.Text className="mt-2">
                 Fecha de Solicitud: {new Date(prestamo.fechaSolicitud).toLocaleDateString()} <br />
                 Estado: <span className="badge bg-warning text-dark">{prestamo.estado}</span>
