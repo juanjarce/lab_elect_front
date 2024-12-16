@@ -98,10 +98,6 @@ const Solicitados = () => {
     }
   }, 300);
 
-  if (loading && !prestamos.length) {
-    return <div>Cargando...</div>;
-  }
-
   if (error) {
     return <div>{error}</div>;
   }
