@@ -22,7 +22,7 @@ const Carrito = () => {
 
     setLoading(true);
     axios
-      .get(`https://72.167.51.48:8082/api/estudiantes/detalles/${id}`, {
+      .get(`http://72.167.51.48:8082/api/estudiantes/detalles/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -45,7 +45,7 @@ const Carrito = () => {
     }
 
     axios
-      .delete(`https://72.167.51.48:8082/api/estudiantes/detalles/eliminar/${idDetalle}`, {
+      .delete(`http://72.167.51.48:8082/api/estudiantes/detalles/eliminar/${idDetalle}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {

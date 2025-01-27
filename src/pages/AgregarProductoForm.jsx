@@ -62,7 +62,7 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
 
     try {
       const response = await axios.post(
-        'https://72.167.51.48:8082/api/admin/productos/agregar',
+        'http://72.167.51.48:8082/api/admin/productos/agregar',
         formDataToSend,
         {
           headers: {

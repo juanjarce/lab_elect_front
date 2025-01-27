@@ -28,7 +28,7 @@ const Prestamos = () => {
     const fetchPrestamos = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`https://72.167.51.48:8082/api/estudiantes/${id}/prestamos?page=${currentPage}&size=5&token=${token}`);
+        const response = await axios.get(`http://72.167.51.48:8082/api/estudiantes/${id}/prestamos?page=${currentPage}&size=5&token=${token}`);
         setPrestamos(response.data.content || []);
         setTotalPages(response.data.totalPages);
       } catch (error) {

@@ -20,7 +20,7 @@ const EstudianteDashboard = () => {
       if (token) {
         // Realizar la solicitud para cerrar sesión
         const response = await axios.put(
-          `https://72.167.51.48:8082/api/estudiantes/logout/${id}`,
+          `http://72.167.51.48:8082/api/estudiantes/logout/${id}`,
           null, // Si es necesario, puedes enviar un objeto vacío o cualquier dato adicional
           { headers: { Authorization: `Bearer ${token}` } }
         );

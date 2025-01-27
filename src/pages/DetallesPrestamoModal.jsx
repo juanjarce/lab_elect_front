@@ -23,7 +23,7 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
             return;
           }
 
-          const response = await axios.get(`https://72.167.51.48:8082/api/admin/prestamos/${prestamoId}/detalles`,
+          const response = await axios.get(`http://72.167.51.48:8082/api/admin/prestamos/${prestamoId}/detalles`,
             {
               headers: {
                 Authorization: `Bearer ${token}`, // Agregar el token al encabezado
@@ -59,7 +59,7 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
           return;
         }
         
-        await axios.delete(`https://72.167.51.48:8082/api/admin/detalles/eliminar/${idDetallePrestamo}`,
+        await axios.delete(`http://72.167.51.48:8082/api/admin/detalles/eliminar/${idDetallePrestamo}`,
           {
             headers: {
               Authorization: `Bearer ${token}`, // Agregar el token al encabezado

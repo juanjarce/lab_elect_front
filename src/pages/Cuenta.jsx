@@ -30,7 +30,7 @@ const Cuenta = () => {
     }
 
     setIsLoading(true); // Activar el estado de carga
-    axios.get(`https://72.167.51.48:8082/api/estudiantes/informacion-cuenta/${id}`, {
+    axios.get(`http://72.167.51.48:8082/api/estudiantes/informacion-cuenta/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -64,7 +64,7 @@ const Cuenta = () => {
     }
 
     try {
-      const response = await axios.put(`https://72.167.51.48:8082/api/estudiantes/actualizar/${id}`, 
+      const response = await axios.put(`http://72.167.51.48:8082/api/estudiantes/actualizar/${id}`, 
         formData,
         {
           headers: {
@@ -91,7 +91,7 @@ const Cuenta = () => {
         console.error('Token no encontrado');
         return;
       }
-      const response = await axios.delete(`https://72.167.51.48:8082/api/estudiantes/eliminar/${id}`, {
+      const response = await axios.delete(`http://72.167.51.48:8082/api/estudiantes/eliminar/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

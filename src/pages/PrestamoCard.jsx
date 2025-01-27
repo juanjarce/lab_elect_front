@@ -14,7 +14,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
   useEffect(() => {
     const fetchEstudianteName = async () => {
       try {
-        const response = await axios.get(`https://72.167.51.48:8082/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
+        const response = await axios.get(`http://72.167.51.48:8082/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
         setEstudianteNombre(response.data.data.nombre);
         setEstudianteCedula(response.data.data.cedula);
       } catch (err) {
@@ -36,7 +36,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
       }
 
       const response = await axios.put(
-        `https://72.167.51.48:8082/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}`,
+        `http://72.167.51.48:8082/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}`,
         null,
         {
           headers: {

@@ -42,7 +42,7 @@ const Productos = () => {
       }
 
       const response = await axios.get(
-        `https://72.167.51.48:8082/api/admin/productos/paginated?page=${page}&size=${pageSize}`,
+        `http://72.167.51.48:8082/api/admin/productos/paginated?page=${page}&size=${pageSize}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -94,7 +94,7 @@ const Productos = () => {
       }
 
       await axios.delete(
-        `https://72.167.51.48:8082/api/admin/productos/eliminar/${productoAEliminar.id}`,
+        `http://72.167.51.48:8082/api/admin/productos/eliminar/${productoAEliminar.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

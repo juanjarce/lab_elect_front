@@ -24,7 +24,7 @@ const VerificarCodigo = () => {
     try {
       // Construimos la URL con el ID del estudiante y el código de verificación
       const response = await fetch(
-        `https://72.167.51.48:8082/api/autenticacion/estudiantes/${id}/activar?verificationCode=${codigo}`,
+        `http://72.167.51.48:8082/api/autenticacion/estudiantes/${id}/activar?verificationCode=${codigo}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
