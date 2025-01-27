@@ -13,7 +13,7 @@ const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
     const fetchEstudianteName = async () => {
       try {
         const response = await axios.get(
-          `http://72.167.51.48:8082/api/admin/estudiante/info?id=${prestamo.idEstudiante}`
+          `https://72.167.51.48:8082/api/admin/estudiante/info?id=${prestamo.idEstudiante}`
         );
         setEstudianteNombre(response.data.data.nombre);
         setEstudianteCedula(response.data.data.cedula);

@@ -70,7 +70,7 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
         return;
       }
 
-      await axios.put(`http://72.167.51.48:8082/api/admin/productos/actualizar/${formData.id}`, formDataToSend, {
+      await axios.put(`https://72.167.51.48:8082/api/admin/productos/actualizar/${formData.id}`, formDataToSend, {
         headers: { 
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`, // Agregar el token al encabezado
