@@ -28,7 +28,7 @@ const Devueltos = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=5`,
+        `http://72.167.51.48:8082/api/admin/prestamos/devueltos?page=${page}&size=5`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ const Devueltos = () => {
         response.data.data.content.map(async (prestamo) => {
           try {
             // Obtener nombre y cedula
-            const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
+            const estudianteResponse = await axios.get(`http://72.167.51.48:8082/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
             const nombre = estudianteResponse.data.data.nombre;
             const cedula = estudianteResponse.data.data.cedula;
 

@@ -39,7 +39,7 @@ const ProductosPestaña = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8081/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`, {
+      const response = await axios.get(`http://72.167.51.48:8082/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -60,7 +60,7 @@ const ProductosPestaña = () => {
 
   const obtenerCantidadDisponible = async (productoId) => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/estudiantes/productos/${productoId}/cantidad-disponible`);
+      const response = await axios.get(`http://72.167.51.48:8082/api/estudiantes/productos/${productoId}/cantidad-disponible`);
       return response.data.data.cantDisponible;
     } catch (error) {
       return 0;
@@ -88,7 +88,7 @@ const ProductosPestaña = () => {
     }
 
     try {
-      await axios.post(`http://localhost:8081/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`, null, {
+      await axios.post(`http://72.167.51.48:8082/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -31,7 +31,7 @@ const ChangePassword = () => {
     setIsLoadingCode(true); // Activar estado de carga del botón de código
     try {
       const idResponse = await fetch(
-        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`
+        `http://72.167.51.48:8082/api/estudiantes/id-by-email?email=${formData.email}`
       );
       if (!idResponse.ok) {
         throw new Error('Error al obtener el ID del estudiante');
@@ -41,7 +41,7 @@ const ChangePassword = () => {
 
       // Enviar el código de verificación usando POST
       await fetch(
-        `http://localhost:8081/api/autenticacion/enviar-verificacion/${estudianteId}`,
+        `http://72.167.51.48:8082/api/autenticacion/enviar-verificacion/${estudianteId}`,
         { method: 'POST' }
       );
 
@@ -67,7 +67,7 @@ const ChangePassword = () => {
     try {
       // Obtener el ID del estudiante
       const idResponse = await fetch(
-        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`
+        `http://72.167.51.48:8082/api/estudiantes/id-by-email?email=${formData.email}`
       );
       if (!idResponse.ok) {
         throw new Error('Error al obtener el ID del estudiante');
@@ -77,7 +77,7 @@ const ChangePassword = () => {
 
       // Realizar la solicitud para cambiar la contraseña
       const response = await fetch(
-        `http://localhost:8081/api/autenticacion/cambiar-contraseña/${estudianteId}`,
+        `http://72.167.51.48:8082/api/autenticacion/cambiar-contraseña/${estudianteId}`,
         {
           method: 'PUT',
           headers: {

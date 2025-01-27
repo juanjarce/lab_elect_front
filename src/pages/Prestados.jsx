@@ -28,7 +28,7 @@ const Prestados = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=5`,
+        `http://72.167.51.48:8082/api/admin/prestamos/prestados?page=${page}&size=5`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ const Prestados = () => {
           response.data.data.content.map(async (prestamo) => {
             try {
               // Obtener nombre
-              const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
+              const estudianteResponse = await axios.get(`http://72.167.51.48:8082/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;
   
@@ -84,7 +84,7 @@ const Prestados = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:8081/api/admin/prestamos/devolver/${idPrestamo}`,
+        `http://72.167.51.48:8082/api/admin/prestamos/devolver/${idPrestamo}`,
         null,
         {
           headers: {
