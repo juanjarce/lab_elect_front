@@ -18,7 +18,7 @@ const ProductosPestaña = () => {
   const [cantidadDisponible, setCantidadDisponible] = useState({});
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [loading, setLoading] = useState(true);  // Estado para el cargando
+  const [loading, setLoading] = useState(true);  // Estado para indicar si está cargando
 
   const pageSize = 8;
 
@@ -34,7 +34,7 @@ const ProductosPestaña = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado.');
-      setLoading(false);  // Detenemos el loading si no hay token
+      setLoading(false);  // Detener el loading si no hay token
       return;
     }
 
@@ -64,7 +64,8 @@ const ProductosPestaña = () => {
         cantidadDisponibles[producto.id] = cantidadResponse;
       }
       setCantidadDisponible(cantidadDisponibles);
-      setLoading(false);  // Detenemos el loading cuando los productos están listos
+
+      setLoading(false);  // Detenemos el loading cuando los productos y cantidades estén listos
 
     } catch (error) {
       setError('Error al cargar los productos.');
@@ -200,4 +201,3 @@ const ProductosPestaña = () => {
 };
 
 export default ProductosPestaña;
-
