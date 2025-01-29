@@ -10,8 +10,8 @@ import './css/Transitions.css';
 
 const ProductosPestaña = () => {
   const { id } = useParams();
-  const [productos, setProductos] = useState([]);
-  const [filteredProductos, setFilteredProductos] = useState([]);
+  const [productos, setProductos] = useState([]); // Todos los productos
+  const [filteredProductos, setFilteredProductos] = useState([]); // Productos filtrados
   const [searchTerm, setSearchTerm] = useState('');
   const [ubicacion, setUbicacion] = useState('');
   const [selectedProducto, setSelectedProducto] = useState(null);
@@ -24,14 +24,14 @@ const ProductosPestaña = () => {
   const pageSize = 8;
 
   useEffect(() => {
-    cargarProductos(currentPage);
-  }, [currentPage]);
+    cargarProductos();
+  }, []);
 
   useEffect(() => {
     filtrarProductos();
-  }, [searchTerm, ubicacion, productos]);
+  }, [searchTerm, ubicacion, productos]); // Cuando cambian los productos, el searchTerm o la ubicacion
 
-  const cargarProductos = async (page) => {
+  const cargarProductos = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado.');
@@ -39,13 +39,13 @@ const ProductosPestaña = () => {
     }
 
     try {
-      const response = await axios.get(`https://labuq.catavento.co:10443/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`, {
+      const response = await axios.get('https://labuq.catavento.co:10443/api/estudiantes/productos', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const { content, totalPages } = response.data.data;
       setProductos(content);
-      setTotalPages(totalPages);
+      setTotalPages(Math.ceil(content.length / pageSize)); // Calculamos el total de páginas basadas en el número total de productos
 
       const cantidadDisponibles = {};
       for (const producto of content) {
@@ -109,8 +109,8 @@ const ProductosPestaña = () => {
     }
   };
 
-  // Función para calcular la paginación basada en los productos filtrados
-  const productosPaginaActual = () => {
+  // Paginación de productos filtrados
+  const paginarProductos = () => {
     const startIndex = currentPage * pageSize;
     return filteredProductos.slice(startIndex, startIndex + pageSize);
   };
@@ -162,7 +162,7 @@ const ProductosPestaña = () => {
       </div>
 
       <TransitionGroup component={Row}>
-        {productosPaginaActual().map((producto) => (
+        {paginarProductos().map((producto) => (
           <CSSTransition key={producto.id} timeout={300} classNames="fade">
             <Col md={3} sm={6} xs={12} className="mb-4">
               <ProductoCard
