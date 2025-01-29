@@ -1,44 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import PrestamoCard from './PrestamoCard';
-import DetallesPrestamoModal from './DetallesPrestamoModal';
-import { debounce } from 'lodash';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import PrestamoCard from './PrestamoCard'; // Importar el componente PrestamoCard
+import DetallesPrestamoModal from './DetallesPrestamoModal'; // Importar el modal de detalles
+import { debounce } from 'lodash'; // Usar lodash para debounce
+import { TransitionGroup, CSSTransition } from 'react-transition-group'; // Importar TransitionGroup y CSSTransition
 
 const Solicitados = () => {
-  const [prestamos, setPrestamos] = useState([]); // Préstamos de la página actual
-  const [todosPrestamos, setTodosPrestamos] = useState([]); // Todos los préstamos cargados
-  const [filteredPrestamos, setFilteredPrestamos] = useState([]); // Préstamos filtrados
+  const [prestamos, setPrestamos] = useState([]);
+  const [filteredPrestamos, setFilteredPrestamos] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPrestamoId, setSelectedPrestamoId] = useState(null);
+  const [showModal, setShowModal] = useState(false); // Controla si el modal se muestra
+  const [selectedPrestamoId, setSelectedPrestamoId] = useState(null); // Guarda el ID del préstamo seleccionado
 
   const fetchPrestamos = async (page = 0) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token'); 
+      console.log(token);
+  
       if (!token) {
         console.error('Token no encontrado');
         return;
       }
-
+      
       const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${page}&size=5`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (response.data.status === 'Exito') {
         const prestamosWithDetails = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
             try {
+              // Obtener nombre y cedula
               const estudianteResponse = await axios.get(`https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;
-
+  
               return { 
                 ...prestamo, 
                 nombreEstudiante: nombre,
@@ -53,11 +54,9 @@ const Solicitados = () => {
             }
           })
         );
-
-        setPrestamos(prestamosWithDetails); // Set the current page of prestamos
-        setTodosPrestamos((prev) => [...prev, ...prestamosWithDetails]); // Accumulate all loaded prestamos
-        setFilteredPrestamos((prev) => [...prev, ...prestamosWithDetails]); // Set filtered prestamos to include all loaded
-        setTotalPages(Math.ceil(response.data.data.totalElements / 5)); // Update total pages based on all data
+        setPrestamos(prestamosWithDetails);
+        setFilteredPrestamos(prestamosWithDetails); // Mostrar todos inicialmente
+        setTotalPages(response.data.data.totalPages);
       } else {
         setError('No hay préstamos solicitados.');
       }
@@ -72,12 +71,23 @@ const Solicitados = () => {
     fetchPrestamos(currentPage);
   }, [currentPage]);
 
-  useEffect(() => {
-    if (search === '') {
-      setFilteredPrestamos(todosPrestamos); // Reset to show all data if no search
+  const handleVerDetalles = (prestamoId) => {
+    setSelectedPrestamoId(prestamoId);
+    setShowModal(true); // Mostrar el modal
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedPrestamoId(null); // Limpiar el ID del préstamo seleccionado
+  };
+
+  const handleSearchChange = debounce((value) => {
+    setSearch(value);
+    if (value === '') {
+      setFilteredPrestamos(prestamos); // Restablecer la lista si no hay búsqueda
     } else {
-      const lowercasedSearch = search.toLowerCase();
-      const filtered = todosPrestamos.filter(
+      const lowercasedSearch = value.toLowerCase();
+      const filtered = prestamos.filter(
         (prestamo) =>
           prestamo.id.toString().includes(lowercasedSearch) ||
           prestamo.nombreEstudiante?.toLowerCase().includes(lowercasedSearch) ||
@@ -85,24 +95,39 @@ const Solicitados = () => {
       );
       setFilteredPrestamos(filtered);
     }
-  }, [search, todosPrestamos]);
-
-  const handleVerDetalles = (prestamoId) => {
-    setSelectedPrestamoId(prestamoId);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedPrestamoId(null);
-  };
-
-  const handleSearchChange = debounce((value) => {
-    setSearch(value);
   }, 300);
 
-  // Paginate filtered prestamos
-  const paginatedPrestamos = filteredPrestamos.slice(currentPage * 5, (currentPage + 1) * 5);
+  const handleAprobar = async (prestamoId) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Token no encontrado');
+        return;
+      }
+
+      // Llamada a la API para aprobar el préstamo
+      await axios.put(
+        `https://labuq.catavento.co:10443/api/admin/prestamos/aprobar/${prestamoId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Actualizar el estado de los préstamos localmente
+      const updatedPrestamos = prestamos.map((prestamo) => {
+        if (prestamo.id === prestamoId) {
+          return { ...prestamo, estado: 'Aprobado' }; // Cambiamos el estado a 'Aprobado'
+        }
+        return prestamo;
+      });
+
+      // Actualizar los estados de los préstamos
+      setPrestamos(updatedPrestamos);
+      setFilteredPrestamos(updatedPrestamos); // Filtrar los préstamos aprobados en la lista filtrada
+
+    } catch (error) {
+      console.error('Error al aprobar el préstamo:', error);
+    }
+  };
 
   if (error) {
     return <div>{error}</div>;
@@ -127,18 +152,18 @@ const Solicitados = () => {
 
       <div className="row">
         <TransitionGroup className="row">
-          {paginatedPrestamos.length > 0 ? (
-            paginatedPrestamos.map((prestamo) => (
+          {filteredPrestamos.length > 0 ? (
+            filteredPrestamos.map((prestamo, index) => (
               <CSSTransition key={prestamo.id} timeout={500} classNames="card-transition">
                 <PrestamoCard
                   prestamo={prestamo}
                   onVerDetalles={handleVerDetalles}
-                  onAprobar={() => fetchPrestamos()}
+                  onAprobar={handleAprobar} // Pasamos la función handleAprobar
                 />
               </CSSTransition>
             ))
           ) : (
-            <p>No hay resultados para mostrar</p>
+            <p>No hay préstamos solicitados.</p>
           )}
         </TransitionGroup>
       </div>
@@ -164,6 +189,7 @@ const Solicitados = () => {
         </Button>
       </div>
 
+      {/* Modal de Detalles */}
       <DetallesPrestamoModal
         prestamoId={selectedPrestamoId}
         show={showModal}
@@ -174,3 +200,4 @@ const Solicitados = () => {
 };
 
 export default Solicitados;
+
