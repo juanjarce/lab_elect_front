@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; // Importación para las transiciones
 import { FaUser, FaIdCard, FaHome, FaPhone, FaEnvelope, FaLock } from 'react-icons/fa';
 
 const Register = () => {
@@ -84,13 +83,7 @@ const Register = () => {
   };
 
   return (
-    <motion.div
-      className="d-flex justify-content-center align-items-center vh-100"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 1.1 }}
-      transition={{ duration: 0.6 }}
-    >
+    <div className="d-flex justify-content-center align-items-center vh-100">
       <div
         className="card p-4 shadow-lg"
         style={{
@@ -211,8 +204,9 @@ const Register = () => {
           </button>
         </form>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 export default Register;
+
