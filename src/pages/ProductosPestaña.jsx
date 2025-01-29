@@ -24,35 +24,50 @@ const ProductosPestaña = () => {
   const pageSize = 8;
 
   useEffect(() => {
-    cargarProductos(currentPage);
-  }, [currentPage]);
+    cargarProductos();
+  }, []); // Cargar productos una vez al inicio
 
   useEffect(() => {
     filtrarProductos();
-  }, [searchTerm, productos, ubicacion]);
+  }, [searchTerm, productos, ubicacion]); // Filtrar productos cada vez que cambian los criterios
 
-  const cargarProductos = async (page) => {
+  const cargarProductos = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado.');
       return;
     }
 
+    let allProducts = [];
+    let totalProductPages = 0;
+    
     try {
-      const response = await axios.get(`https://labuq.catavento.co:10443/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`, {
+      // Realizar solicitudes por cada página de productos
+      const response = await axios.get('https://labuq.catavento.co:10443/api/estudiantes/productos/paginated', {
         headers: { Authorization: `Bearer ${token}` },
+        params: { page: 0, size: pageSize }
       });
 
-      const { content, totalPages } = response.data.data;
-      setProductos(content);
-      setTotalPages(totalPages);
+      totalProductPages = response.data.data.totalPages;
+
+      for (let i = 0; i < totalProductPages; i++) {
+        const pageResponse = await axios.get('https://labuq.catavento.co:10443/api/estudiantes/productos/paginated', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { page: i, size: pageSize }
+        });
+        allProducts = allProducts.concat(pageResponse.data.data.content);
+      }
+
+      setProductos(allProducts);
+      setTotalPages(Math.ceil(allProducts.length / pageSize));
 
       const cantidadDisponibles = {};
-      for (const producto of content) {
+      for (const producto of allProducts) {
         const cantidadResponse = await obtenerCantidadDisponible(producto.id);
         cantidadDisponibles[producto.id] = cantidadResponse;
       }
       setCantidadDisponible(cantidadDisponibles);
+
     } catch (error) {
       setError('Error al cargar los productos.');
     }
@@ -75,6 +90,7 @@ const ProductosPestaña = () => {
       return matchesSearch && matchesUbicacion;
     });
     setFilteredProductos(filtered);
+    setTotalPages(Math.ceil(filtered.length / pageSize));
   };
 
   const handleAgregarCarrito = async (productoId, cantidad) => {
@@ -108,6 +124,13 @@ const ProductosPestaña = () => {
       setError(error.response?.data?.message || 'Error al agregar el producto al carrito.');
     }
   };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Solo mostrar los productos de la página actual
+  const productosPaginaActual = filteredProductos.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
 
   return (
     <Container fluid>
@@ -156,7 +179,7 @@ const ProductosPestaña = () => {
       </div>
 
       <TransitionGroup component={Row}>
-        {filteredProductos.map((producto) => (
+        {productosPaginaActual.map((producto) => (
           <CSSTransition key={producto.id} timeout={300} classNames="fade">
             <Col md={3} sm={6} xs={12} className="mb-4">
               <ProductoCard
@@ -172,7 +195,7 @@ const ProductosPestaña = () => {
 
       <Pagination className="justify-content-center mt-3">
         {[...Array(totalPages).keys()].map((page) => (
-          <Pagination.Item key={page} active={page === currentPage} onClick={() => setCurrentPage(page)}>
+          <Pagination.Item key={page} active={page === currentPage} onClick={() => handlePageChange(page)}>
             {page + 1}
           </Pagination.Item>
         ))}
