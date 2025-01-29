@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Row, Col, Form, Container, Pagination, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
+import { Row, Col, Form, Container, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
 import { Filter } from 'react-bootstrap-icons';
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
@@ -10,26 +10,23 @@ import './css/Transitions.css';
 
 const ProductosPestaña = () => {
   const { id } = useParams();
-  const [productos, setProductos] = useState([]); // Todos los productos
-  const [filteredProductos, setFilteredProductos] = useState([]); // Productos filtrados
+  const [productos, setProductos] = useState([]);
+  const [filteredProductos, setFilteredProductos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [ubicacion, setUbicacion] = useState('');
   const [selectedProducto, setSelectedProducto] = useState(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const [cantidadDisponible, setCantidadDisponible] = useState({});
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  const pageSize = 8;
-
+  // Usaremos todos los productos sin paginación
   useEffect(() => {
     cargarProductos();
   }, []);
 
   useEffect(() => {
     filtrarProductos();
-  }, [searchTerm, ubicacion, productos]); // Cuando cambian los productos, el searchTerm o la ubicacion
+  }, [searchTerm, productos, ubicacion]);
 
   const cargarProductos = async () => {
     const token = localStorage.getItem('token');
@@ -43,9 +40,9 @@ const ProductosPestaña = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const { content, totalPages } = response.data.data;
+      const content = response.data.data;
       setProductos(content);
-      setTotalPages(Math.ceil(content.length / pageSize)); // Calculamos el total de páginas basadas en el número total de productos
+      setFilteredProductos(content);
 
       const cantidadDisponibles = {};
       for (const producto of content) {
@@ -109,12 +106,6 @@ const ProductosPestaña = () => {
     }
   };
 
-  // Paginación de productos filtrados
-  const paginarProductos = () => {
-    const startIndex = currentPage * pageSize;
-    return filteredProductos.slice(startIndex, startIndex + pageSize);
-  };
-
   return (
     <Container fluid>
       {error && (
@@ -162,7 +153,7 @@ const ProductosPestaña = () => {
       </div>
 
       <TransitionGroup component={Row}>
-        {paginarProductos().map((producto) => (
+        {filteredProductos.map((producto) => (
           <CSSTransition key={producto.id} timeout={300} classNames="fade">
             <Col md={3} sm={6} xs={12} className="mb-4">
               <ProductoCard
@@ -175,14 +166,6 @@ const ProductosPestaña = () => {
           </CSSTransition>
         ))}
       </TransitionGroup>
-
-      <Pagination className="justify-content-center mt-3">
-        {[...Array(totalPages).keys()].map((page) => (
-          <Pagination.Item key={page} active={page === currentPage} onClick={() => setCurrentPage(page)}>
-            {page + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
 
       {selectedProducto && (
         <ProductoDetalleModal producto={selectedProducto} onClose={() => setSelectedProducto(null)} />
