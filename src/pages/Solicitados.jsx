@@ -112,17 +112,8 @@ const Solicitados = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Actualizar el estado de los préstamos localmente
-      const updatedPrestamos = prestamos.map((prestamo) => {
-        if (prestamo.id === prestamoId) {
-          return { ...prestamo, estado: 'Aprobado' }; // Cambiamos el estado a 'Aprobado'
-        }
-        return prestamo;
-      });
-
-      // Actualizar los estados de los préstamos
-      setPrestamos(updatedPrestamos);
-      setFilteredPrestamos(updatedPrestamos); // Filtrar los préstamos aprobados en la lista filtrada
+      // Recargar la lista de préstamos después de aprobar el préstamo
+      fetchPrestamos(currentPage);
 
     } catch (error) {
       console.error('Error al aprobar el préstamo:', error);
@@ -200,4 +191,3 @@ const Solicitados = () => {
 };
 
 export default Solicitados;
-
