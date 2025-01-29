@@ -168,7 +168,7 @@ const Login = () => {
 
         <div className="mt-3 text-center">
           <a href="/registro" className="d-block mb-2">¿No tienes cuenta? Regístrate</a>
-          <a href="/recuperar-contraseña" className="d-block">¿Olvidaste tu contraseña?</a>
+          <a href="/recuperar-contrasenia" className="d-block">¿Olvidaste tu contraseña?</a>
         </div>
       </div>
     </motion.div>

@@ -41,7 +41,7 @@ const App = () => {
           <Route path="cuenta" element={<Cuenta />} />
         </Route>
         <Route path="/verificar-codigo/:id" element={<VerificarCodigo />} />
-        <Route path="/recuperar-contraseña" element={<ChangePassword />} />
+        <Route path="/recuperar-contrasenia" element={<ChangePassword />} />
       </Routes>
     </BrowserRouter>
   );
