@@ -113,7 +113,53 @@ const Solicitados = () => {
       );
 
       // Recargar la lista de préstamos después de aprobar el préstamo
-      fetchPrestamos(currentPage);
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token'); 
+        console.log(token);
+    
+        if (!token) {
+          console.error('Token no encontrado');
+          return;
+        }
+        
+        const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${page}&size=5`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.data.status === 'Exito') {
+          const prestamosWithDetails = await Promise.all(
+            response.data.data.content.map(async (prestamo) => {
+              try {
+                // Obtener nombre y cedula
+                const estudianteResponse = await axios.get(`https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
+                const nombre = estudianteResponse.data.data.nombre;
+                const cedula = estudianteResponse.data.data.cedula;
+    
+                return { 
+                  ...prestamo, 
+                  nombreEstudiante: nombre,
+                  cedulaEstudiante: cedula,
+                };
+              } catch {
+                return { 
+                  ...prestamo, 
+                  nombreEstudiante: 'Nombre no disponible',
+                  cedulaEstudiante: 'Cédula no disponible',
+                };
+              }
+            })
+          );
+          setPrestamos(prestamosWithDetails);
+          setFilteredPrestamos(prestamosWithDetails); // Mostrar todos inicialmente
+          setTotalPages(response.data.data.totalPages);
+        } else {
+          setError('No hay préstamos solicitados.');
+        }
+      } catch (err) {
+        setError('Error al cargar los préstamos solicitados.');
+      } finally {
+        setLoading(false);
+      }
 
     } catch (error) {
       console.error('Error al aprobar el préstamo:', error);
