@@ -29,7 +29,7 @@ const ProductosPestaña = () => {
 
   useEffect(() => {
     filtrarProductos();
-  }, [searchTerm, productos, ubicacion]);
+  }, [searchTerm, ubicacion, productos]);
 
   const cargarProductos = async (page) => {
     const token = localStorage.getItem('token');
@@ -109,6 +109,12 @@ const ProductosPestaña = () => {
     }
   };
 
+  // Función para calcular la paginación basada en los productos filtrados
+  const productosPaginaActual = () => {
+    const startIndex = currentPage * pageSize;
+    return filteredProductos.slice(startIndex, startIndex + pageSize);
+  };
+
   return (
     <Container fluid>
       {error && (
@@ -156,7 +162,7 @@ const ProductosPestaña = () => {
       </div>
 
       <TransitionGroup component={Row}>
-        {filteredProductos.map((producto) => (
+        {productosPaginaActual().map((producto) => (
           <CSSTransition key={producto.id} timeout={300} classNames="fade">
             <Col md={3} sm={6} xs={12} className="mb-4">
               <ProductoCard
@@ -186,4 +192,3 @@ const ProductosPestaña = () => {
 };
 
 export default ProductosPestaña;
-
