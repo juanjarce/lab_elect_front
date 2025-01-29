@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Row, Col, Form, Container, Pagination, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
+import { Row, Col, Form, Container, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
 import { Filter } from 'react-bootstrap-icons';
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
@@ -15,8 +15,6 @@ const ProductosPestaña = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [ubicacion, setUbicacion] = useState('');
   const [selectedProducto, setSelectedProducto] = useState(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const [cantidadDisponible, setCantidadDisponible] = useState({});
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -24,14 +22,14 @@ const ProductosPestaña = () => {
   const pageSize = 8;
 
   useEffect(() => {
-    cargarProductos(currentPage);
-  }, [currentPage]);
+    cargarProductos();  // Cargar todos los productos al inicio
+  }, []);
 
   useEffect(() => {
-    filtrarProductos();
+    filtrarProductos();  // Aplicar filtros siempre que haya un cambio en los términos de búsqueda o los productos
   }, [searchTerm, productos, ubicacion]);
 
-  const cargarProductos = async (page) => {
+  const cargarProductos = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado.');
@@ -39,20 +37,32 @@ const ProductosPestaña = () => {
     }
 
     try {
-      const response = await axios.get(`https://labuq.catavento.co:10443/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      let allProducts = [];
+      let currentPage = 0;
+      let totalPages = 1;  // Inicializamos en 1 para comenzar el ciclo
 
-      const { content, totalPages } = response.data.data;
-      setProductos(content);
-      setTotalPages(totalPages);
+      // Hacer solicitudes para obtener todas las páginas de productos
+      while (currentPage < totalPages) {
+        const response = await axios.get(`https://labuq.catavento.co:10443/api/estudiantes/productos/paginated?page=${currentPage}&size=${pageSize}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
+        const { content, totalPages: newTotalPages } = response.data.data;
+        allProducts = [...allProducts, ...content];
+        totalPages = newTotalPages;  // Actualizamos la cantidad total de páginas
+        currentPage++;
+      }
+
+      setProductos(allProducts);  // Guardamos todos los productos en el estado
+
+      // Obtener la cantidad disponible para cada producto
       const cantidadDisponibles = {};
-      for (const producto of content) {
+      for (const producto of allProducts) {
         const cantidadResponse = await obtenerCantidadDisponible(producto.id);
         cantidadDisponibles[producto.id] = cantidadResponse;
       }
       setCantidadDisponible(cantidadDisponibles);
+
     } catch (error) {
       setError('Error al cargar los productos.');
     }
@@ -170,14 +180,6 @@ const ProductosPestaña = () => {
         ))}
       </TransitionGroup>
 
-      <Pagination className="justify-content-center mt-3">
-        {[...Array(totalPages).keys()].map((page) => (
-          <Pagination.Item key={page} active={page === currentPage} onClick={() => setCurrentPage(page)}>
-            {page + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
-
       {selectedProducto && (
         <ProductoDetalleModal producto={selectedProducto} onClose={() => setSelectedProducto(null)} />
       )}
@@ -186,3 +188,4 @@ const ProductosPestaña = () => {
 };
 
 export default ProductosPestaña;
+
