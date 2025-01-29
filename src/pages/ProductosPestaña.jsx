@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Row, Col, Form, Container, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
+import { Row, Col, Form, Container, Pagination, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
 import { Filter } from 'react-bootstrap-icons';
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
@@ -15,20 +15,23 @@ const ProductosPestaña = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [ubicacion, setUbicacion] = useState('');
   const [selectedProducto, setSelectedProducto] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [cantidadDisponible, setCantidadDisponible] = useState({});
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Usaremos todos los productos sin paginación
+  const pageSize = 8;
+
   useEffect(() => {
-    cargarProductos();
-  }, []);
+    cargarProductos(currentPage);
+  }, [currentPage]);
 
   useEffect(() => {
     filtrarProductos();
   }, [searchTerm, productos, ubicacion]);
 
-  const cargarProductos = async () => {
+  const cargarProductos = async (page) => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado.');
@@ -36,13 +39,13 @@ const ProductosPestaña = () => {
     }
 
     try {
-      const response = await axios.get('https://labuq.catavento.co:10443/api/estudiantes/productos', {
+      const response = await axios.get(`https://labuq.catavento.co:10443/api/estudiantes/productos/paginated?page=${page}&size=${pageSize}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const content = response.data.data;
+      const { content, totalPages } = response.data.data;
       setProductos(content);
-      setFilteredProductos(content);
+      setTotalPages(totalPages);
 
       const cantidadDisponibles = {};
       for (const producto of content) {
@@ -166,6 +169,14 @@ const ProductosPestaña = () => {
           </CSSTransition>
         ))}
       </TransitionGroup>
+
+      <Pagination className="justify-content-center mt-3">
+        {[...Array(totalPages).keys()].map((page) => (
+          <Pagination.Item key={page} active={page === currentPage} onClick={() => setCurrentPage(page)}>
+            {page + 1}
+          </Pagination.Item>
+        ))}
+      </Pagination>
 
       {selectedProducto && (
         <ProductoDetalleModal producto={selectedProducto} onClose={() => setSelectedProducto(null)} />
