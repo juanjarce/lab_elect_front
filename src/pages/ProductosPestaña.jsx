@@ -209,4 +209,3 @@ const ProductosPestaña = () => {
 };
 
 export default ProductosPestaña;
-
