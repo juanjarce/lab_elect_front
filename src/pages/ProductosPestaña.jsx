@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Row, Col, Form, Container, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
+import { Row, Col, Form, Container, OverlayTrigger, Popover, Alert, Spinner } from 'react-bootstrap';
 import { Filter } from 'react-bootstrap-icons';
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
@@ -18,6 +18,7 @@ const ProductosPestaña = () => {
   const [cantidadDisponible, setCantidadDisponible] = useState({});
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [loading, setLoading] = useState(true);  // Estado para el cargando
 
   const pageSize = 8;
 
@@ -33,6 +34,7 @@ const ProductosPestaña = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado.');
+      setLoading(false);  // Detenemos el loading si no hay token
       return;
     }
 
@@ -62,9 +64,11 @@ const ProductosPestaña = () => {
         cantidadDisponibles[producto.id] = cantidadResponse;
       }
       setCantidadDisponible(cantidadDisponibles);
+      setLoading(false);  // Detenemos el loading cuando los productos están listos
 
     } catch (error) {
       setError('Error al cargar los productos.');
+      setLoading(false);  // Detenemos el loading si hay error
     }
   };
 
@@ -132,56 +136,64 @@ const ProductosPestaña = () => {
         </Alert>
       )}
 
-      <div className="d-flex align-items-center mb-3">
-        <Form.Control
-          type="text"
-          placeholder="Buscar por nombre o categoría"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="me-2"
-        />
-        <OverlayTrigger
-          trigger="click"
-          placement="bottom"
-          overlay={
-            <Popover id="popover-filter">
-              <Popover.Body>
-                <Form.Control
-                  as="select"
-                  value={ubicacion}
-                  onChange={(e) => setUbicacion(e.target.value)}
-                >
-                  <option value="">Todas las ubicaciones</option>
-                  <option value="LABORATORIO_ELECTRÓNICA">Laboratorio Electrónica</option>
-                  <option value="LABORATORIO_PROTOTIPADO">Laboratorio Prototipado</option>
-                  <option value="LABORATORIO_TELEMÁTICA">Laboratorio Telemática</option>
-                  <option value="BODEGA">Bodega</option>
-                </Form.Control>
-              </Popover.Body>
-            </Popover>
-          }
-        >
-          <Filter size={20} style={{ cursor: 'pointer' }} />
-        </OverlayTrigger>
-      </div>
+      {loading ? (  // Mostrar el Spinner de carga mientras los productos están cargando
+        <div className="d-flex justify-content-center mt-5">
+          <Spinner animation="border" variant="primary" />
+        </div>
+      ) : (
+        <>
+          <div className="d-flex align-items-center mb-3">
+            <Form.Control
+              type="text"
+              placeholder="Buscar por nombre o categoría"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="me-2"
+            />
+            <OverlayTrigger
+              trigger="click"
+              placement="bottom"
+              overlay={
+                <Popover id="popover-filter">
+                  <Popover.Body>
+                    <Form.Control
+                      as="select"
+                      value={ubicacion}
+                      onChange={(e) => setUbicacion(e.target.value)}
+                    >
+                      <option value="">Todas las ubicaciones</option>
+                      <option value="LABORATORIO_ELECTRÓNICA">Laboratorio Electrónica</option>
+                      <option value="LABORATORIO_PROTOTIPADO">Laboratorio Prototipado</option>
+                      <option value="LABORATORIO_TELEMÁTICA">Laboratorio Telemática</option>
+                      <option value="BODEGA">Bodega</option>
+                    </Form.Control>
+                  </Popover.Body>
+                </Popover>
+              }
+            >
+              <Filter size={20} style={{ cursor: 'pointer' }} />
+            </OverlayTrigger>
+          </div>
 
-      <TransitionGroup component={Row}>
-        {filteredProductos.map((producto) => (
-          <CSSTransition key={producto.id} timeout={300} classNames="fade">
-            <Col md={3} sm={6} xs={12} className="mb-4">
-              <ProductoCard
-                producto={producto}
-                onAgregarCarrito={handleAgregarCarrito}
-                cantidadDisponible={cantidadDisponible[producto.id]}
-                onClick={() => setSelectedProducto(producto)}
-              />
-            </Col>
-          </CSSTransition>
-        ))}
-      </TransitionGroup>
+          <TransitionGroup component={Row}>
+            {filteredProductos.map((producto) => (
+              <CSSTransition key={producto.id} timeout={300} classNames="fade">
+                <Col md={3} sm={6} xs={12} className="mb-4">
+                  <ProductoCard
+                    producto={producto}
+                    onAgregarCarrito={handleAgregarCarrito}
+                    cantidadDisponible={cantidadDisponible[producto.id]}
+                    onClick={() => setSelectedProducto(producto)}
+                  />
+                </Col>
+              </CSSTransition>
+            ))}
+          </TransitionGroup>
 
-      {selectedProducto && (
-        <ProductoDetalleModal producto={selectedProducto} onClose={() => setSelectedProducto(null)} />
+          {selectedProducto && (
+            <ProductoDetalleModal producto={selectedProducto} onClose={() => setSelectedProducto(null)} />
+          )}
+        </>
       )}
     </Container>
   );
