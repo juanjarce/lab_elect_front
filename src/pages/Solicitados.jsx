@@ -154,7 +154,7 @@ const Solicitados = () => {
               </CSSTransition>
             ))
           ) : (
-            <p>No hay préstamos solicitados.</p>
+            <p></p>
           )}
         </TransitionGroup>
       </div>
