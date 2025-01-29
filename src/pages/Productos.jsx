@@ -25,14 +25,14 @@ const Productos = () => {
   const pageSize = 8;
 
   useEffect(() => {
-    cargarProductos(currentPage);
-  }, [currentPage]);
+    cargarProductos(); // Cargar productos al cargar el componente
+  }, []);
 
   useEffect(() => {
-    aplicarFiltros();
+    aplicarFiltros(); // Aplicar filtros siempre que cambien los términos de búsqueda o productos
   }, [searchTerm, selectedUbicacion, productos]);
 
-  const cargarProductos = async (page) => {
+  const cargarProductos = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -42,7 +42,7 @@ const Productos = () => {
       }
 
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/admin/productos/paginated?page=${page}&size=${pageSize}`,
+        `https://labuq.catavento.co:10443/api/admin/productos/paginated?page=0&size=999`, // Obtener todos los productos
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -76,6 +76,7 @@ const Productos = () => {
     });
 
     setFilteredProductos(filtrados);
+    setTotalPages(Math.ceil(filtrados.length / pageSize)); // Actualizar totalPages según los productos filtrados
   };
 
   const confirmarEliminacion = (producto) => {
@@ -121,6 +122,8 @@ const Productos = () => {
     setShowModificarModal(true);
   };
 
+  const productosPorPagina = filteredProductos.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+
   return (
     <Container fluid>
       <Row className="mb-3 align-items-center">
@@ -156,7 +159,7 @@ const Productos = () => {
 
       <Row>
         <TransitionGroup component={null}>
-          {filteredProductos.map((producto) => (
+          {productosPorPagina.map((producto) => (
             <CSSTransition key={producto.id} timeout={300} classNames="fade">
               <Col md={3} sm={6} xs={12} className="mb-3">
                 <Card
@@ -239,7 +242,7 @@ const Productos = () => {
         onClose={() => setShowAgregarModal(false)}
         onSave={(nuevoProducto) => {
           setShowAgregarModal(false);
-          cargarProductos(currentPage);
+          cargarProductos();
         }}
       />
 
@@ -248,7 +251,7 @@ const Productos = () => {
         onClose={() => setShowModificarModal(false)}
         onSave={() => {
           setShowModificarModal(false);
-          cargarProductos(currentPage);
+          cargarProductos();
         }}
         producto={productoAEditar}
       />
