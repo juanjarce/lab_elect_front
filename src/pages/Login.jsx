@@ -167,8 +167,20 @@ const Login = () => {
         </form>
 
         <div className="mt-3 text-center">
-          <a href="/registro" className="d-block mb-2">¿No tienes cuenta? Regístrate</a>
-          <a href="/recuperar-contrasenia" className="d-block">¿Olvidaste tu contraseña?</a>
+          <button
+            onClick={() => navigate('/registro')}
+            className="btn btn-link p-0 m-1"
+            style={{ textDecoration: 'none' }}
+          >
+            ¿No tienes cuenta? Regístrate
+          </button>
+          <button
+            onClick={() => navigate('/recuperar-contrasenia')}
+            className="btn btn-link p-0 m-1"
+            style={{ textDecoration: 'none' }}
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
         </div>
       </div>
     </motion.div>
