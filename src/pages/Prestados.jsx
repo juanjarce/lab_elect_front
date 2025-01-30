@@ -141,6 +141,7 @@ const Prestados = () => {
               placeholder="Buscar por ID, Nombre del Estudiante o Documento"
               onChange={(e) => handleSearchChange(e.target.value)}
               className="w-100"
+              disabled={true} // Barra de búsqueda deshabilitada
             />
           </Col>
         </Row>

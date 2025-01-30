@@ -20,6 +20,7 @@ const ProductosPestaña = () => {
   const [cantidadDisponible, setCantidadDisponible] = useState({});
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [cargando, setCargando] = useState(true); // Nuevo estado para manejar la carga
 
   const pageSize = 8;
 
@@ -37,39 +38,34 @@ const ProductosPestaña = () => {
       setError('Token no encontrado.');
       return;
     }
-
-    let allProducts = [];
-    let totalProductPages = 0;
-    
+  
+    setCargando(true); // Iniciar el estado de carga
+  
     try {
-      // Realizar solicitudes por cada página de productos
-      const response = await axios.get('https://labuq.catavento.co:10443/api/estudiantes/productos/paginated', {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { page: 0, size: pageSize }
+      // Obtener todos los productos en una sola solicitud
+      const response = await axios.get('https://labuq.catavento.co:10443/api/estudiantes/productos/todos', {
+        headers: { Authorization: `Bearer ${token}` }
       });
-
-      totalProductPages = response.data.data.totalPages;
-
-      for (let i = 0; i < totalProductPages; i++) {
-        const pageResponse = await axios.get('https://labuq.catavento.co:10443/api/estudiantes/productos/paginated', {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { page: i, size: pageSize }
-        });
-        allProducts = allProducts.concat(pageResponse.data.data.content);
-      }
-
-      setProductos(allProducts);
-      setTotalPages(Math.ceil(allProducts.length / pageSize));
-
+  
+      const allProducts = response.data.data; // Lista completa de productos
+  
+      // Obtener cantidad disponible de cada producto
       const cantidadDisponibles = {};
-      for (const producto of allProducts) {
-        const cantidadResponse = await obtenerCantidadDisponible(producto.id);
-        cantidadDisponibles[producto.id] = cantidadResponse;
-      }
+      await Promise.all(
+        allProducts.map(async (producto) => {
+          const cantidadResponse = await obtenerCantidadDisponible(producto.id);
+          cantidadDisponibles[producto.id] = cantidadResponse;
+        })
+      );
+  
+      setProductos(allProducts);
       setCantidadDisponible(cantidadDisponibles);
-
+      setTotalPages(Math.ceil(allProducts.length / pageSize));
+  
     } catch (error) {
       setError('Error al cargar los productos.');
+    } finally {
+      setCargando(false); // Finalizar la carga
     }
   };
 
