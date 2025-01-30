@@ -91,6 +91,38 @@ const ProductosPestaña = () => {
     setTotalPages(Math.ceil(filtered.length / pageSize));
   };
 
+  const handleAgregarCarrito = async (productoId, cantidad) => {
+    setError(null);
+    setSuccessMessage(null);
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Token no encontrado.');
+      return;
+    }
+
+    try {
+      await axios.post(`https://labuq.catavento.co:10443/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setCantidadDisponible((prevCantidad) => ({
+        ...prevCantidad,
+        [productoId]: (prevCantidad[productoId] || 0) - cantidad,
+      }));
+
+      setProductos((prevProductos) =>
+        prevProductos.map((producto) =>
+          producto.id === productoId ? { ...producto, cantidad: 0 } : producto
+        )
+      );
+
+      setSuccessMessage('Producto agregado al carrito con éxito.');
+    } catch (error) {
+      setError(error.response?.data?.message || 'Error al agregar el producto al carrito.');
+    }
+  };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -164,7 +196,7 @@ const ProductosPestaña = () => {
               <Col md={3} sm={6} xs={12} className="mb-4">
                 <ProductoCard
                   producto={producto}
-                  onAgregarCarrito={() => handlePageChange(producto.id)}
+                  onAgregarCarrito={handleAgregarCarrito}
                   cantidadDisponible={cantidadDisponible[producto.id]}
                   onClick={() => setSelectedProducto(producto)}
                 />
