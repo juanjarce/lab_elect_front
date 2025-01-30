@@ -22,7 +22,7 @@ const Productos = () => {
   const [selectedUbicacion, setSelectedUbicacion] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const pageSize = 8;
+  const pageSize = 32;
 
   const paginationRef = useRef(null); // Referencia para el contenedor de paginación
 

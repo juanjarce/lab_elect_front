@@ -22,7 +22,7 @@ const ProductosPestaña = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [cargando, setCargando] = useState(true);
 
-  const pageSize = 8;
+  const pageSize = 32;
   const paginationRef = useRef(null);
 
   useEffect(() => {
