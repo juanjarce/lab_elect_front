@@ -49,17 +49,25 @@ const ProductosPestaña = () => {
   
       const allProducts = response.data.data; // Lista completa de productos
   
-      // Obtener cantidad disponible de cada producto
-      const cantidadDisponibles = {};
-      await Promise.all(
+      // Obtener cantidad disponible de cada producto de manera concurrente
+      const cantidadDisponibles = await Promise.all(
         allProducts.map(async (producto) => {
           const cantidadResponse = await obtenerCantidadDisponible(producto.id);
-          cantidadDisponibles[producto.id] = cantidadResponse;
+          return { id: producto.id, cantidad: cantidadResponse }; // Retorna el id y la cantidad
         })
       );
   
+      // Crear un objeto de cantidad disponible para fácil acceso
+      const cantidadDisponible = {};
+      cantidadDisponibles.forEach(({ id, cantidad }) => {
+        cantidadDisponible[id] = cantidad; // Asignar la cantidad al producto correspondiente
+      });
+  
+      // Establecer los productos y las cantidades disponibles
       setProductos(allProducts);
-      setCantidadDisponible(cantidadDisponibles);
+      setCantidadDisponible(cantidadDisponible);
+  
+      // Asignar el total de páginas
       setTotalPages(Math.ceil(allProducts.length / pageSize));
   
     } catch (error) {
@@ -67,7 +75,7 @@ const ProductosPestaña = () => {
     } finally {
       setCargando(false); // Finalizar la carga
     }
-  };
+  };  
 
   const obtenerCantidadDisponible = async (productoId) => {
     try {
