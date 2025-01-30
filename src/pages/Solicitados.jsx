@@ -104,28 +104,21 @@ const Solicitados = () => {
         console.error('Token no encontrado');
         return;
       }
-
+  
       // Llamada a la API para aprobar el préstamo
       await axios.put(
         `https://labuq.catavento.co:10443/api/admin/prestamos/aprobar/${prestamoId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
+  
       // Recargar la lista de préstamos después de aprobar el préstamo
       setLoading(true);
       try {
-        const token = localStorage.getItem('token'); 
-        console.log(token);
-    
-        if (!token) {
-          console.error('Token no encontrado');
-          return;
-        }
-        
-        const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${page}&size=5`, {
+        const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${currentPage}&size=5`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        
         if (response.data.status === 'Exito') {
           const prestamosWithDetails = await Promise.all(
             response.data.data.content.map(async (prestamo) => {
@@ -134,7 +127,7 @@ const Solicitados = () => {
                 const estudianteResponse = await axios.get(`https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
                 const nombre = estudianteResponse.data.data.nombre;
                 const cedula = estudianteResponse.data.data.cedula;
-    
+  
                 return { 
                   ...prestamo, 
                   nombreEstudiante: nombre,
@@ -160,11 +153,11 @@ const Solicitados = () => {
       } finally {
         setLoading(false);
       }
-
+  
     } catch (error) {
       console.error('Error al aprobar el préstamo:', error);
     }
-  };
+  };  
 
   if (error) {
     return <div>{error}</div>;
