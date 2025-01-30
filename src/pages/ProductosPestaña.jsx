@@ -6,6 +6,7 @@ import { Filter } from 'react-bootstrap-icons';
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { Spinner } from 'react-bootstrap'; // Importa el componente Spinner
 import './css/Transitions.css';
 
 const ProductosPestaña = () => {
@@ -182,6 +183,11 @@ const ProductosPestaña = () => {
         </OverlayTrigger>
       </div>
 
+      {cargando ? (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <Spinner animation="border" variant="primary" />
+      </div>
+    ) : (
       <TransitionGroup component={Row}>
         {productosPaginaActual.map((producto) => (
           <CSSTransition key={producto.id} timeout={300} classNames="fade">
@@ -196,6 +202,7 @@ const ProductosPestaña = () => {
           </CSSTransition>
         ))}
       </TransitionGroup>
+    )}
 
       <Pagination className="justify-content-center mt-3">
         {[...Array(totalPages).keys()].map((page) => (
