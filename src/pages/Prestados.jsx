@@ -28,7 +28,7 @@ const Prestados = () => {
       }
 
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/admin/prestamos/prestados?page=${page}&size=5`,
+        `https://labuq.catavento.co:10443/api/admin/prestamos/prestados?page=${page}&size=100`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

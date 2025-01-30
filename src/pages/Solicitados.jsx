@@ -28,7 +28,7 @@ const Solicitados = () => {
         return;
       }
       
-      const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${page}&size=5`, {
+      const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${page}&size=100`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.status === 'Exito') {
