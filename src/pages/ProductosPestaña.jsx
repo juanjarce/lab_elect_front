@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Row, Col, Form, Container, Pagination, OverlayTrigger, Popover, Alert } from 'react-bootstrap';
@@ -6,8 +6,7 @@ import { Filter } from 'react-bootstrap-icons';
 import ProductoCard from './ProductoCard';
 import ProductoDetalleModal from './ProductoDetalleModal';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { Spinner } from 'react-bootstrap'; // Importa el componente Spinner
-import './css/Transitions.css';
+import { Spinner } from 'react-bootstrap';
 
 const ProductosPestaña = () => {
   const { id } = useParams();
@@ -21,17 +20,18 @@ const ProductosPestaña = () => {
   const [cantidadDisponible, setCantidadDisponible] = useState({});
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [cargando, setCargando] = useState(true); // Nuevo estado para manejar la carga
+  const [cargando, setCargando] = useState(true);
 
   const pageSize = 8;
+  const paginationRef = useRef(null);
 
   useEffect(() => {
     cargarProductos();
-  }, []); // Cargar productos una vez al inicio
+  }, []);
 
   useEffect(() => {
     filtrarProductos();
-  }, [searchTerm, productos, ubicacion]); // Filtrar productos cada vez que cambian los criterios
+  }, [searchTerm, productos, ubicacion]);
 
   const cargarProductos = async () => {
     const token = localStorage.getItem('token');
@@ -39,44 +39,37 @@ const ProductosPestaña = () => {
       setError('Token no encontrado.');
       return;
     }
-  
-    setCargando(true); // Iniciar el estado de carga
-  
+
+    setCargando(true);
+
     try {
-      // Obtener todos los productos en una sola solicitud
       const response = await axios.get('https://labuq.catavento.co:10443/api/estudiantes/productos/todos', {
         headers: { Authorization: `Bearer ${token}` }
       });
-  
-      const allProducts = response.data.data; // Lista completa de productos
-  
-      // Obtener cantidad disponible de cada producto de manera concurrente
+
+      const allProducts = response.data.data;
+
       const cantidadDisponibles = await Promise.all(
         allProducts.map(async (producto) => {
           const cantidadResponse = await obtenerCantidadDisponible(producto.id);
-          return { id: producto.id, cantidad: cantidadResponse }; // Retorna el id y la cantidad
+          return { id: producto.id, cantidad: cantidadResponse };
         })
       );
-  
-      // Crear un objeto de cantidad disponible para fácil acceso
+
       const cantidadDisponible = {};
       cantidadDisponibles.forEach(({ id, cantidad }) => {
-        cantidadDisponible[id] = cantidad; // Asignar la cantidad al producto correspondiente
+        cantidadDisponible[id] = cantidad;
       });
-  
-      // Establecer los productos y las cantidades disponibles
+
       setProductos(allProducts);
       setCantidadDisponible(cantidadDisponible);
-  
-      // Asignar el total de páginas
       setTotalPages(Math.ceil(allProducts.length / pageSize));
-  
     } catch (error) {
       setError('Error al cargar los productos.');
     } finally {
-      setCargando(false); // Finalizar la carga
+      setCargando(false);
     }
-  };  
+  };
 
   const obtenerCantidadDisponible = async (productoId) => {
     try {
@@ -98,43 +91,20 @@ const ProductosPestaña = () => {
     setTotalPages(Math.ceil(filtered.length / pageSize));
   };
 
-  const handleAgregarCarrito = async (productoId, cantidad) => {
-    setError(null);
-    setSuccessMessage(null);
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError('Token no encontrado.');
-      return;
-    }
-
-    try {
-      await axios.post(`https://labuq.catavento.co:10443/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setCantidadDisponible((prevCantidad) => ({
-        ...prevCantidad,
-        [productoId]: (prevCantidad[productoId] || 0) - cantidad,
-      }));
-
-      setProductos((prevProductos) =>
-        prevProductos.map((producto) =>
-          producto.id === productoId ? { ...producto, cantidad: 0 } : producto
-        )
-      );
-
-      setSuccessMessage('Producto agregado al carrito con éxito.');
-    } catch (error) {
-      setError(error.response?.data?.message || 'Error al agregar el producto al carrito.');
-    }
-  };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  // Solo mostrar los productos de la página actual
+  const scrollPagination = (direction) => {
+    if (paginationRef.current) {
+      const scrollAmount = 100;
+      paginationRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const productosPaginaActual = filteredProductos.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
 
   return (
@@ -184,33 +154,70 @@ const ProductosPestaña = () => {
       </div>
 
       {cargando ? (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-        <Spinner animation="border" variant="primary" />
-      </div>
-    ) : (
-      <TransitionGroup component={Row}>
-        {productosPaginaActual.map((producto) => (
-          <CSSTransition key={producto.id} timeout={300} classNames="fade">
-            <Col md={3} sm={6} xs={12} className="mb-4">
-              <ProductoCard
-                producto={producto}
-                onAgregarCarrito={handleAgregarCarrito}
-                cantidadDisponible={cantidadDisponible[producto.id]}
-                onClick={() => setSelectedProducto(producto)}
-              />
-            </Col>
-          </CSSTransition>
-        ))}
-      </TransitionGroup>
-    )}
+        <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+          <Spinner animation="border" variant="primary" />
+        </div>
+      ) : (
+        <TransitionGroup component={Row}>
+          {productosPaginaActual.map((producto) => (
+            <CSSTransition key={producto.id} timeout={300} classNames="fade">
+              <Col md={3} sm={6} xs={12} className="mb-4">
+                <ProductoCard
+                  producto={producto}
+                  onAgregarCarrito={() => handlePageChange(producto.id)}
+                  cantidadDisponible={cantidadDisponible[producto.id]}
+                  onClick={() => setSelectedProducto(producto)}
+                />
+              </Col>
+            </CSSTransition>
+          ))}
+        </TransitionGroup>
+      )}
 
-      <Pagination className="justify-content-center mt-3">
-        {[...Array(totalPages).keys()].map((page) => (
-          <Pagination.Item key={page} active={page === currentPage} onClick={() => handlePageChange(page)}>
-            {page + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '10px' }}>
+        <button
+          onClick={() => scrollPagination('left')}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '20px',
+            cursor: 'pointer',
+            padding: '5px'
+          }}
+        >
+          ◀
+        </button>
+        <div
+          ref={paginationRef}
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            whiteSpace: 'nowrap',
+            maxWidth: '300px',
+            padding: '5px'
+          }}
+        >
+          <Pagination style={{ display: 'flex', flexWrap: 'nowrap' }}>
+            {[...Array(totalPages).keys()].map((page) => (
+              <Pagination.Item key={page} active={page === currentPage} onClick={() => handlePageChange(page)}>
+                {page + 1}
+              </Pagination.Item>
+            ))}
+          </Pagination>
+        </div>
+        <button
+          onClick={() => scrollPagination('right')}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '20px',
+            cursor: 'pointer',
+            padding: '5px'
+          }}
+        >
+          ▶
+        </button>
+      </div>
 
       {selectedProducto && (
         <ProductoDetalleModal producto={selectedProducto} onClose={() => setSelectedProducto(null)} />

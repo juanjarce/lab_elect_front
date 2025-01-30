@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Card, Button, Row, Col, Pagination, Container, Form, Spinner, Modal } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -23,6 +23,8 @@ const Productos = () => {
   const [loading, setLoading] = useState(false);
 
   const pageSize = 8;
+
+  const paginationRef = useRef(null); // Referencia para el contenedor de paginación
 
   useEffect(() => {
     cargarProductos(); // Cargar productos al cargar el componente
@@ -123,6 +125,17 @@ const Productos = () => {
   };
 
   const productosPorPagina = filteredProductos.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+
+  // Función para desplazar la paginación
+  const scrollPagination = (direction) => {
+    if (paginationRef.current) {
+      const scrollAmount = 100; // Cantidad de desplazamiento
+      paginationRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   return (
     <Container fluid>
@@ -225,17 +238,60 @@ const Productos = () => {
         </div>
       )}
 
-      <Pagination className="justify-content-center mt-3">
-        {[...Array(totalPages).keys()].map((page) => (
-          <Pagination.Item
-            key={page}
-            active={page === currentPage}
-            onClick={() => handlePageChange(page)}
-          >
-            {page + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
+      {/* Contenedor de la paginación con botones de desplazamiento */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '10px' }}>
+        {/* Botón izquierdo para desplazar */}
+        <button
+          onClick={() => scrollPagination('left')}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '20px',
+            cursor: 'pointer',
+            padding: '5px',
+          }}
+        >
+          ◀
+        </button>
+
+        {/* Contenedor de paginación con scroll horizontal */}
+        <div
+          ref={paginationRef}
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            whiteSpace: 'nowrap',
+            maxWidth: '300px', // Puedes ajustar el tamaño
+            padding: '5px',
+          }}
+        >
+          <Pagination style={{ display: 'flex', flexWrap: 'nowrap' }}>
+            {[...Array(totalPages).keys()].map((page) => (
+              <Pagination.Item
+                key={page}
+                active={page === currentPage}
+                onClick={() => handlePageChange(page)}
+              >
+                {page + 1}
+              </Pagination.Item>
+            ))}
+          </Pagination>
+        </div>
+
+        {/* Botón derecho para desplazar */}
+        <button
+          onClick={() => scrollPagination('right')}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '20px',
+            cursor: 'pointer',
+            padding: '5px',
+          }}
+        >
+          ▶
+        </button>
+      </div>
 
       <AgregarProductoForm
         show={showAgregarModal}
