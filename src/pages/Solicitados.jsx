@@ -112,48 +112,6 @@ const Solicitados = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
   
-      // Recargar la lista de préstamos después de aprobar el préstamo
-      setLoading(true);
-      try {
-        const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${currentPage}&size=5`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        
-        if (response.data.status === 'Exito') {
-          const prestamosWithDetails = await Promise.all(
-            response.data.data.content.map(async (prestamo) => {
-              try {
-                // Obtener nombre y cedula
-                const estudianteResponse = await axios.get(`https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
-                const nombre = estudianteResponse.data.data.nombre;
-                const cedula = estudianteResponse.data.data.cedula;
-  
-                return { 
-                  ...prestamo, 
-                  nombreEstudiante: nombre,
-                  cedulaEstudiante: cedula,
-                };
-              } catch {
-                return { 
-                  ...prestamo, 
-                  nombreEstudiante: 'Nombre no disponible',
-                  cedulaEstudiante: 'Cédula no disponible',
-                };
-              }
-            })
-          );
-          setPrestamos(prestamosWithDetails);
-          setFilteredPrestamos(prestamosWithDetails); // Mostrar todos inicialmente
-          setTotalPages(response.data.data.totalPages);
-        } else {
-          setError('No hay préstamos solicitados.');
-        }
-      } catch (err) {
-        setError('Error al cargar los préstamos solicitados.');
-      } finally {
-        setLoading(false);
-      }
-  
     } catch (error) {
       console.error('Error al aprobar el préstamo:', error);
     }
@@ -187,8 +145,8 @@ const Solicitados = () => {
               <CSSTransition key={prestamo.id} timeout={500} classNames="card-transition">
                 <PrestamoCard
                   prestamo={prestamo}
-                  onVerDetalles={handleVerDetalles}
-                  onAprobar={handleAprobar} // Pasamos la función handleAprobar
+                  onVerDetalles={handleVerDetalles} // Pasamos la función para ver detalles
+                  onAprobar={() => fetchPrestamos(currentPage)} // Recargar préstamos tras aprobar
                 />
               </CSSTransition>
             ))
