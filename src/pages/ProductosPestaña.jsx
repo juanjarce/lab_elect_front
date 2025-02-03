@@ -49,18 +49,6 @@ const ProductosPestaña = () => {
 
       const allProducts = response.data.data;
 
-      const cantidadDisponibles = await Promise.all(
-        allProducts.map(async (producto) => {
-          const cantidadResponse = await obtenerCantidadDisponible(producto.id);
-          return { id: producto.id, cantidad: cantidadResponse };
-        })
-      );
-
-      const cantidadDisponible = {};
-      cantidadDisponibles.forEach(({ id, cantidad }) => {
-        cantidadDisponible[id] = cantidad;
-      });
-
       setProductos(allProducts);
       setCantidadDisponible(cantidadDisponible);
       setTotalPages(Math.ceil(allProducts.length / pageSize));
@@ -68,15 +56,6 @@ const ProductosPestaña = () => {
       setError('Error al cargar los productos.');
     } finally {
       setCargando(false);
-    }
-  };
-
-  const obtenerCantidadDisponible = async (productoId) => {
-    try {
-      const response = await axios.get(`https://labuq.catavento.co:10443/api/estudiantes/productos/${productoId}/cantidad-disponible`);
-      return response.data.data.cantDisponible;
-    } catch (error) {
-      return 0;
     }
   };
 
@@ -89,38 +68,6 @@ const ProductosPestaña = () => {
     });
     setFilteredProductos(filtered);
     setTotalPages(Math.ceil(filtered.length / pageSize));
-  };
-
-  const handleAgregarCarrito = async (productoId, cantidad) => {
-    setError(null);
-    setSuccessMessage(null);
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError('Token no encontrado.');
-      return;
-    }
-
-    try {
-      await axios.post(`https://labuq.catavento.co:10443/api/estudiantes/producto/agregar/${id}/${productoId}?cantidad=${cantidad}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setCantidadDisponible((prevCantidad) => ({
-        ...prevCantidad,
-        [productoId]: (prevCantidad[productoId] || 0) - cantidad,
-      }));
-
-      setProductos((prevProductos) =>
-        prevProductos.map((producto) =>
-          producto.id === productoId ? { ...producto, cantidad: 0 } : producto
-        )
-      );
-
-      setSuccessMessage('Producto agregado al carrito con éxito.');
-    } catch (error) {
-      setError(error.response?.data?.message || 'Error al agregar el producto al carrito.');
-    }
   };
 
   const handlePageChange = (page) => {
@@ -196,8 +143,6 @@ const ProductosPestaña = () => {
               <Col md={3} sm={6} xs={12} className="mb-4">
                 <ProductoCard
                   producto={producto}
-                  onAgregarCarrito={handleAgregarCarrito}
-                  cantidadDisponible={cantidadDisponible[producto.id]}
                   onClick={() => setSelectedProducto(producto)}
                 />
               </Col>
@@ -252,7 +197,10 @@ const ProductosPestaña = () => {
       </div>
 
       {selectedProducto && (
-        <ProductoDetalleModal producto={selectedProducto} onClose={() => setSelectedProducto(null)} />
+        <ProductoDetalleModal 
+          producto={selectedProducto} 
+          id={id} 
+          onClose={() => setSelectedProducto(null)} />
       )}
     </Container>
   );

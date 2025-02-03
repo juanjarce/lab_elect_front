@@ -110,7 +110,7 @@ const Login = () => {
                 checked={!isAdmin}
                 onChange={handleUserTypeChange}
               />
-              <label className="form-check-label">Estudiante</label>
+              <label className="form-check-label">Estudiante-Docente</label>
             </div>
             <div className="form-check form-check-inline">
               <input
