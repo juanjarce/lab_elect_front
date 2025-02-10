@@ -23,7 +23,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
             return;
           }    
 
-          const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/${prestamoId}/detalles`, {
+          const response = await axios.get(`http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -35,7 +35,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
             setError('No se pudieron obtener los detalles.');
           }
         } catch (err) {
-          setError(`Error al cargar los detalles: ${err.response?.data?.message || err.message}`);
+          
         } finally {
           setLoading(false);
         }
@@ -49,7 +49,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
     setIsSubmitting(true);
     try {
       const response = await axios.put(
-        `https://labuq.catavento.co:10443/api/admin/detalle/devolver/${detalleAConfirmar.id}`,
+        `http://localhost:8081/api/admin/detalle/devolver/${detalleAConfirmar.id}`,
         null,
         {
           headers: {
@@ -75,6 +75,13 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  
+  const handleCloseModal = () => {
+    // Limpiar los detalles al cerrar el modal
+    setDetalles([]);
+    onClose(); // Llamar a la función que cierra el modal
   };
 
   if (error) {
@@ -174,7 +181,9 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>Cerrar</Button>
+          <Button variant="secondary" onClick={handleCloseModal}>
+             Cerrar
+          </Button>
       </Modal.Footer>
     </Modal>
   );

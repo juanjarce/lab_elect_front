@@ -1,0 +1,52 @@
+.reserva-formulario {
+    padding: 20px;
+  }
+  
+  .reserva-formulario h5 {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .agenda-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .agenda-item {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    min-width: 120px;
+  }
+  
+  .reserva-horario {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .reserva-horario input {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .reserva-botones {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+  
+  .alerta-mensaje {
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+  }
+  

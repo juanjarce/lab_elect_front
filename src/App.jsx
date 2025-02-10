@@ -14,6 +14,11 @@ import Productos from './pages/Productos'; // Componente para la pestaña "Cuent
 import Solicitados from './pages/Solicitados'; // Componente para la pestaña "Cuenta"
 import Prestados from './pages/Prestados'; // Componente para la pestaña "Cuenta"
 import Devueltos from './pages/Devueltos'; // Componente para la pestaña "Cuenta"
+import GestionLaboratorios from './pages/GestionLaboratorios';
+import GestionReservas from './pages/GestionReservas';
+import Laboratorios from './pages/Laboratorios';
+import MisReservas from './pages/MisReservas';
+
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Importa el JS de Bootstrap para que los colapsables funcionen
@@ -31,6 +36,8 @@ const App = () => {
           <Route path="prestamos/solicitados" element={<Solicitados />} />
           <Route path="prestamos/prestados" element={<Prestados />} />
           <Route path="prestamos/devueltos" element={<Devueltos />} />
+          <Route path="laboratorios/configuracion" element={<GestionLaboratorios />} />
+          <Route path="laboratorios/reservas" element={<GestionReservas />} />
           {/* Aquí puedes agregar más rutas según las secciones del Admin */}
         </Route>
         <Route path="/estudiante-dashboard/:id" element={<EstudianteDashboard />}>
@@ -39,6 +46,8 @@ const App = () => {
           <Route path="carrito" element={<Carrito />} />
           <Route path="prestamos" element={<Prestamos />} />
           <Route path="cuenta" element={<Cuenta />} />
+          <Route path="laboratorios" element={<Laboratorios />} /> 
+          <Route path="reservas" element={<MisReservas />} />
         </Route>
         <Route path="/verificar-codigo/:id" element={<VerificarCodigo />} />
         <Route path="/recuperar-contrasenia" element={<ChangePassword />} />

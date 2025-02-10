@@ -19,7 +19,7 @@ const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
             return;
           }    
 
-          const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/${prestamoId}/detalles`, {
+          const response = await axios.get(`http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -40,6 +40,12 @@ const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
       fetchDetalles();
     }
   }, [prestamoId]);
+
+  const handleCloseModal = () => {
+    // Limpiar los detalles al cerrar el modal
+    setDetalles([]);
+    onClose(); // Llamar a la función que cierra el modal
+  };
 
   if (error) {
     return <div>{error}</div>;
@@ -98,7 +104,9 @@ const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>Cerrar</Button>
+        <Button variant="secondary" onClick={handleCloseModal}>
+            Cerrar
+        </Button>
       </Modal.Footer>
     </Modal>
   );
