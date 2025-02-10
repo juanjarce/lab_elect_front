@@ -18,7 +18,7 @@ const MisReservas = () => {
     useEffect(() => {
         const fetchReservas = async () => {
             try {
-                const response = await axios.get(`http://localhost:8081/api/estudiantes/reservas/${id}`, {
+                const response = await axios.get(`https://labuq.catavento.co:10443/api/estudiantes/reservas/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setReservas(response.data.data);

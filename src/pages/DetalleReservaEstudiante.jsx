@@ -14,7 +14,7 @@ const DetalleReservaEstudiante = ({ show, onHide, reserva, onReservaCancelada })
         setLoading(true);
 
         try {
-            await axios.delete(`http://localhost:8081/api/estudiantes/reserva/cancelar/${reserva.estudianteId}`, {
+            await axios.delete(`https://labuq.catavento.co:10443/api/estudiantes/reserva/cancelar/${reserva.estudianteId}`, {
                 headers: { Authorization: `Bearer ${token}` },
                 data: { detalleAgendaId: reserva.id } // 🔥 IMPORTANTE: `data` para enviar el body en DELETE
             });

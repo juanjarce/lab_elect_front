@@ -44,7 +44,7 @@ const Productos = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:8081/api/admin/productos/paginated?page=0&size=999`, // Obtener todos los productos
+        `https://labuq.catavento.co:10443/api/admin/productos/paginated?page=0&size=999`, // Obtener todos los productos
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -97,7 +97,7 @@ const Productos = () => {
       }
 
       await axios.delete(
-        `http://localhost:8081/api/admin/productos/eliminar/${productoAEliminar.id}`,
+        `https://labuq.catavento.co:10443/api/admin/productos/eliminar/${productoAEliminar.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -28,7 +28,7 @@ const Solicitados = () => {
         return;
       }
       
-      const response = await axios.get(`http://localhost:8081/api/admin/prestamos/solicitados?page=${page}&size=100`, {
+      const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${page}&size=100`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.status === 'Exito') {
@@ -36,7 +36,7 @@ const Solicitados = () => {
           response.data.data.content.map(async (prestamo) => {
             try {
               // Obtener nombre y cedula
-              const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
+              const estudianteResponse = await axios.get(`https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;
   

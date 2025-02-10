@@ -20,7 +20,7 @@ const EstudianteDashboard = () => {
       if (token) {
         // Realizar la solicitud para cerrar sesión
         const response = await axios.put(
-          `http://localhost:8081/api/estudiantes/logout/${id}`,
+          `https://labuq.catavento.co:10443/api/estudiantes/logout/${id}`,
           null, // Si es necesario, puedes enviar un objeto vacío o cualquier dato adicional
           { headers: { Authorization: `Bearer ${token}` } }
         );
