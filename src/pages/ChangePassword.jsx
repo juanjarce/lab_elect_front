@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
     email: '',
-    currentPassword: '',
     newPassword: '',
     confirmPassword: '',
     verificationCode: '', // Campo para el código de verificación
@@ -70,7 +69,7 @@ const ChangePassword = () => {
         `https://labuq.catavento.co:10443/api/estudiantes/id-by-email?email=${formData.email}`
       );
       if (!idResponse.ok) {
-        throw new Error('Error al obtener el ID del estudiante');
+        throw new Error('El email no se encuentra registrado');
       }
       const { data } = await idResponse.json();
       const estudianteId = data.id;
@@ -84,7 +83,6 @@ const ChangePassword = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            contraseñaActual: formData.currentPassword,
             nuevaContraseña: formData.newPassword,
             codigoVerificación: formData.verificationCode, // Incluir el código de verificación
           }),
@@ -177,21 +175,6 @@ const ChangePassword = () => {
               />
             </div>
           )}
-
-          <div className="mb-3">
-            <label htmlFor="currentPassword" className="form-label">
-              <FaLock /> Contraseña actual
-            </label>
-            <input
-              type="password"
-              className="form-control"
-              id="currentPassword"
-              name="currentPassword"
-              value={formData.currentPassword}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
 
           <div className="mb-3">
             <label htmlFor="newPassword" className="form-label">
