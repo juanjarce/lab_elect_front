@@ -147,26 +147,34 @@ const Prestados = () => {
         </Row>
       </Form>
 
-      <TransitionGroup className="row">
-        {filteredPrestamos.length > 0 ? (
-          filteredPrestamos.map((prestamo) => (
-            <CSSTransition
-              key={prestamo.id}
-              timeout={500}
-              classNames="card-transition"
-              unmountOnExit
-            >
-              <PrestamoCardEntregado
-                prestamo={prestamo}
-                onVerDetalles={handleVerDetalles}
-                onEntregar={handleEntregaPrestamo}
-              />
-            </CSSTransition>
-          ))
-        ) : (
-          <p></p>
-        )}
-      </TransitionGroup>
+      {loading ? (
+        <div className="d-flex justify-content-center my-4">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Cargando préstamos...</span>
+          </div>
+        </div>
+      ) : (
+        <TransitionGroup className="row">
+          {filteredPrestamos.length > 0 ? (
+            filteredPrestamos.map((prestamo) => (
+              <CSSTransition
+                key={prestamo.id}
+                timeout={500}
+                classNames="card-transition"
+                unmountOnExit
+              >
+                <PrestamoCardEntregado
+                  prestamo={prestamo}
+                  onVerDetalles={handleVerDetalles}
+                  onEntregar={handleEntregaPrestamo}
+                />
+              </CSSTransition>
+            ))
+          ) : (
+            <p className="text-center">No hay préstamos en estado PRESTADO.</p>
+          )}
+        </TransitionGroup>
+      )}
 
       {/* Paginación */}
       <div className="d-flex justify-content-center mt-4">

@@ -120,6 +120,15 @@ const Solicitados = () => {
         </Row>
       </Form>
 
+      {/* Mostrar un spinner mientras se cargan los préstamos */}
+      {loading && (
+        <div className="text-center my-4">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+      )}
+
       <div className="row">
         <TransitionGroup className="row">
           {filteredPrestamos.length > 0 ? (
@@ -127,13 +136,13 @@ const Solicitados = () => {
               <CSSTransition key={prestamo.id} timeout={500} classNames="card-transition">
                 <PrestamoCard
                   prestamo={prestamo}
-                  onVerDetalles={handleVerDetalles} // Pasamos la función para ver detalles
-                  onAprobar={() => fetchPrestamos(currentPage)} // Recargar préstamos tras aprobar
+                  onVerDetalles={handleVerDetalles}
+                  onAprobar={() => fetchPrestamos(currentPage)}
                 />
               </CSSTransition>
             ))
           ) : (
-            <p></p>
+            !loading && <p>No hay préstamos solicitados.</p>
           )}
         </TransitionGroup>
       </div>

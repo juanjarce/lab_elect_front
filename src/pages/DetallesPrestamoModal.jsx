@@ -106,7 +106,15 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
         <Modal.Title>Detalles del Préstamo</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <TablaDetalles detalles={detalles} onEliminar={handleEliminarDetalle} />
+        {loading ? (
+          <div className="text-center my-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Cargando detalles...</span>
+            </div>
+          </div>
+        ) : (
+          <TablaDetalles detalles={detalles} onEliminar={handleEliminarDetalle} />
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleCloseModal}>

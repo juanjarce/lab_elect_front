@@ -119,7 +119,13 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
           </Alert>
         )}
         
-        {/* Tabla de detalles */}
+        {loading ? (
+        <div className="d-flex justify-content-center my-4">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Cargando detalles...</span>
+          </Spinner>
+        </div>
+        ) : (
         <div className="table-responsive">
           <table className="table table-bordered">
             <thead>
@@ -130,7 +136,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
                 <th>Categoría</th>
                 <th>Link DataSheet</th>
                 <th>Estado</th>
-                <th>Acción</th> {/* Columna para el botón de entrega */}
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -170,7 +176,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
                           setShowConfirm(true);
                         }}
                       >
-                        <FaCheckCircle /> {/* Ícono de "check-circle" */}
+                        <FaCheckCircle />
                       </Button>
                     )}
                   </td>
@@ -179,6 +185,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
             </tbody>
           </table>
         </div>
+      )}
       </Modal.Body>
       <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
