@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
@@ -26,7 +26,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Importa el JS de Bootstra
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/registro" element={<Register />} />
@@ -52,7 +52,7 @@ const App = () => {
         <Route path="/verificar-codigo/:id" element={<VerificarCodigo />} />
         <Route path="/recuperar-contrasenia" element={<ChangePassword />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
