@@ -49,7 +49,10 @@ const Prestamos = () => {
     setShowModal(true);
   };
 
-  const handleCloseModal = () => setShowModal(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedPrestamo(null);
+  };
   const handlePageChange = (page) => setCurrentPage(page);
 
   const filteredPrestamos = prestamos.filter((prestamo) => {

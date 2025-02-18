@@ -57,7 +57,13 @@ const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
         <Modal.Title>Detalles del Préstamo</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* Tabla de detalles */}
+      {loading ? (
+        <div className="d-flex justify-content-center my-4">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Cargando detalles...</span>
+          </Spinner>
+        </div>
+      ) : (
         <div className="table-responsive">
           <table className="table table-bordered">
             <thead>
@@ -102,6 +108,7 @@ const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
             </tbody>
           </table>
         </div>
+      )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleCloseModal}>
