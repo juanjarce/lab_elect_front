@@ -57,8 +57,17 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
         }
     };
 
+    const handleClose = () => {
+        setFecha('');
+        setAgendas([]);
+        setMensaje(null);
+        setLoading(false);
+        setLoadingReserva(false);
+        onClose(); // Llama a la función original de cierre
+    };    
+
     return (
-        <Modal show={show} onHide={onClose} centered>
+        <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
                 <Modal.Title>Reservas - {laboratorio?.nombre}</Modal.Title>
             </Modal.Header>
@@ -100,7 +109,7 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
                 )}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={onClose}>Cerrar</Button>
+                <Button variant="secondary" onClick={handleClose}>Cerrar</Button>
             </Modal.Footer>
         </Modal>
     );

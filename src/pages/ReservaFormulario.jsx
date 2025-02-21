@@ -70,8 +70,20 @@ const ReservaFormulario = ({ show, onClose, laboratorio }) => {
         }
     };
 
+    const handleClose = () => {
+        setFecha('');
+        setAgendas([]);
+        setMensaje(null);
+        setSelectedAgenda(null);
+        setShowDetalleReserva(false);
+        setFechaNueva('');
+        setHoraInicio('');
+        setHoraFin('');
+        onClose(); // Llama la función de cierre proporcionada por las props
+    };
+
     return (
-        <Modal show={show} onHide={onClose} centered>
+        <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
                 <Modal.Title>Reservas - {laboratorio?.nombre}</Modal.Title>
             </Modal.Header>
@@ -148,7 +160,7 @@ const ReservaFormulario = ({ show, onClose, laboratorio }) => {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={onClose}>Cerrar</Button>
+                <Button variant="secondary" onClick={handleClose}>Cerrar</Button>
             </Modal.Footer>
             <DetalleReservaFormulario 
                 show={showDetalleReserva} 
