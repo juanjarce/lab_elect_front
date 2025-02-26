@@ -79,6 +79,9 @@ const ProductosPestaña = () => {
     }
   };
 
+  /**
+   * Funcion para filtrar sobre los productos ya cargados
+   */
   const filtrarProductos = () => {
     const term = searchTerm.toLowerCase();
     const filtered = productos.filter((producto) => {
@@ -94,8 +97,13 @@ const ProductosPestaña = () => {
     setTotalPages(Math.ceil(filtered.length / pageSize));
   };
 
+  /**
+   * Maneja el cambio de pagina para la paginacion acumulativa
+   * @param {*} page la pagina a cambiar
+   */
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    cargarProductos(page);
   };
 
   const scrollPagination = (direction) => {
