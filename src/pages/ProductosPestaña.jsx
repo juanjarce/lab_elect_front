@@ -106,6 +106,10 @@ const ProductosPestaña = () => {
     cargarProductos(page);
   };
 
+  /**
+   * Paginacion con el scroll de abajo de las paginas
+   * @param {*} direction
+   */
   const scrollPagination = (direction) => {
     if (paginationRef.current) {
       const scrollAmount = 100;
@@ -116,6 +120,9 @@ const ProductosPestaña = () => {
     }
   };
 
+  /**
+   * Se usa el filtrado global para los productos
+   */
   const productosPaginaActual = filteredProductos.slice(
     currentPage * pageSize,
     (currentPage + 1) * pageSize,
