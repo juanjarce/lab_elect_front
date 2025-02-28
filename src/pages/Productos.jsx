@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Card, Button, Row, Col, Pagination, Container, Form, Spinner, Modal } from 'react-bootstrap';
+import { Card, Button, Row, Col, Pagination, Container, Form, Spinner, Modal, OverlayTrigger, Popover } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import AgregarProductoForm from './AgregarProductoForm';
+import { Filter, Search } from 'react-bootstrap-icons';
 import ModificarProductoForm from './ModificarProductoForm';
 import './css/Productos.css';
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
-  const [filteredProductos, setFilteredProductos] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [showAgregarModal, setShowAgregarModal] = useState(false);
@@ -18,21 +18,18 @@ const Productos = () => {
   const [productoAEliminar, setProductoAEliminar] = useState(null);
 
   // Estados para búsqueda y filtro
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUbicacion, setSelectedUbicacion] = useState('');
+  const [searchNombre, setSearchNombre] = useState('');
+  const [searchCategoria, setSearchCategoria] = useState('');
+  const [ubicacion, setUbicacion] = useState('');;
   const [loading, setLoading] = useState(false);
 
   const pageSize = 32;
 
-  const paginationRef = useRef(null); // Referencia para el contenedor de paginación
+  const paginationRef = useRef(null);
 
   useEffect(() => {
-    cargarProductos(); // Cargar productos al cargar el componente
-  }, []);
-
-  useEffect(() => {
-    aplicarFiltros(); // Aplicar filtros siempre que cambien los términos de búsqueda o productos
-  }, [searchTerm, selectedUbicacion, productos]);
+    cargarProductos(currentPage);
+  }, [currentPage]);
 
   const cargarProductos = async () => {
     setLoading(true);
@@ -44,41 +41,20 @@ const Productos = () => {
       }
 
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/admin/productos/paginated?page=0&size=999`, // Obtener todos los productos
+        `https://labuq.catavento.co:10443/api/admin/productos/filtrados?page=${currentPage}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      const { content, totalPages } = response.data.data;
-      setProductos(content);
-      setTotalPages(totalPages);
+      setProductos(response.data.data.content);
+      setTotalPages(response.data.data.totalPages);
     } catch (error) {
       console.error('Error al cargar productos:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const aplicarFiltros = () => {
-    const term = searchTerm.toLowerCase();
-    const filtrados = productos.filter((producto) => {
-      const cumpleBusqueda =
-        producto.nombre.toLowerCase().includes(term) ||
-        producto.categoria.toLowerCase().includes(term) ||
-        producto.id.toString().includes(term) ||
-        (producto.codigoActivosFijos && producto.codigoActivosFijos.toLowerCase().includes(term)) ||
-        (producto.responsable && producto.responsable.toLowerCase().includes(term));
-
-      const cumpleUbicacion =
-        !selectedUbicacion || producto.ubicacion === selectedUbicacion;
-
-      return cumpleBusqueda && cumpleUbicacion;
-    });
-
-    setFilteredProductos(filtrados);
-    setTotalPages(Math.ceil(filtrados.length / pageSize)); // Actualizar totalPages según los productos filtrados
   };
 
   const confirmarEliminacion = (producto) => {
@@ -119,12 +95,15 @@ const Productos = () => {
     setCurrentPage(page);
   };
 
+  const handleSearch = () => {
+    setCurrentPage(0);
+    cargarProductos(0);
+  };
+
   const handleEditar = (producto) => {
     setProductoAEditar(producto);
     setShowModificarModal(true);
   };
-
-  const productosPorPagina = filteredProductos.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
 
   // Función para desplazar la paginación
   const scrollPagination = (direction) => {
@@ -139,28 +118,45 @@ const Productos = () => {
 
   return (
     <Container fluid>
-      <Row className="mb-3 align-items-center">
-        <Col md={8}>
-          <Form.Control
-            type="text"
-            placeholder="Buscar por nombre, categoría, ID, código o responsable"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </Col>
-        <Col md={4}>
-          <Form.Select
-            value={selectedUbicacion}
-            onChange={(e) => setSelectedUbicacion(e.target.value)}
-          >
-            <option value="">Todas las ubicaciones</option>
-            <option value="LABORATORIO_ELECTRÓNICA">Laboratorio Electrónica</option>
-            <option value="LABORATORIO_PROTOTIPADO">Laboratorio Prototipado</option>
-            <option value="LABORATORIO_TELEMÁTICA">Laboratorio Telemática</option>
-            <option value="BODEGA">Bodega</option>
-          </Form.Select>
-        </Col>
-      </Row>
+
+      <div className="d-flex align-items-center mb-3">
+        <Form.Control
+          type="text"
+          placeholder="Buscar por nombre"
+          value={searchNombre}
+          onChange={(e) => setSearchNombre(e.target.value)}
+          className="me-2"
+        />
+        <Form.Control
+          type="text"
+          placeholder="Buscar por categoría"
+          value={searchCategoria}
+          onChange={(e) => setSearchCategoria(e.target.value)}
+          className="me-2"
+        />
+        <OverlayTrigger
+          trigger="click"
+          placement="bottom"
+          overlay={
+            <Popover id="popover-filter">
+              <Popover.Body>
+                <Form.Select value={ubicacion} onChange={(e) => setUbicacion(e.target.value)}>
+                  <option value="">Todas las ubicaciones</option>
+                  <option value="LABORATORIO_ELECTRÓNICA">Laboratorio Electrónica</option>
+                  <option value="LABORATORIO_PROTOTIPADO">Laboratorio Prototipado</option>
+                  <option value="LABORATORIO_TELEMÁTICA">Laboratorio Telemática</option>
+                  <option value="BODEGA">Bodega</option>
+                </Form.Select>
+              </Popover.Body>
+            </Popover>
+          }
+        >
+          <Filter size={20} style={{ cursor: 'pointer' }} />
+        </OverlayTrigger>
+        <Button variant="light" className="ms-2" onClick={handleSearch}>
+          <Search size={20} />
+        </Button>
+      </div>
 
       <Button
         variant="success"
@@ -172,7 +168,7 @@ const Productos = () => {
 
       <Row>
         <TransitionGroup component={null}>
-          {productosPorPagina.map((producto) => (
+          {productos.map((producto) => (
             <CSSTransition key={producto.id} timeout={300} classNames="fade">
               <Col md={3} sm={6} xs={12} className="mb-3">
                 <Card

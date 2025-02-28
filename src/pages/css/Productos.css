@@ -30,3 +30,25 @@
     }
 }
   
+/* Tamaño fijo para las tarjetas de productos */
+.producto-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 350px; /* Ajusta la altura según lo necesites */
+}
+
+/* Fijar altura del cuerpo de la tarjeta para alineación uniforme */
+.producto-card .card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Asegurar que la imagen tenga un tamaño uniforme */
+.producto-card .card-img-top {
+  height: 150px; /* Ajusta según lo necesites */
+  object-fit: cover;
+}
