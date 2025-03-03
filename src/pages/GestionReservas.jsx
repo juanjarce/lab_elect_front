@@ -42,7 +42,7 @@ const GestionReservas = () => {
         return;
       }
 
-      const response = await axios.get('https://labuq.catavento.co:10443/api/admin/laboratorios/info', {
+      const response = await axios.get('http://localhost:8081/api/admin/laboratorios/info', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -59,7 +59,7 @@ const GestionReservas = () => {
     if (!selectedLaboratorio || !fecha) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/agenda/${selectedLaboratorio.id}/${fecha}`, {
+      const response = await axios.get(`http://localhost:8081/api/admin/agenda/${selectedLaboratorio.id}/${fecha}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAgendas(response.data.data || []);

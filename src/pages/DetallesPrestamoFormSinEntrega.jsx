@@ -19,7 +19,7 @@ const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
             return;
           }    
 
-          const response = await axios.get(`https://labuq.catavento.co:10443/api/admin/prestamos/${prestamoId}/detalles`, {
+          const response = await axios.get(`http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

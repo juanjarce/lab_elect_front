@@ -37,7 +37,7 @@ const ProductosPestaña = () => {
     setCargando(true);
     try {
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/estudiantes/productos/filtrados?page=${page}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
+        `http://localhost:8081/api/estudiantes/productos/filtrados?page=${page}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProductos(response.data.data.content);

@@ -19,7 +19,7 @@ const AdminDashboard = () => {
       if (token) {
         // Realizar la solicitud para cerrar sesión
         const response = await axios.put(
-          `https://labuq.catavento.co:10443/api/admin/logout/${id}`, 
+          `http://localhost:8081/api/admin/logout/${id}`, 
           null, // Si es necesario, puedes enviar un objeto vacío o cualquier dato adicional
           { headers: { Authorization: `Bearer ${token}` } }
         );
