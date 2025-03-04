@@ -1,99 +1,110 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Modal, Button } from 'react-bootstrap';
-import TablaDetalles from './TablaDetalles'; // Componente reutilizable
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Modal, Button } from "react-bootstrap";
+import TablaDetalles from "./TablaDetalles";
 
 const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
   const [detalles, setDetalles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  /**
+   * load the details of a loan
+   * */
   useEffect(() => {
     if (prestamoId) {
       const fetchDetalles = async () => {
-        setLoading(true); // Establecer carga en true al inicio de la solicitud
+        setLoading(true);
         try {
-          // Obtener el token del localStorage
-          const token = localStorage.getItem('token'); 
-          console.log(token);
-          
-          // Verificar si el token existe
+          const token = localStorage.getItem("token");
           if (!token) {
-            setError('Token no encontrado');
+            setError("Token no encontrado");
             return;
           }
-  
-          const response = await axios.get(`http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`, {
-            headers: {
-              Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+          const response = await axios.get(
+            `http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             },
-          });
-  
-          if (response.data.status === 'Exito') {
-            setDetalles(response.data.data || []); // Asignar detalles si la respuesta es exitosa
+          );
+          if (response.data.status === "Exito") {
+            setDetalles(response.data.data || []);
           } else {
-            setError('No se pudieron obtener los detalles.');
+            setError("No se pudieron obtener los detalles.");
           }
         } catch (err) {
           setDetalles([]);
-          const token = localStorage.getItem('token'); // Obtener el token desde el localStorage
-  
+          console.log(err);
+          const token = localStorage.getItem("token");
           if (!token) {
-            setError('Token no encontrado.');
+            setError("Token no encontrado.");
             return;
           }
-        
           try {
-            // Realizar la solicitud DELETE
-            const response = await axios.delete(`http://localhost:8081/api/admin/prestamos/eliminar/${prestamoId}`, {
-              headers: {
-                Authorization: `Bearer ${token}`, // Incluir el token en los headers
+            // do the delete request (idk why, I am comming  crazy)
+            const response = await axios.delete(
+              `http://localhost:8081/api/admin/prestamos/eliminar/${prestamoId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
               },
-            });
-        
+            );
           } catch (error) {
-            
+            console.log(error);
           }
         } finally {
-          setLoading(false); // Asegurarnos de que se apaga la carga, independientemente del resultado
+          setLoading(false);
         }
       };
-  
       fetchDetalles();
     }
   }, [prestamoId]);
-  
+
+  /**
+   * handles functionality to delete a load detail
+   * @param {*} idDetallePrestamo
+   * @returns
+   */
   const handleEliminarDetalle = async (idDetallePrestamo) => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar el detalle con ID ${idDetallePrestamo}?`)) {
+    if (
+      window.confirm(
+        `¿Estás seguro de que deseas eliminar el detalle con ID ${idDetallePrestamo}?`,
+      )
+    ) {
       try {
-        // Obtener el token del localStorage
-        const token = localStorage.getItem('token'); 
-        console.log(token);
-    
-        // Verificar si el token existe
+        const token = localStorage.getItem("token");
         if (!token) {
-          console.error('Token no encontrado');
+          console.error("Token no encontrado");
           return;
         }
-        
-        await axios.delete(`http://localhost:8081/api/admin/detalles/eliminar/${idDetallePrestamo}`,
+        await axios.delete(
+          `http://localhost:8081/api/admin/detalles/eliminar/${idDetallePrestamo}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+              Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
-        setDetalles((prevDetalles) => prevDetalles.filter((detalle) => detalle.id !== idDetallePrestamo));
+        setDetalles((prevDetalles) =>
+          prevDetalles.filter((detalle) => detalle.id !== idDetallePrestamo),
+        );
       } catch (err) {
-        alert(`Error al eliminar el detalle: ${err.response?.data?.message || err.message}`);
+        alert(
+          `Error al eliminar el detalle: ${err.response?.data?.message || err.message}`,
+        );
       }
     }
   };
 
+  /**
+   * handles the functionality to confirm a loan
+   */
   const handleCloseModal = () => {
-    // Limpiar los detalles al cerrar el modal
     setDetalles([]);
-    onClose(); // Llamar a la función que cierra el modal
+    onClose();
   };
 
   if (error) {
@@ -113,7 +124,10 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
             </div>
           </div>
         ) : (
-          <TablaDetalles detalles={detalles} onEliminar={handleEliminarDetalle} />
+          <TablaDetalles
+            detalles={detalles}
+            onEliminar={handleEliminarDetalle}
+          />
         )}
       </Modal.Body>
       <Modal.Footer>

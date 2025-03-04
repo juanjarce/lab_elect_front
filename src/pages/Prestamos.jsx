@@ -1,38 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { FaSearch, FaFilter } from 'react-icons/fa';
-import { Modal, Button } from 'react-bootstrap';
-import DetallesPrestamoFormSinEntrega from './DetallesPrestamoFormSinEntrega';
-import { CSSTransition } from 'react-transition-group'; // Importar para animaciones
-import './css/Prestamos.css'; 
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { FaSearch, FaFilter } from "react-icons/fa";
+import DetallesPrestamoFormSinEntrega from "./DetallesPrestamoFormSinEntrega";
+import { CSSTransition } from "react-transition-group"; // Importar para animaciones
+import "./css/Prestamos.css";
 
 const Prestamos = () => {
   const { id } = useParams();
   const [prestamos, setPrestamos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [estadoFilter, setEstadoFilter] = useState('');
-  const [selectedPrestamo, setSelectedPrestamo] = useState(null); 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [estadoFilter, setEstadoFilter] = useState("");
+  const [selectedPrestamo, setSelectedPrestamo] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
+  /**
+   * fetch the loans
+   * */
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      console.error('Token no encontrado');
+      console.error("Token no encontrado");
       return;
     }
-
     const fetchPrestamos = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8081/api/estudiantes/${id}/prestamos?page=${currentPage}&size=5&token=${token}`);
+        const response = await axios.get(
+          `http://localhost:8081/api/estudiantes/${id}/prestamos?page=${currentPage}&size=5&token=${token}`,
+        );
         setPrestamos(response.data.content || []);
         setTotalPages(response.data.totalPages);
       } catch (error) {
-        console.error('Error fetching prestamos:', error);
+        console.error("Error fetching prestamos:", error);
       } finally {
         setLoading(false);
       }
@@ -41,23 +44,52 @@ const Prestamos = () => {
     fetchPrestamos();
   }, [id, currentPage]);
 
+  /**
+   * handles the change on the search input
+   * @param {*} event
+   * @returns
+   */
   const handleSearchChange = (event) => setSearchTerm(event.target.value);
+
+  /**
+   * handles the filter change for the loans
+   * @param {*} event
+   * @returns
+   */
   const handleFilterChange = (event) => setEstadoFilter(event.target.value);
+
+  /**
+   * handles the selection of a loan
+   * @param {*} prestamoId
+   */
   const handleSelectPrestamo = (prestamoId) => {
     const selected = prestamos.find((prestamo) => prestamo.id === prestamoId);
     setSelectedPrestamo(selected);
     setShowModal(true);
   };
 
+  /**
+   * handles the close modal
+   */
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedPrestamo(null);
   };
+
+  /**
+   * handles the pag change
+   * @param {*} page
+   * @returns
+   */
   const handlePageChange = (page) => setCurrentPage(page);
 
   const filteredPrestamos = prestamos.filter((prestamo) => {
-    const matchesSearch = prestamo.id.toString().includes(searchTerm) || prestamo.fechaPrestamo.includes(searchTerm);
-    const matchesEstado = estadoFilter ? prestamo.estado === estadoFilter : true;
+    const matchesSearch =
+      prestamo.id.toString().includes(searchTerm) ||
+      prestamo.fechaPrestamo.includes(searchTerm);
+    const matchesEstado = estadoFilter
+      ? prestamo.estado === estadoFilter
+      : true;
     return matchesSearch && matchesEstado;
   });
 
@@ -96,7 +128,9 @@ const Prestamos = () => {
             </div>
 
             {filteredPrestamos.length === 0 ? (
-              <div>No se encontró historial de préstamos para este estudiante.</div>
+              <div>
+                No se encontró historial de préstamos para este estudiante.
+              </div>
             ) : (
               <div className="row">
                 {filteredPrestamos.map((prestamo) => (
@@ -107,9 +141,13 @@ const Prestamos = () => {
                   >
                     <div className="card shadow-sm producto-card">
                       <div className="card-body bg-light">
-                        <h5 className="card-title">Préstamo ID: {prestamo.id}</h5>
+                        <h5 className="card-title">
+                          Préstamo ID: {prestamo.id}
+                        </h5>
                         <p className="card-text">Estado: {prestamo.estado}</p>
-                        <p className="card-text">Fecha de Préstamo: {prestamo.fechaPrestamo}</p>
+                        <p className="card-text">
+                          Fecha de Préstamo: {prestamo.fechaPrestamo}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -125,7 +163,9 @@ const Prestamos = () => {
               >
                 Anterior
               </button>
-              <span>Página {currentPage + 1} de {totalPages}</span>
+              <span>
+                Página {currentPage + 1} de {totalPages}
+              </span>
               <button
                 className="btn btn-outline-secondary ms-2"
                 disabled={currentPage === totalPages - 1}
@@ -148,5 +188,3 @@ const Prestamos = () => {
 };
 
 export default Prestamos;
-
-

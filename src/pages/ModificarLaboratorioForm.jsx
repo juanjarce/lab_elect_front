@@ -1,18 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
+import axios from "axios";
 
 const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
   const [formData, setFormData] = useState({
-    id: '',
-    nombre: '',
-    descripcion: '',
-    capacidad: '',
-    imagen: null
+    id: "",
+    nombre: "",
+    descripcion: "",
+    capacidad: "",
+    imagen: null,
   });
-
-  const [imageError, setImageError] = useState('');
+  const [imageError, setImageError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  /**
+   * handles the submission of the form
+   * @param {*} event
+   * @returns
+   */
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (imageError) {
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const formDataToSend = {
+        nombre: formData.nombre,
+        descripcion: formData.descripcion,
+        capacidad: formData.capacidad,
+        imagen: formData.imagen || null,
+      };
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token no encontrado");
+        setIsLoading(false);
+        return;
+      }
+      await axios.put(
+        `http://localhost:8081/api/admin/laboratorios/actualizar/${formData.id}`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      onSave(formDataToSend);
+      onClose();
+    } catch (error) {
+      console.error("Error al modificar el laboratorio:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * handles the image change on the form
+   * @param {*} event
+   */
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const fileSizeInKB = file.size / 1024;
+      if (fileSizeInKB > 64) {
+        setImageError("La imagen no debe superar los 64KB.");
+      } else {
+        setImageError("");
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFormData({ ...formData, imagen: reader.result.split(",")[1] });
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  };
 
   useEffect(() => {
     if (laboratorio) {
@@ -21,64 +84,10 @@ const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
         nombre: laboratorio.nombre,
         descripcion: laboratorio.descripcion,
         capacidad: laboratorio.capacidad,
-        imagen: null 
+        imagen: null,
       });
     }
   }, [laboratorio]);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (imageError) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const formDataToSend = {
-        nombre: formData.nombre,
-        descripcion: formData.descripcion,
-        capacidad: formData.capacidad,
-        imagen: formData.imagen || null 
-      };
-
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('Token no encontrado');
-        setIsLoading(false);
-        return;
-      }
-
-      await axios.put(`http://localhost:8081/api/admin/laboratorios/actualizar/${formData.id}`, formDataToSend, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      onSave(formDataToSend);
-      onClose();
-    } catch (error) {
-      console.error('Error al modificar el laboratorio:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const fileSizeInKB = file.size / 1024;
-      if (fileSizeInKB > 64) {
-        setImageError('La imagen no debe superar los 64KB.');
-      } else {
-        setImageError('');
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFormData({ ...formData, imagen: reader.result.split(',')[1] });
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  };
 
   return (
     <Modal show={show} onHide={onClose}>
@@ -97,7 +106,9 @@ const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
             <Form.Control
               type="text"
               value={formData.nombre}
-              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, nombre: e.target.value })
+              }
               required
             />
           </Form.Group>
@@ -108,7 +119,9 @@ const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
               as="textarea"
               rows={3}
               value={formData.descripcion}
-              onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, descripcion: e.target.value })
+              }
               required
             />
           </Form.Group>
@@ -118,7 +131,9 @@ const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
             <Form.Control
               type="number"
               value={formData.capacidad}
-              onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, capacidad: e.target.value })
+              }
               required
             />
           </Form.Group>
@@ -132,14 +147,25 @@ const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
             </Form.Text>
           </Form.Group>
 
-          <Button variant="primary" type="submit" disabled={isLoading || imageError} className="mt-3">
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={isLoading || imageError}
+            className="mt-3"
+          >
             {isLoading ? (
               <>
-                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                {' Guardando...'}
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                {" Guardando..."}
               </>
             ) : (
-              'Guardar Cambios'
+              "Guardar Cambios"
             )}
           </Button>
         </Form>
@@ -149,3 +175,4 @@ const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
 };
 
 export default ModificarLaboratorioForm;
+

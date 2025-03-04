@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Button, Form, Spinner } from 'react-bootstrap';
-import { FaShoppingCart } from 'react-icons/fa';
+import { useState, useEffect } from "react";
+import { Card } from "react-bootstrap";
 
 const ProductoCard = ({ producto, onClick }) => {
   const [cantidad, setCantidad] = useState(1);
-  const [cargando, setCargando] = useState(false);  // Estado para controlar la animación de carga
+  const [cargando, setCargando] = useState(false);
 
-  useEffect(() => {
-  
-  }, [producto.id]);
+  useEffect(() => {}, [producto.id]);
 
-  // Agregar el manejador de clics para el Card
+  /**
+   * handles the click action on the cards
+   * @param {*} e
+   */
   const handleCardClick = (e) => {
-    // Evitar que el clic se registre cuando se hace clic en el campo de cantidad o el botón de agregar al carrito
-    if (e.target.tagName !== 'INPUT' && e.target.closest('button') === null) {
-      onClick(); // Llama a la función onClick pasada como prop
+    if (e.target.tagName !== "INPUT" && e.target.closest("button") === null) {
+      onClick();
     }
   };
 
@@ -22,13 +21,13 @@ const ProductoCard = ({ producto, onClick }) => {
     <Card
       className="producto-card"
       style={{
-        position: 'relative',
-        height: '100%',
-        padding: '10px',
-        maxWidth: '300px', // Ajusta el ancho máximo de la tarjeta
-        margin: '10px', // Margen entre tarjetas
-        display: 'flex',
-        flexDirection: 'column',
+        position: "relative",
+        height: "100%",
+        padding: "10px",
+        maxWidth: "300px",
+        margin: "10px",
+        display: "flex",
+        flexDirection: "column",
       }}
       onClick={handleCardClick}
     >
@@ -37,25 +36,25 @@ const ProductoCard = ({ producto, onClick }) => {
         src={`data:image/png;base64,${producto.imagen}`}
         alt={producto.nombre}
         style={{
-          height: '150px',
-          objectFit: 'cover',
+          height: "150px",
+          objectFit: "cover",
         }}
       />
       <Card.Body
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          paddingBottom: '10px',
-          flexGrow: 1, // Para que el contenido se ajuste de manera flexible
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          paddingBottom: "10px",
+          flexGrow: 1,
         }}
       >
-        <Card.Title style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{producto.nombre}</Card.Title>
+        <Card.Title style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
+          {producto.nombre}
+        </Card.Title>
       </Card.Body>
     </Card>
   );
 };
 
 export default ProductoCard;
-
-

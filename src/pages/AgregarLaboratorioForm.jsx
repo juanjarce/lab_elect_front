@@ -1,74 +1,84 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
-import axios from 'axios';
+import { useState } from "react";
+import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
+import axios from "axios";
+import PropTypes from "prop-types";
 
 const AgregarLaboratorioForm = ({ show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
-    nombre: '',
-    descripcion: '',
+    nombre: "",
+    descripcion: "",
     capacidad: 0,
     imagen: null,
   });
-
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  /**
+   * handles the change of the input form
+   * @param {*} e
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  /**
+   * handles the image upload
+   * @param {*} e
+   */
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 64 * 1024) {
-        setError('La imagen no debe exceder los 64 KB.');
+        setError("La imagen no debe exceder los 64 KB.");
         setFormData({ ...formData, imagen: null });
       } else {
-        setError('');
+        setError("");
         const reader = new FileReader();
         reader.onloadend = () => {
-          setFormData({ ...formData, imagen: reader.result.split(',')[1] });
+          setFormData({ ...formData, imagen: reader.result.split(",")[1] });
         };
         reader.readAsDataURL(file);
       }
     }
   };
 
+  /**
+   * handle the submition of the form
+   * @param {*} e
+   * @returns
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (error) return;
     if (!formData.imagen) {
-      setError('Debe subir una imagen del laboratorio.');
+      setError("Debe subir una imagen del laboratorio.");
       return;
     }
-
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setError('No se encontró el token de autenticación.');
+      setError("No se encontró el token de autenticación.");
       return;
     }
-
-    setError('');
+    setError("");
     setIsLoading(true);
-
     try {
       const response = await axios.post(
-        'http://localhost:8081/api/admin/laboratorios/agregar',
+        "http://localhost:8081/api/admin/laboratorios/agregar",
         formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       );
-      console.log('Laboratorio agregado:', response.data);
+      console.log("Laboratorio agregado:", response.data);
       onSave(response.data);
-      setFormData({ nombre: '', descripcion: '', capacidad: 0, imagen: null });
+      setFormData({ nombre: "", descripcion: "", capacidad: 0, imagen: null });
     } catch (error) {
-      console.error('Error al agregar el laboratorio:', error);
-      setError('Error al agregar el laboratorio. Intenta nuevamente.');
+      console.error("Error al agregar el laboratorio:", error);
+      setError("Error al agregar el laboratorio. Intenta nuevamente.");
     } finally {
       setIsLoading(false);
     }
@@ -116,21 +126,43 @@ const AgregarLaboratorioForm = ({ show, onClose, onSave }) => {
             <Form.Label>Imagen</Form.Label>
             <Form.Control type="file" onChange={handleImageUpload} />
           </Form.Group>
-          <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
+          <Button
+            variant="primary"
+            type="submit"
+            className="mt-3"
+            disabled={isLoading}
+          >
             {isLoading ? (
               <>
-                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />{' '}
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />{" "}
                 Guardando...
               </>
             ) : (
-              'Guardar'
+              "Guardar"
             )}
           </Button>
-          {error && <Alert variant="danger" className="mt-2">{error}</Alert>}
+          {error && (
+            <Alert variant="danger" className="mt-2">
+              {error}
+            </Alert>
+          )}
         </Form>
       </Modal.Body>
     </Modal>
   );
 };
 
+AgregarLaboratorioForm.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+};
+
 export default AgregarLaboratorioForm;
+

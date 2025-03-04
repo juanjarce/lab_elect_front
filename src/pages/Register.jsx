@@ -1,22 +1,33 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaUser, FaIdCard, FaHome, FaPhone, FaEnvelope, FaLock } from 'react-icons/fa';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  FaUser,
+  FaIdCard,
+  FaHome,
+  FaPhone,
+  FaEnvelope,
+  FaLock,
+} from "react-icons/fa";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    cedula: '',
-    name: '',
-    address: '',
-    numeroTelefono: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    cedula: "",
+    name: "",
+    address: "",
+    numeroTelefono: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Estado para la animación de carga
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  /**
+   * handles the input change of the register form
+   * @param {*} e
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -25,60 +36,70 @@ const Register = () => {
     }));
   };
 
+  /**
+   * handles the submition of the form
+   * @param {*} e
+   * @returns
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
-    setIsLoading(true); // Activar el spinner del botón
-
+    setIsLoading(true);
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
-      setIsLoading(false); // Desactivar el spinner
+      setError("Las contraseñas no coinciden");
+      setIsLoading(false);
       return;
     }
-
     try {
-      const registerResponse = await fetch('http://localhost:8081/api/autenticacion/registrar-estudiante', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cedula: formData.cedula,
-          name: formData.name,
-          address: formData.address,
-          numeroTelefono: formData.numeroTelefono,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
+      const registerResponse = await fetch(
+        "http://localhost:8081/api/autenticacion/registrar-estudiante",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cedula: formData.cedula,
+            name: formData.name,
+            address: formData.address,
+            numeroTelefono: formData.numeroTelefono,
+            email: formData.email,
+            password: formData.password,
+          }),
+        },
+      );
       if (!registerResponse.ok) {
         const errorData = await registerResponse.json();
-        throw new Error(errorData.message || 'Error al registrar al estudiante');
+        throw new Error(
+          errorData.message || "Error al registrar al estudiante",
+        );
       }
-
-      const idResponse = await fetch(`http://localhost:8081/api/estudiantes/id?cedula=${formData.cedula}`);
+      const idResponse = await fetch(
+        `http://localhost:8081/api/estudiantes/id?cedula=${formData.cedula}`,
+      );
       if (!idResponse.ok) {
-        throw new Error('Error al obtener el ID del estudiante');
+        throw new Error("Error al obtener el ID del estudiante");
       }
-
       const idData = await idResponse.json();
       const id = idData.data.id;
-
-      const verifyResponse = await fetch(`http://localhost:8081/api/autenticacion/enviar-verificacion/${id}`, {
-        method: 'POST',
-      });
+      const verifyResponse = await fetch(
+        `http://localhost:8081/api/autenticacion/enviar-verificacion/${id}`,
+        {
+          method: "POST",
+        },
+      );
       if (!verifyResponse.ok) {
-        throw new Error('Error al enviar la verificación de la cuenta');
+        throw new Error("Error al enviar la verificación de la cuenta");
       }
-
-      setSuccessMessage('Registro exitoso. Revisa tu correo para activar tu cuenta.');
+      setSuccessMessage(
+        "Registro exitoso. Revisa tu correo para activar tu cuenta.",
+      );
       setTimeout(() => {
         navigate(`/verificar-codigo/${id}`);
       }, 3000);
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false); // Desactivar el spinner
+      setIsLoading(false);
     }
   };
 
@@ -87,15 +108,17 @@ const Register = () => {
       <div
         className="card p-4 shadow-lg"
         style={{
-          width: '100%',
-          maxWidth: '500px',
-          maxHeight: '90vh',
-          overflowY: 'auto',
+          width: "100%",
+          maxWidth: "500px",
+          maxHeight: "90vh",
+          overflowY: "auto",
         }}
       >
         <h3 className="text-center mb-4">Registro</h3>
         {error && <div className="alert alert-danger">{error}</div>}
-        {successMessage && <div className="alert alert-success">{successMessage}</div>}
+        {successMessage && (
+          <div className="alert alert-success">{successMessage}</div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-3 input-group">
             <span className="input-group-text">
@@ -195,11 +218,19 @@ const Register = () => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100" disabled={isLoading}>
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={isLoading}
+          >
             {isLoading ? (
-              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
             ) : (
-              'Registrarse'
+              "Registrarse"
             )}
           </button>
         </form>
@@ -209,4 +240,3 @@ const Register = () => {
 };
 
 export default Register;
-

@@ -1,29 +1,37 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
-import axios from 'axios';
+import { useState } from "react";
+import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
+import axios from "axios";
+import PropTypes from "prop-types";
 
 const AgregarProductoForm = ({ show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
-    nombre: '',
-    descripcion: '',
+    nombre: "",
+    descripcion: "",
     cantidad: 0,
     disponibleParaPrestamo: true,
     imagen: null,
-    categoria: 'EQUIPOS',
-    codigoActivosFijos: '', // Opcional
-    linkDataSheet: '', // Opcional
-    ubicacion: 'LABORATORIO_ELECTRÓNICA',
-    responsable: '', // Campo obligatorio
+    categoria: "EQUIPOS",
+    codigoActivosFijos: "", // Opcional
+    linkDataSheet: "", // Opcional
+    ubicacion: "LABORATORIO_ELECTRÓNICA",
+    responsable: "", // Campo obligatorio
   });
-
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false); // Estado para manejar la animación de carga
 
+  /**
+   * handles the change of the input form
+   * @param {*} e
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  /**
+   * handles the image upload
+   * @param {*} e
+   */
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -41,55 +49,56 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
     }
   };
 
+  /**
+   * handle the submition of the form
+   * @param {*} e
+   * @returns
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (error) return;
     if (!formData.imagen) {
-      setError('Debe subir una imagen del producto.');
+      setError("Debe subir una imagen del producto.");
       return;
     }
-
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setError('No se encontró el token de autenticación.');
+      setError("No se encontró el token de autenticación.");
       return;
     }
-
-    setError('');
-    setIsLoading(true); // Activar la animación de carga
-
+    setError("");
+    setIsLoading(true);
     const formDataToSend = { ...formData, imagen: formData.imagen };
-
     try {
       const response = await axios.post(
-        'http://localhost:8081/api/admin/productos/agregar',
+        "http://localhost:8081/api/admin/productos/agregar",
         formDataToSend,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-        }
+        },
       );
-      console.log('Producto agregado:', response.data);
+      console.log("Producto agregado:", response.data);
       onSave(response.data);
       setFormData({
-        nombre: '',
-        descripcion: '',
+        nombre: "",
+        descripcion: "",
         cantidad: 0,
         disponibleParaPrestamo: true,
         imagen: null,
-        categoria: 'EQUIPOS',
-        codigoActivosFijos: '',
-        linkDataSheet: '',
-        ubicacion: 'LABORATORIO_ELECTRÓNICA',
-        responsable: '',
-      }); // Reiniciar campos tras éxito
+        categoria: "EQUIPOS",
+        codigoActivosFijos: "",
+        linkDataSheet: "",
+        ubicacion: "LABORATORIO_ELECTRÓNICA",
+        responsable: "",
+      });
     } catch (error) {
-      console.error('Error al agregar el producto:', error);
-      setError('Error al agregar el producto. Intenta nuevamente.');
+      console.error("Error al agregar el producto:", error);
+      setError("Error al agregar el producto. Intenta nuevamente.");
     } finally {
-      setIsLoading(false); // Desactivar la animación de carga
+      setIsLoading(false);
     }
   };
 
@@ -174,9 +183,15 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
               onChange={handleInputChange}
               required
             >
-              <option value="LABORATORIO_ELECTRÓNICA">Laboratorio Electrónica</option>
-              <option value="LABORATORIO_PROTOTIPADO">Laboratorio Prototipado</option>
-              <option value="LABORATORIO_TELEMÁTICA">Laboratorio Telemática</option>
+              <option value="LABORATORIO_ELECTRÓNICA">
+                Laboratorio Electrónica
+              </option>
+              <option value="LABORATORIO_PROTOTIPADO">
+                Laboratorio Prototipado
+              </option>
+              <option value="LABORATORIO_TELEMÁTICA">
+                Laboratorio Telemática
+              </option>
               <option value="BODEGA">Bodega</option>
             </Form.Select>
           </Form.Group>
@@ -189,7 +204,12 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
               onChange={handleInputChange}
             />
           </Form.Group>
-          <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
+          <Button
+            variant="primary"
+            type="submit"
+            className="mt-3"
+            disabled={isLoading}
+          >
             {isLoading ? (
               <>
                 <Spinner
@@ -198,18 +218,28 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
                   size="sm"
                   role="status"
                   aria-hidden="true"
-                />{' '}
+                />{" "}
                 Guardando...
               </>
             ) : (
-              'Guardar'
+              "Guardar"
             )}
           </Button>
-          {error && <Alert variant="danger" className="mt-2">{error}</Alert>}
+          {error && (
+            <Alert variant="danger" className="mt-2">
+              {error}
+            </Alert>
+          )}
         </Form>
       </Modal.Body>
     </Modal>
   );
+};
+
+AgregarProductoForm.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
 };
 
 export default AgregarProductoForm;

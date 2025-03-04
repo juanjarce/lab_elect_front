@@ -1,30 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { Card } from 'react-bootstrap';
-import axios from 'axios';
-import { CSSTransition } from 'react-transition-group'; // Importa CSSTransition
-import './css/PrestamoCardDevueltos.css'; // Importa el archivo CSS para animaciones
+import { useState, useEffect } from "react";
+import { Card } from "react-bootstrap";
+import axios from "axios";
+import { CSSTransition } from "react-transition-group";
+import "./css/PrestamoCardDevueltos.css";
 
 const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
-  const [estudianteNombre, setEstudianteNombre] = useState('');
-  const [estudianteCedula, setEstudianteCedula] = useState('');
-  const [inProp, setInProp] = useState(false); // Control de la animación de entrada
+  const [estudianteNombre, setEstudianteNombre] = useState("");
+  const [estudianteCedula, setEstudianteCedula] = useState("");
+  const [inProp, setInProp] = useState(false);
 
+  /**
+   * fetch the studend info
+   * */
   useEffect(() => {
     const fetchEstudianteName = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`
+          `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
         );
         setEstudianteNombre(response.data.data.nombre);
         setEstudianteCedula(response.data.data.cedula);
-        
       } catch (err) {
-        setEstudianteNombre('Nombre no disponible');
-        setEstudianteCedula('Cedula no disponible');
+        setEstudianteNombre("Nombre no disponible");
+        setEstudianteCedula("Cedula no disponible");
       }
     };
     fetchEstudianteName();
-    setInProp(true); // Activar la animación al montar el componente
+    setInProp(true);
   }, [prestamo.idEstudiante]);
 
   return (
@@ -35,14 +37,22 @@ const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
         classNames="card-transition" // Nombre base de las clases de animación
         unmountOnExit
       >
-        <Card className="prestamo-card mb-3 shadow-sm" onClick={() => onVerDetalles(prestamo.id)} style={{ cursor: 'pointer' }}>
+        <Card
+          className="prestamo-card mb-3 shadow-sm"
+          onClick={() => onVerDetalles(prestamo.id)}
+          style={{ cursor: "pointer" }}
+        >
           <Card.Body className="d-flex justify-content-between align-items-center">
             <div>
               <Card.Title className="mb-1">Préstamo #{prestamo.id}</Card.Title>
-              <Card.Subtitle className="text-muted">Estudiante: {estudianteNombre}</Card.Subtitle>
+              <Card.Subtitle className="text-muted">
+                Estudiante: {estudianteNombre}
+              </Card.Subtitle>
               <Card.Text className="mt-2">
-                Fecha de Solicitud: {new Date(prestamo.fechaSolicitud).toLocaleDateString()} <br />
-                Estado: <span className="badge bg-success">{prestamo.estado}</span>
+                Fecha de Solicitud:{" "}
+                {new Date(prestamo.fechaSolicitud).toLocaleDateString()} <br />
+                Estado:{" "}
+                <span className="badge bg-success">{prestamo.estado}</span>
               </Card.Text>
             </div>
           </Card.Body>
@@ -53,4 +63,3 @@ const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
 };
 
 export default PrestamoCardDevueltos;
-

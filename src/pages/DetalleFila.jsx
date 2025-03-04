@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { Button } from 'react-bootstrap';
-import { FaTrashAlt, FaSpinner } from 'react-icons/fa';
+import { useState } from "react";
+import { Button } from "react-bootstrap";
+import { FaTrashAlt, FaSpinner } from "react-icons/fa";
 
 const DetalleFila = ({ detalle, onEliminar }) => {
-  const [loadingEliminar, setLoadingEliminar] = useState(false); // Estado de carga
+  const [loadingEliminar, setLoadingEliminar] = useState(false);
 
-  // Función para manejar la eliminación
+  /**
+   * handles the functionality to delete a product
+   */
   const handleEliminar = () => {
-    setLoadingEliminar(true); // Activamos el estado de carga
-    onEliminar(detalle.id) // Llamamos a la función onEliminar
-      .finally(() => setLoadingEliminar(false)); // Desactivamos el estado de carga después de la eliminación
+    setLoadingEliminar(true);
+    onEliminar(detalle.id).finally(() => setLoadingEliminar(false));
   };
 
   return (
@@ -20,7 +21,7 @@ const DetalleFila = ({ detalle, onEliminar }) => {
         <img
           src={`data:image/png;base64,${detalle.producto.imagen}`}
           alt={detalle.producto.nombre}
-          style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+          style={{ width: "50px", height: "50px", objectFit: "cover" }}
         />
       </td>
       <td>{detalle.producto.nombre}</td> {/* Nombre del producto */}
@@ -33,7 +34,8 @@ const DetalleFila = ({ detalle, onEliminar }) => {
           onClick={handleEliminar}
           disabled={loadingEliminar} // Desactivamos el botón mientras se está eliminando
         >
-          {loadingEliminar ? <FaSpinner className="fa-spin" /> : <FaTrashAlt />} {/* Muestra el spinner mientras se carga */}
+          {loadingEliminar ? <FaSpinner className="fa-spin" /> : <FaTrashAlt />}{" "}
+          {/* Muestra el spinner mientras se carga */}
         </Button>
       </td>
     </tr>
@@ -41,4 +43,3 @@ const DetalleFila = ({ detalle, onEliminar }) => {
 };
 
 export default DetalleFila;
-

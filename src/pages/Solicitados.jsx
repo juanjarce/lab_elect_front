@@ -1,98 +1,114 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Form, Row, Col, Button } from 'react-bootstrap';
-import PrestamoCard from './PrestamoCard'; // Importar el componente PrestamoCard
-import DetallesPrestamoModal from './DetallesPrestamoModal'; // Importar el modal de detalles
-import { debounce } from 'lodash'; // Usar lodash para debounce
-import { TransitionGroup, CSSTransition } from 'react-transition-group'; // Importar TransitionGroup y CSSTransition
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Form, Row, Col, Button } from "react-bootstrap";
+import PrestamoCard from "./PrestamoCard";
+import DetallesPrestamoModal from "./DetallesPrestamoModal";
+import { debounce } from "lodash";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 const Solicitados = () => {
   const [prestamos, setPrestamos] = useState([]);
   const [filteredPrestamos, setFilteredPrestamos] = useState([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
-  const [showModal, setShowModal] = useState(false); // Controla si el modal se muestra
-  const [selectedPrestamoId, setSelectedPrestamoId] = useState(null); // Guarda el ID del préstamo seleccionado
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPrestamoId, setSelectedPrestamoId] = useState(null);
 
+  /**
+   * handles the loans fetch
+   * @param {*} page
+   * @returns
+   */
   const fetchPrestamos = async (page = 0) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token'); 
+      const token = localStorage.getItem("token");
       console.log(token);
-  
       if (!token) {
-        console.error('Token no encontrado');
+        console.error("Token no encontrado");
         return;
       }
-      
-      const response = await axios.get(`http://localhost:8081/api/admin/prestamos/solicitados?page=${page}&size=100`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.data.status === 'Exito') {
+      const response = await axios.get(
+        `http://localhost:8081/api/admin/prestamos/solicitados?page=${page}&size=100`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (response.data.status === "Exito") {
         const prestamosWithDetails = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
             try {
-              // Obtener nombre y cedula
-              const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
+              const estudianteResponse = await axios.get(
+                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+              );
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;
-  
-              return { 
-                ...prestamo, 
+              return {
+                ...prestamo,
                 nombreEstudiante: nombre,
                 cedulaEstudiante: cedula,
               };
             } catch {
-              return { 
-                ...prestamo, 
-                nombreEstudiante: 'Nombre no disponible',
-                cedulaEstudiante: 'Cédula no disponible',
+              return {
+                ...prestamo,
+                nombreEstudiante: "Nombre no disponible",
+                cedulaEstudiante: "Cédula no disponible",
               };
             }
-          })
+          }),
         );
         setPrestamos(prestamosWithDetails);
         setFilteredPrestamos(prestamosWithDetails); // Mostrar todos inicialmente
         setTotalPages(response.data.data.totalPages);
       } else {
-        setError('No hay préstamos solicitados.');
+        setError("No hay préstamos solicitados.");
       }
     } catch (err) {
-      setError('Error al cargar los préstamos solicitados.');
+      setError("Error al cargar los préstamos solicitados.");
+      console.log(err);
     } finally {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     fetchPrestamos(currentPage);
   }, [currentPage]);
 
+  /**
+   * handles the details showing the modal
+   * @param {*} prestamoId
+   */
   const handleVerDetalles = (prestamoId) => {
     setSelectedPrestamoId(prestamoId);
-    setShowModal(true); // Mostrar el modal
+    setShowModal(true);
   };
 
+  /**
+   * handles the close modal for the detail
+   */
   const handleCloseModal = () => {
     setShowModal(false);
-    setSelectedPrestamoId(null); // Limpiar el ID del préstamo seleccionado
+    setSelectedPrestamoId(null);
   };
 
+  /**
+   * handles the search
+   */
   const handleSearchChange = debounce((value) => {
     setSearch(value);
-    if (value === '') {
-      setFilteredPrestamos(prestamos); // Restablecer la lista si no hay búsqueda
+    if (value === "") {
+      setFilteredPrestamos(prestamos);
     } else {
       const lowercasedSearch = value.toLowerCase();
       const filtered = prestamos.filter(
         (prestamo) =>
           prestamo.id.toString().includes(lowercasedSearch) ||
           prestamo.nombreEstudiante?.toLowerCase().includes(lowercasedSearch) ||
-          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch)
+          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch),
       );
       setFilteredPrestamos(filtered);
     }
@@ -131,23 +147,24 @@ const Solicitados = () => {
 
       <div className="row">
         <TransitionGroup className="row">
-          {filteredPrestamos.length > 0 ? (
-            filteredPrestamos.map((prestamo, index) => (
-              <CSSTransition key={prestamo.id} timeout={500} classNames="card-transition">
-                <PrestamoCard
-                  prestamo={prestamo}
-                  onVerDetalles={handleVerDetalles}
-                  onAprobar={() => fetchPrestamos(currentPage)}
-                />
-              </CSSTransition>
-            ))
-          ) : (
-            !loading && <p>No hay préstamos solicitados.</p>
-          )}
+          {filteredPrestamos.length > 0
+            ? filteredPrestamos.map((prestamo, index) => (
+                <CSSTransition
+                  key={prestamo.id}
+                  timeout={500}
+                  classNames="card-transition"
+                >
+                  <PrestamoCard
+                    prestamo={prestamo}
+                    onVerDetalles={handleVerDetalles}
+                    onAprobar={() => fetchPrestamos(currentPage)}
+                  />
+                </CSSTransition>
+              ))
+            : !loading && <p>No hay préstamos solicitados.</p>}
         </TransitionGroup>
       </div>
 
-      {/* Paginación */}
       <div className="d-flex justify-content-center mt-4">
         <Button
           variant="secondary"
@@ -168,7 +185,6 @@ const Solicitados = () => {
         </Button>
       </div>
 
-      {/* Modal de Detalles */}
       <DetallesPrestamoModal
         prestamoId={selectedPrestamoId}
         show={showModal}
@@ -179,3 +195,4 @@ const Solicitados = () => {
 };
 
 export default Solicitados;
+

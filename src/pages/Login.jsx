@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Login = () => {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Estado para el botón de carga
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  /**
+   * handles the input change of the user
+   * @param {*} e
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -17,74 +21,71 @@ const Login = () => {
     }));
   };
 
+  /**
+   * handles the user type change
+   * @param {*} e
+   */
   const handleUserTypeChange = (e) => {
-    setIsAdmin(e.target.value === 'admin');
-    setFormData({ username: '', password: '' }); // Reiniciar el formulario
+    setIsAdmin(e.target.value === "admin");
+    setFormData({ username: "", password: "" });
   };
 
+  /**
+   * handles the submition functionality for the form
+   * @param {*} e
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setIsLoading(true); // Mostrar animación de carga
-
+    setIsLoading(true);
     const url = isAdmin
-      ? 'http://localhost:8081/api/autenticacion/login-admin'
-      : 'http://localhost:8081/api/autenticacion/login-estudiante';
-
+      ? "http://localhost:8081/api/autenticacion/login-admin"
+      : "http://localhost:8081/api/autenticacion/login-estudiante";
     const payload = isAdmin
       ? { username: formData.username, password: formData.password }
       : { email: formData.username, password: formData.password };
-
     try {
       const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al iniciar sesión');
+        throw new Error(errorData.message || "Error al iniciar sesión");
       }
-
       const data = await response.json();
       const token = data.data;
-      localStorage.setItem('token', token);
-
-      // Obtener el ID dependiendo si es admin o estudiante
+      localStorage.setItem("token", token);
       let id;
       if (isAdmin) {
         const idResponse = await fetch(
           `http://localhost:8081/api/admin/id?username=${formData.username}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!idResponse.ok) {
-          throw new Error('Error al obtener el ID del administrador');
+          throw new Error("Error al obtener el ID del administrador");
         }
         const { data: adminData } = await idResponse.json();
         id = adminData.id;
-
-        // Redirigir con transición
         navigate(`/admin-dashboard/${id}`);
       } else {
         const idResponse = await fetch(
           `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.username}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!idResponse.ok) {
-          throw new Error('Error al obtener el ID del estudiante');
+          throw new Error("Error al obtener el ID del estudiante");
         }
         const { data: studentData } = await idResponse.json();
         id = studentData.id;
-
-        // Redirigir con transición
         navigate(`/estudiante-dashboard/${id}`);
       }
     } catch (err) {
-      console.error('Error en el login:', err.message);
+      console.error("Error en el login:", err.message);
       setError(err.message);
     } finally {
-      setIsLoading(false); // Ocultar animación de carga
+      setIsLoading(false);
     }
   };
 
@@ -96,7 +97,10 @@ const Login = () => {
       exit={{ opacity: 0, scale: 1.1 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="card p-4 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
+      <div
+        className="card p-4 shadow-lg"
+        style={{ width: "100%", maxWidth: "400px" }}
+      >
         <h3 className="text-center mb-4">Iniciar sesión</h3>
         {error && <div className="alert alert-danger text-center">{error}</div>}
         <form onSubmit={handleSubmit}>
@@ -127,7 +131,7 @@ const Login = () => {
 
           <div className="mb-3">
             <label htmlFor="username" className="form-label">
-              {isAdmin ? 'Usuario' : 'Email'}
+              {isAdmin ? "Usuario" : "Email"}
             </label>
             <input
               type="text"
@@ -141,7 +145,9 @@ const Login = () => {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="password" className="form-label">Contraseña</label>
+            <label htmlFor="password" className="form-label">
+              Contraseña
+            </label>
             <input
               type="password"
               className="form-control"
@@ -159,25 +165,29 @@ const Login = () => {
             disabled={isLoading} // Deshabilitar botón mientras carga
           >
             {isLoading ? (
-              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
             ) : (
-              'Iniciar sesión'
+              "Iniciar sesión"
             )}
           </button>
         </form>
 
         <div className="mt-3 text-center">
           <button
-            onClick={() => navigate('/registro')}
+            onClick={() => navigate("/registro")}
             className="btn btn-link p-0 m-1"
-            style={{ textDecoration: 'none' }}
+            style={{ textDecoration: "none" }}
           >
             ¿No tienes cuenta? Regístrate
           </button>
           <button
-            onClick={() => navigate('/recuperar-contrasenia')}
+            onClick={() => navigate("/recuperar-contrasenia")}
             className="btn btn-link p-0 m-1"
-            style={{ textDecoration: 'none' }}
+            style={{ textDecoration: "none" }}
           >
             ¿Olvidaste tu contraseña?
           </button>

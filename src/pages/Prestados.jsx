@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Form, Row, Col, Button } from 'react-bootstrap';
-import PrestamoCardEntregado from './PrestamoCardEntregado';
-import DetallesPrestamoForm from './DetallesPrestamoForm';
-import { debounce } from 'lodash';
-import { TransitionGroup, CSSTransition } from 'react-transition-group'; // Importa TransitionGroup y CSSTransition
-import './css/PrestamoCardEntregado.css'; // Asegúrate de tener las clases CSS necesarias
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Form, Row, Col, Button } from "react-bootstrap";
+import PrestamoCardEntregado from "./PrestamoCardEntregado";
+import DetallesPrestamoForm from "./DetallesPrestamoForm";
+import { debounce } from "lodash";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+import "./css/PrestamoCardEntregado.css";
 
 const Prestados = () => {
   const [prestamos, setPrestamos] = useState([]);
   const [filteredPrestamos, setFilteredPrestamos] = useState([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
@@ -18,54 +18,59 @@ const Prestados = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPrestamoId, setSelectedPrestamoId] = useState(null);
 
+  /**
+   * fech all the loans
+   * @param {*} page
+   * @returns
+   */
   const fetchPrestamos = async (page = 0) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        console.error('Token no encontrado');
+        console.error("Token no encontrado");
         return;
       }
-
       const response = await axios.get(
         `http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=100`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      if (response.data.status === 'Exito') {
-          const prestamosWithNames = await Promise.all(
+      if (response.data.status === "Exito") {
+        const prestamosWithNames = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
             try {
-              // Obtener nombre
-              const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
+              const estudianteResponse = await axios.get(
+                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+              );
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;
-  
-              return { 
-                ...prestamo, 
+              return {
+                ...prestamo,
                 nombreEstudiante: nombre,
                 cedulaEstudiante: cedula,
               };
             } catch {
-              return { 
-                ...prestamo, 
-                nombreEstudiante: 'Nombre no disponible',
-                cedulaEstudiante: 'Cédula no disponible',
+              return {
+                ...prestamo,
+                nombreEstudiante: "Nombre no disponible",
+                cedulaEstudiante: "Cédula no disponible",
               };
             }
-          })
+          }),
         );
         setPrestamos(prestamosWithNames);
         setFilteredPrestamos(prestamosWithNames);
         setTotalPages(response.data.data.totalPages);
       } else {
-        setError('No hay préstamos en estado PRESTADO.');
+        setError("No hay préstamos en estado PRESTADO.");
       }
     } catch (err) {
-      setError('Error al cargar los préstamos en estado PRESTADO.');
+      console.log(err);
+      setError("Error al cargar los préstamos en estado PRESTADO.");
     } finally {
       setLoading(false);
     }
@@ -77,9 +82,9 @@ const Prestados = () => {
 
   const handleEntregaPrestamo = async (idPrestamo) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        console.error('Token no encontrado');
+        console.error("Token no encontrado");
         return;
       }
 
@@ -90,9 +95,9 @@ const Prestados = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      alert(response.data.message || 'Préstamo entregado con éxito.');
+      alert(response.data.message || "Préstamo entregado con éxito.");
       fetchPrestamos(currentPage); // Recargar la lista tras entregar
     } catch (err) {
       alert(`${err.response?.data?.message}`);
@@ -111,7 +116,7 @@ const Prestados = () => {
 
   const handleSearchChange = debounce((value) => {
     setSearch(value);
-    if (value === '') {
+    if (value === "") {
       setFilteredPrestamos(prestamos);
     } else {
       const lowercasedSearch = value.toLowerCase();
@@ -119,7 +124,7 @@ const Prestados = () => {
         (prestamo) =>
           prestamo.id.toString().includes(lowercasedSearch) ||
           prestamo.nombreEstudiante?.toLowerCase().includes(lowercasedSearch) ||
-          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch)
+          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch),
       );
       setFilteredPrestamos(filtered);
     }
@@ -198,7 +203,11 @@ const Prestados = () => {
       </div>
 
       {/* Modal de Detalles */}
-      <DetallesPrestamoForm prestamoId={selectedPrestamoId} show={showModal} onClose={handleCloseModal} />
+      <DetallesPrestamoForm
+        prestamoId={selectedPrestamoId}
+        show={showModal}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

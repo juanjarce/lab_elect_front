@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Form, Row, Col, Button } from 'react-bootstrap';
-import PrestamoCardDevueltos from './PrestamoCardDevueltos'; // El card que muestra los préstamos devueltos
-import DetallesPrestamoForm from './DetallesPrestamoForm';
-import { debounce } from 'lodash';
-import { TransitionGroup, CSSTransition } from 'react-transition-group'; // Importar TransitionGroup y CSSTransition
-import './css/PrestamoCardDevueltos.css'; // Asegúrate de tener las clases CSS necesarias
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Form, Row, Col, Button } from "react-bootstrap";
+import PrestamoCardDevueltos from "./PrestamoCardDevueltos";
+import DetallesPrestamoForm from "./DetallesPrestamoForm";
+import { debounce } from "lodash";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+import "./css/PrestamoCardDevueltos.css";
 
 const Devueltos = () => {
   const [prestamos, setPrestamos] = useState([]);
   const [filteredPrestamos, setFilteredPrestamos] = useState([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
@@ -18,76 +18,87 @@ const Devueltos = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPrestamoId, setSelectedPrestamoId] = useState(null);
 
+  /**
+   * handles the loans fetch
+   * @param {*} page
+   * @returns
+   */
   const fetchPrestamos = async (page = 0) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        console.error('Token no encontrado');
+        console.error("Token no encontrado");
         return;
       }
-
       const response = await axios.get(
         `http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=100`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      if (response.data.status === 'Exito') {
+      if (response.data.status === "Exito") {
         const prestamosWithNames = await Promise.all(
-        response.data.data.content.map(async (prestamo) => {
-          try {
-            // Obtener nombre y cedula
-            const estudianteResponse = await axios.get(`http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`);
-            const nombre = estudianteResponse.data.data.nombre;
-            const cedula = estudianteResponse.data.data.cedula;
-
-            return { 
-              ...prestamo, 
-              nombreEstudiante: nombre,
-              cedulaEstudiante: cedula,
-            };
-          } catch {
-            return { 
-              ...prestamo, 
-              nombreEstudiante: 'Nombre no disponible',
-              cedulaEstudiante: 'Cédula no disponible',
-            };
-          }
-        })
+          response.data.data.content.map(async (prestamo) => {
+            try {
+              const estudianteResponse = await axios.get(
+                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+              );
+              const nombre = estudianteResponse.data.data.nombre;
+              const cedula = estudianteResponse.data.data.cedula;
+              return {
+                ...prestamo,
+                nombreEstudiante: nombre,
+                cedulaEstudiante: cedula,
+              };
+            } catch {
+              return {
+                ...prestamo,
+                nombreEstudiante: "Nombre no disponible",
+                cedulaEstudiante: "Cédula no disponible",
+              };
+            }
+          }),
         );
         setPrestamos(prestamosWithNames);
         setFilteredPrestamos(prestamosWithNames);
         setTotalPages(response.data.data.totalPages);
       } else {
-        setError('No hay préstamos en estado DEVUELTO.');
+        setError("No hay préstamos en estado DEVUELTO.");
       }
-    } catch (err) {
-      setError('Error al cargar los préstamos en estado DEVUELTO.');
+    } catch (error) {
+      setError("Error al cargar los préstamos en estado DEVUELTO.");
+      console.log(error);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchPrestamos(currentPage);
-  }, [currentPage]);
-
+  /**
+   * handles the details by setting the selected prestamo and show modal
+   * @param {*} prestamoId
+   */
   const handleVerDetalles = (prestamoId) => {
     setSelectedPrestamoId(prestamoId);
     setShowModal(true);
   };
 
+  /**
+   * handles the close modal by setting the show modal and prestamo
+   */
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedPrestamoId(null);
   };
 
+  /**
+   * handles the functionality when search condition change
+   */
   const handleSearchChange = debounce((value) => {
     setSearch(value);
-    if (value === '') {
+    if (value === "") {
       setFilteredPrestamos(prestamos);
     } else {
       const lowercasedSearch = value.toLowerCase();
@@ -95,11 +106,18 @@ const Devueltos = () => {
         (prestamo) =>
           prestamo.id.toString().includes(lowercasedSearch) ||
           prestamo.nombreEstudiante?.toLowerCase().includes(lowercasedSearch) ||
-          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch)
+          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch),
       );
       setFilteredPrestamos(filtered);
     }
   }, 300);
+
+  /**
+   * handle the change of page
+   * */
+  useEffect(() => {
+    fetchPrestamos(currentPage);
+  }, [currentPage]);
 
   if (error) {
     return <div>{error}</div>;
@@ -125,7 +143,9 @@ const Devueltos = () => {
       {loading ? (
         <div className="d-flex justify-content-center my-4">
           <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Cargando préstamos devueltos...</span>
+            <span className="visually-hidden">
+              Cargando préstamos devueltos...
+            </span>
           </div>
         </div>
       ) : (
@@ -150,7 +170,7 @@ const Devueltos = () => {
         </TransitionGroup>
       )}
 
-      {/* Paginación */}
+      {/* Pagination */}
       <div className="d-flex justify-content-center mt-4">
         <Button
           variant="secondary"
@@ -171,12 +191,14 @@ const Devueltos = () => {
         </Button>
       </div>
 
-      {/* Modal de Detalles */}
-      <DetallesPrestamoForm prestamoId={selectedPrestamoId} show={showModal} onClose={handleCloseModal} />
+      {/* Details modal */}
+      <DetallesPrestamoForm
+        prestamoId={selectedPrestamoId}
+        show={showModal}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
 
 export default Devueltos;
-
-

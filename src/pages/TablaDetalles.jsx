@@ -1,6 +1,5 @@
-import React from 'react';
-import { Table } from 'react-bootstrap';
-import DetalleFila from './DetalleFila'; // Importamos el componente de fila
+import { Table } from "react-bootstrap";
+import DetalleFila from "./DetalleFila";
 
 const TablaDetalles = ({ detalles, onEliminar }) => {
   return (
@@ -9,10 +8,10 @@ const TablaDetalles = ({ detalles, onEliminar }) => {
         <tr>
           <th>ID Detalle</th>
           <th>Fecha Solicitud</th>
-          <th>Imagen</th> {/* Columna de imagen */}
-          <th>Producto</th> {/* Columna del nombre del producto */}
+          <th>Imagen</th>
+          <th>Producto</th>
           <th>Cantidad</th>
-          <th>Ubicación</th> {/* Nueva columna para la ubicación */}
+          <th>Ubicación</th>
           <th>Acción</th>
         </tr>
       </thead>
@@ -30,5 +29,3 @@ const TablaDetalles = ({ detalles, onEliminar }) => {
 };
 
 export default TablaDetalles;
-
-

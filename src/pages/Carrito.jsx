@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { Table, Alert } from 'react-bootstrap';
-import DetalleFila from './DetalleFila'; 
-import { CSSTransition, TransitionGroup } from 'react-transition-group'; 
-import './css/Carrito.css'; 
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { Table, Alert } from "react-bootstrap";
+import DetalleFila from "./DetalleFila";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "./css/Carrito.css";
 
 const Carrito = () => {
-  const { id } = useParams(); 
-  const [detalles, setDetalles] = useState([]); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(''); 
+  const { id } = useParams();
+  const [detalles, setDetalles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Obtener los detalles de préstamo del estudiante
+  /**
+   * Get details of student loads everytime the id change
+   * */
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      console.error('Token no encontrado');
+      console.error("Token no encontrado");
       return;
     }
-
     setLoading(true);
     axios
       .get(`http://localhost:8081/api/estudiantes/detalles/${id}`, {
@@ -31,30 +31,36 @@ const Carrito = () => {
         setLoading(false);
       })
       .catch((error) => {
-        setError('Error al cargar los detalles del préstamo');
+        console.log("Error al cargar los detalles del préstamo", error);
         setLoading(false);
       });
   }, [id]);
 
-  // Eliminar detalle de préstamo
+  /**
+   * Handles the function of removing products from the cart
+   * @param {*} idDetalle
+   * @returns
+   */
   const handleEliminar = (idDetalle) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      console.error('Token no encontrado');
+      console.error("Token no encontrado");
       return;
     }
-
     axios
-      .delete(`http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .delete(
+        `http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
       .then(() => {
         setDetalles((prevDetalles) =>
-          prevDetalles.filter((detalle) => detalle.id !== idDetalle)
+          prevDetalles.filter((detalle) => detalle.id !== idDetalle),
         );
       })
       .catch(() => {
-        setError('Error al eliminar el detalle de préstamo');
+        console.log("Error al eliminar el detalle de préstamo");
       });
   };
 
@@ -68,7 +74,12 @@ const Carrito = () => {
         <Alert variant="info">El carrito está vacío.</Alert>
       ) : (
         <TransitionGroup component="div">
-          <CSSTransition in={true} timeout={500} classNames="fade" unmountOnExit>
+          <CSSTransition
+            in={true}
+            timeout={500}
+            classNames="fade"
+            unmountOnExit
+          >
             <Table striped bordered hover responsive>
               <thead>
                 <tr>

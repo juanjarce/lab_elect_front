@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Alert } from 'react-bootstrap';
-import { FaCartPlus } from 'react-icons/fa'; // Ícono de carrito
-import axios from 'axios';
-import { Spinner } from 'react-bootstrap'; // Agregar esta línea
+import { useState, useEffect } from "react";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
+import { FaCartPlus } from "react-icons/fa"; // Ícono de carrito
+import axios from "axios";
+import { Spinner } from "react-bootstrap"; // Agregar esta línea
 
 const ProductoDetalleModal = ({ producto, id, onClose }) => {
   const [cantidadDisponible, setCantidadDisponible] = useState(null);
@@ -12,58 +12,63 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Obtener la cantidad disponible cuando se abre el modal
+  /**
+   * get the available quantity
+   * */
   useEffect(() => {
     const obtenerCantidadDisponible = async () => {
       setLoadingCantidad(true);
       try {
-        const response = await axios.get(`http://localhost:8081/api/estudiantes/productos/${producto.id}/cantidad-disponible`);
-        if (response.data.status === 'Exito') {
+        const response = await axios.get(
+          `http://localhost:8081/api/estudiantes/productos/${producto.id}/cantidad-disponible`,
+        );
+        if (response.data.status === "Exito") {
           setCantidadDisponible(response.data.data.cantDisponible);
         } else {
           setCantidadDisponible(0);
-          setError('Cantidad no disponible.');
+          setError("Cantidad no disponible.");
         }
       } catch (err) {
-        setError('Error al obtener la cantidad disponible.');
+        setError("Error al obtener la cantidad disponible.");
         setCantidadDisponible(0);
+        console.log(err);
       } finally {
         setLoadingCantidad(false);
       }
     };
-
     obtenerCantidadDisponible();
   }, [producto.id]);
 
-  // Función para agregar al carrito
+  /**
+   * handles the add to cart functionality
+   * @returns
+   */
   const handleAgregarCarrito = async () => {
-    setLoading(true); // Inicia el loading
-
+    setLoading(true);
     setError(null);
     setSuccessMessage(null);
-
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setError('Token no encontrado.');
+      setError("Token no encontrado.");
       return;
     }
-
     try {
-      await axios.post(`http://localhost:8081/api/estudiantes/producto/agregar/${id}/${producto.id}?cantidad=${cantidadSeleccionada}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Actualizar la cantidad disponible
+      await axios.post(
+        `http://localhost:8081/api/estudiantes/producto/agregar/${id}/${producto.id}?cantidad=${cantidadSeleccionada}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       setCantidadDisponible((prev) => prev - cantidadSeleccionada);
-
-      // Resetear cantidad seleccionada a 1 después de agregar
       setCantidadSeleccionada(1);
-
-      setSuccessMessage('Producto agregado al carrito con éxito.');
-
-      setLoading(false); // Detén el loading cuando la operación termine
+      setSuccessMessage("Producto agregado al carrito con éxito.");
+      setLoading(false);
     } catch (error) {
-      setError(error.response?.data?.message || 'Error al agregar el producto al carrito.');
+      setError(
+        error.response?.data?.message ||
+          "Error al agregar el producto al carrito.",
+      );
     }
   };
 
@@ -81,45 +86,46 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
             <Form.Label>ID Producto</Form.Label>
             <Form.Control type="text" value={producto.id} disabled />
           </Form.Group>
-
           <Form.Group>
             <Form.Label>Nombre</Form.Label>
             <Form.Control type="text" value={producto.nombre} disabled />
           </Form.Group>
-
           <Form.Group>
             <Form.Label>Descripción</Form.Label>
-            <Form.Control as="textarea" rows={3} value={producto.descripcion} disabled />
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={producto.descripcion}
+              disabled
+            />
           </Form.Group>
-
           <Form.Group>
             <Form.Label>Categoría</Form.Label>
             <Form.Control type="text" value={producto.categoria} disabled />
           </Form.Group>
-
           <Form.Group>
             <Form.Label>Total Existencias</Form.Label>
             <Form.Control type="text" value={producto.cantidad} disabled />
           </Form.Group>
-
           <Form.Group>
-          <Form.Label>Link DataSheet</Form.Label>
-          <a href={producto.linkDataSheet} target="_blank" rel="noopener noreferrer">
-           {producto.linkDataSheet}
-          </a>
+            <Form.Label>Link DataSheet</Form.Label>
+            <a
+              href={producto.linkDataSheet}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {producto.linkDataSheet}
+            </a>
           </Form.Group>
-
-          <hr /> {/* Línea horizontal que actúa como separador */}
-
+          <hr />
           <Form.Group>
             <Form.Label>Cantidad Disponible</Form.Label>
             <Form.Control
               type="text"
-              value={loadingCantidad ? 'Cargando...' : cantidadDisponible}
+              value={loadingCantidad ? "Cargando..." : cantidadDisponible}
               disabled
             />
           </Form.Group>
-
           <Form.Group>
             <Form.Label>Seleccionar Cantidad</Form.Label>
             <Form.Control
@@ -131,12 +137,14 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
               disabled={cantidadDisponible === 0}
             />
           </Form.Group>
-
-          {/* Botón para agregar al carrito */}
           <Button
             variant="primary"
             onClick={handleAgregarCarrito}
-            disabled={cantidadDisponible === 0 || cantidadSeleccionada > cantidadDisponible || loading} // Deshabilita el botón mientras carga
+            disabled={
+              cantidadDisponible === 0 ||
+              cantidadSeleccionada > cantidadDisponible ||
+              loading
+            }
             className="mt-3 w-100"
           >
             {loading ? (
@@ -162,3 +170,4 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
 };
 
 export default ProductoDetalleModal;
+

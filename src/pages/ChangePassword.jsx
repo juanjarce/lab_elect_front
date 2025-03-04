@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
-import { FaEnvelope, FaLock, FaLockOpen } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { FaEnvelope, FaLockOpen } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    newPassword: '',
-    confirmPassword: '',
-    verificationCode: '', // Campo para el código de verificación
+    email: "",
+    newPassword: "",
+    confirmPassword: "",
+    verificationCode: "",
   });
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [isVerificationSent, setIsVerificationSent] = useState(false); // Controlar si se envió el código
-  const [isLoadingCode, setIsLoadingCode] = useState(false); // Estado de carga del botón de código
-  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false); // Estado de carga del botón de cambio de contraseña
+  const [isVerificationSent, setIsVerificationSent] = useState(false);
+  const [isLoadingCode, setIsLoadingCode] = useState(false);
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
   const navigate = useNavigate();
 
+  /**
+   * handles the change of the input form
+   * @param {*} e
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -25,81 +29,78 @@ const ChangePassword = () => {
     }));
   };
 
-  // Función para enviar el código de verificación
+  /**
+   * handles the sent of the verification code
+   */
   const sendVerificationCode = async () => {
-    setIsLoadingCode(true); // Activar estado de carga del botón de código
+    setIsLoadingCode(true);
     try {
       const idResponse = await fetch(
-        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`
+        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`,
       );
       if (!idResponse.ok) {
-        throw new Error('Error al obtener el ID del estudiante');
+        throw new Error("Error al obtener el ID del estudiante");
       }
       const { data } = await idResponse.json();
       const estudianteId = data.id;
-
-      // Enviar el código de verificación usando POST
       await fetch(
         `http://localhost:8081/api/autenticacion/enviar-verificacion/${estudianteId}`,
-        { method: 'POST' }
+        { method: "POST" },
       );
-
-      setIsVerificationSent(true); // Indicar que el código se envió con éxito
+      setIsVerificationSent(true);
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoadingCode(false); // Desactivar estado de carga del botón de código
+      setIsLoadingCode(false);
     }
   };
 
+  /**
+   * handles the submition of the form
+   * @param {*} e
+   * @returns
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
-
     if (formData.newPassword !== formData.confirmPassword) {
-      setError('Las contraseñas nuevas no coinciden');
+      setError("Las contraseñas nuevas no coinciden");
       return;
     }
-
-    setIsLoadingSubmit(true); // Activar estado de carga del botón de cambio de contraseña
+    setIsLoadingSubmit(true);
     try {
-      // Obtener el ID del estudiante
       const idResponse = await fetch(
-        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`
+        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`,
       );
       if (!idResponse.ok) {
-        throw new Error('El email no se encuentra registrado');
+        throw new Error("El email no se encuentra registrado");
       }
       const { data } = await idResponse.json();
       const estudianteId = data.id;
-
-      // Realizar la solicitud para cambiar la contraseña
       const response = await fetch(
         `http://localhost:8081/api/autenticacion/cambiar-contraseña/${estudianteId}`,
         {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             nuevaContraseña: formData.newPassword,
-            codigoVerificación: formData.verificationCode, // Incluir el código de verificación
+            codigoVerificación: formData.verificationCode,
           }),
-        }
+        },
       );
-
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al cambiar la contraseña');
+        throw new Error(errorData.message || "Error al cambiar la contraseña");
       }
-
-      setSuccessMessage('Contraseña cambiada exitosamente');
-      setTimeout(() => navigate('/'), 3000); // Redirigir después de 3 segundos
+      setSuccessMessage("Contraseña cambiada exitosamente");
+      setTimeout(() => navigate("/"), 3000);
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoadingSubmit(false); // Desactivar estado de carga del botón de cambio de contraseña
+      setIsLoadingSubmit(false);
     }
   };
 
@@ -112,7 +113,7 @@ const ChangePassword = () => {
     >
       <motion.div
         className="card p-4 shadow-lg"
-        style={{ width: '100%', maxWidth: '500px', overflowY: 'auto' }}
+        style={{ width: "100%", maxWidth: "500px", overflowY: "auto" }}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
@@ -151,9 +152,9 @@ const ChangePassword = () => {
                     role="status"
                   />
                 ) : isVerificationSent ? (
-                  'Código enviado'
+                  "Código enviado"
                 ) : (
-                  'Enviar código'
+                  "Enviar código"
                 )}
               </button>
             </div>
@@ -217,7 +218,7 @@ const ChangePassword = () => {
                 role="status"
               />
             ) : (
-              'Cambiar contraseña'
+              "Cambiar contraseña"
             )}
           </button>
         </form>
