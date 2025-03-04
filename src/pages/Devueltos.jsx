@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Form, Row, Col, Button } from "react-bootstrap";
+import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
 import PrestamoCardDevueltos from "./PrestamoCardDevueltos";
 import DetallesPrestamoForm from "./DetallesPrestamoForm";
+import { Search } from "react-bootstrap-icons";
 import { debounce } from "lodash";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./css/PrestamoCardDevueltos.css";
 
 const Devueltos = () => {
   const [prestamos, setPrestamos] = useState([]);
-  const [filteredPrestamos, setFilteredPrestamos] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +23,7 @@ const Devueltos = () => {
    * @param {*} page
    * @returns
    */
-  const fetchPrestamos = async (page = 0) => {
+  const fetchPrestamos = async (page = 0, searchQuery = "") => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -32,7 +32,7 @@ const Devueltos = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=100`,
+        `http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=100&search=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -63,7 +63,6 @@ const Devueltos = () => {
           }),
         );
         setPrestamos(prestamosWithNames);
-        setFilteredPrestamos(prestamosWithNames);
         setTotalPages(response.data.data.totalPages);
       } else {
         setError("No hay préstamos en estado DEVUELTO.");
@@ -94,30 +93,19 @@ const Devueltos = () => {
   };
 
   /**
-   * handles the functionality when search condition change
-   */
-  const handleSearchChange = debounce((value) => {
-    setSearch(value);
-    if (value === "") {
-      setFilteredPrestamos(prestamos);
-    } else {
-      const lowercasedSearch = value.toLowerCase();
-      const filtered = prestamos.filter(
-        (prestamo) =>
-          prestamo.id.toString().includes(lowercasedSearch) ||
-          prestamo.nombreEstudiante?.toLowerCase().includes(lowercasedSearch) ||
-          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch),
-      );
-      setFilteredPrestamos(filtered);
-    }
-  }, 300);
-
-  /**
    * handle the change of page
    * */
   useEffect(() => {
-    fetchPrestamos(currentPage);
+    fetchPrestamos(currentPage, search);
   }, [currentPage]);
+
+  /**
+  * handles the search with a button click
+  */
+  const handleSearch = () => {
+    fetchPrestamos(0, search);
+    setCurrentPage(0);
+  };
 
   if (error) {
     return <div>{error}</div>;
@@ -130,12 +118,17 @@ const Devueltos = () => {
       <Form className="mb-4">
         <Row>
           <Col xs={12}>
-            <Form.Control
-              type="text"
-              placeholder="Buscar por ID, Nombre del Estudiante o Documento"
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-100"
-            />
+           <InputGroup className="d-flex">
+              <Form.Control
+                type="text"
+                placeholder="Buscar por ID, Nombre del Estudiante o Documento"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+             />
+              <Button variant="primary" onClick={handleSearch}>
+                <Search />
+              </Button>
+            </InputGroup>
           </Col>
         </Row>
       </Form>
@@ -150,8 +143,8 @@ const Devueltos = () => {
         </div>
       ) : (
         <TransitionGroup className="row">
-          {filteredPrestamos.length > 0 ? (
-            filteredPrestamos.map((prestamo) => (
+          {prestamos.length > 0 ? (
+            prestamos.map((prestamo) => (
               <CSSTransition
                 key={prestamo.id}
                 timeout={500}
@@ -165,7 +158,7 @@ const Devueltos = () => {
               </CSSTransition>
             ))
           ) : (
-            <p className="text-center">No hay préstamos en estado DEVUELTO.</p>
+            <p className="text-center"></p>
           )}
         </TransitionGroup>
       )}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Form, Row, Col, Button } from "react-bootstrap";
+import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
+import { Search } from "react-bootstrap-icons";
 import PrestamoCard from "./PrestamoCard";
 import DetallesPrestamoModal from "./DetallesPrestamoModal";
 import { debounce } from "lodash";
@@ -8,7 +9,6 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 const Solicitados = () => {
   const [prestamos, setPrestamos] = useState([]);
-  const [filteredPrestamos, setFilteredPrestamos] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,27 +22,26 @@ const Solicitados = () => {
    * @param {*} page
    * @returns
    */
-  const fetchPrestamos = async (page = 0) => {
+  const fetchPrestamos = async (page = 0, searchQuery = "") => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      console.log(token);
       if (!token) {
         console.error("Token no encontrado");
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/admin/prestamos/solicitados?page=${page}&size=100`,
+        `http://localhost:8081/api/admin/prestamos/solicitados?page=${page}&size=100&search=${searchQuery}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        },
+        }
       );
-      if (response.data.status === "Exito") {
+      if (response.data.status === "Éxito") {
         const prestamosWithDetails = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
             try {
               const estudianteResponse = await axios.get(
-                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`
               );
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;
@@ -58,10 +57,9 @@ const Solicitados = () => {
                 cedulaEstudiante: "Cédula no disponible",
               };
             }
-          }),
+          })
         );
         setPrestamos(prestamosWithDetails);
-        setFilteredPrestamos(prestamosWithDetails); // Mostrar todos inicialmente
         setTotalPages(response.data.data.totalPages);
       } else {
         setError("No hay préstamos solicitados.");
@@ -75,7 +73,7 @@ const Solicitados = () => {
   };
 
   useEffect(() => {
-    fetchPrestamos(currentPage);
+    fetchPrestamos(currentPage, search);
   }, [currentPage]);
 
   /**
@@ -96,23 +94,12 @@ const Solicitados = () => {
   };
 
   /**
-   * handles the search
+   * handles the search with a button click
    */
-  const handleSearchChange = debounce((value) => {
-    setSearch(value);
-    if (value === "") {
-      setFilteredPrestamos(prestamos);
-    } else {
-      const lowercasedSearch = value.toLowerCase();
-      const filtered = prestamos.filter(
-        (prestamo) =>
-          prestamo.id.toString().includes(lowercasedSearch) ||
-          prestamo.nombreEstudiante?.toLowerCase().includes(lowercasedSearch) ||
-          prestamo.cedulaEstudiante.toString().includes(lowercasedSearch),
-      );
-      setFilteredPrestamos(filtered);
-    }
-  }, 300);
+  const handleSearch = () => {
+    fetchPrestamos(0, search);
+    setCurrentPage(0);
+  };
 
   if (error) {
     return <div>{error}</div>;
@@ -125,18 +112,21 @@ const Solicitados = () => {
       <Form className="mb-4">
         <Row>
           <Col xs={12}>
-            <Form.Control
-              type="text"
-              placeholder="Buscar por ID, Nombre del Estudiante o Documento"
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-100"
-              disabled={true} // Barra de búsqueda deshabilitada
-            />
+           <InputGroup className="d-flex">
+              <Form.Control
+                type="text"
+                placeholder="Buscar por ID, Nombre del Estudiante o Documento"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+             />
+              <Button variant="primary" onClick={handleSearch}>
+                <Search />
+              </Button>
+            </InputGroup>
           </Col>
         </Row>
       </Form>
 
-      {/* Mostrar un spinner mientras se cargan los préstamos */}
       {loading && (
         <div className="text-center my-4">
           <div className="spinner-border text-primary" role="status">
@@ -147,8 +137,8 @@ const Solicitados = () => {
 
       <div className="row">
         <TransitionGroup className="row">
-          {filteredPrestamos.length > 0
-            ? filteredPrestamos.map((prestamo, index) => (
+          {prestamos.length > 0
+            ? prestamos.map((prestamo, index) => (
                 <CSSTransition
                   key={prestamo.id}
                   timeout={500}
@@ -157,11 +147,11 @@ const Solicitados = () => {
                   <PrestamoCard
                     prestamo={prestamo}
                     onVerDetalles={handleVerDetalles}
-                    onAprobar={() => fetchPrestamos(currentPage)}
+                    onAprobar={() => fetchPrestamos(currentPage, search)}
                   />
                 </CSSTransition>
               ))
-            : !loading && <p>No hay préstamos solicitados.</p>}
+            : !loading && <p></p>}
         </TransitionGroup>
       </div>
 
@@ -195,4 +185,3 @@ const Solicitados = () => {
 };
 
 export default Solicitados;
-
