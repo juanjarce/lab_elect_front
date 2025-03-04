@@ -31,7 +31,7 @@ const Solicitados = () => {
         return;
       }
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${page}&size=100&search=${searchQuery}`,
+        `https://labuq.catavento.co:10443/api/admin/prestamos/solicitados?page=${page}&size=99&search=${searchQuery}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
