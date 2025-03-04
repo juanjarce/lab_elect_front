@@ -20,7 +20,7 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
       setLoadingCantidad(true);
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/estudiantes/productos/${producto.id}/cantidad-disponible`,
+          `https://labuq.catavento.co:10443/api/estudiantes/productos/${producto.id}/cantidad-disponible`,
         );
         if (response.data.status === "Exito") {
           setCantidadDisponible(response.data.data.cantDisponible);
@@ -54,7 +54,7 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
     }
     try {
       await axios.post(
-        `http://localhost:8081/api/estudiantes/producto/agregar/${id}/${producto.id}?cantidad=${cantidadSeleccionada}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/producto/agregar/${id}/${producto.id}?cantidad=${cantidadSeleccionada}`,
         null,
         {
           headers: { Authorization: `Bearer ${token}` },

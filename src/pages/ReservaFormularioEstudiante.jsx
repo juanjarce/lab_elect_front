@@ -28,7 +28,7 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8081/api/estudiantes/agenda/${id}/${laboratorio.id}/${fecha}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/agenda/${id}/${laboratorio.id}/${fecha}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -58,7 +58,7 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
     setLoadingReserva(true);
     try {
       const response = await axios.post(
-        "http://localhost:8081/api/estudiantes/reserva/reservar",
+        "https://labuq.catavento.co:10443/api/estudiantes/reserva/reservar",
         {
           agendaId: agendaId,
           estudianteId: id,

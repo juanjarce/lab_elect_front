@@ -22,7 +22,7 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
             return;
           }
           const response = await axios.get(
-            `http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`,
+            `https://labuq.catavento.co:10443/api/admin/prestamos/${prestamoId}/detalles`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -45,7 +45,7 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
           try {
             // do the delete request (idk why, I am comming  crazy)
             const response = await axios.delete(
-              `http://localhost:8081/api/admin/prestamos/eliminar/${prestamoId}`,
+              `https://labuq.catavento.co:10443/api/admin/prestamos/eliminar/${prestamoId}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -81,7 +81,7 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
           return;
         }
         await axios.delete(
-          `http://localhost:8081/api/admin/detalles/eliminar/${idDetallePrestamo}`,
+          `https://labuq.catavento.co:10443/api/admin/detalles/eliminar/${idDetallePrestamo}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

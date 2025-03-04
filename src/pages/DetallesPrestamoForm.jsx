@@ -25,7 +25,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
             return;
           }
           const response = await axios.get(
-            `http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`,
+            `https://labuq.catavento.co:10443/api/admin/prestamos/${prestamoId}/detalles`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -54,7 +54,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
     setIsSubmitting(true);
     try {
       const response = await axios.put(
-        `http://localhost:8081/api/admin/detalle/devolver/${detalleAConfirmar.id}`,
+        `https://labuq.catavento.co:10443/api/admin/detalle/devolver/${detalleAConfirmar.id}`,
         null,
         {
           headers: {

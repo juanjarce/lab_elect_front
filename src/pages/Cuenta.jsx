@@ -40,7 +40,7 @@ const Cuenta = () => {
 
     setIsLoading(true);
     axios
-      .get(`http://localhost:8081/api/estudiantes/informacion-cuenta/${id}`, {
+      .get(`https://labuq.catavento.co:10443/api/estudiantes/informacion-cuenta/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -81,7 +81,7 @@ const Cuenta = () => {
     }
     try {
       const response = await axios.put(
-        `http://localhost:8081/api/estudiantes/actualizar/${id}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/actualizar/${id}`,
         formData,
         {
           headers: {
@@ -117,7 +117,7 @@ const Cuenta = () => {
         return;
       }
       const response = await axios.delete(
-        `http://localhost:8081/api/estudiantes/eliminar/${id}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/eliminar/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
