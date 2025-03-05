@@ -69,6 +69,9 @@ const EstudianteDashboard = () => {
               <Nav.Link as={Link} to="reservas">
                 Mis Reservas
               </Nav.Link>
+              <Nav.Link as={Link} to="quejas">
+                Quejas & Recursos
+              </Nav.Link>
               <Nav.Link as={Link} to="cuenta">
                 Mi Cuenta
               </Nav.Link>

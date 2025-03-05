@@ -17,6 +17,7 @@ import GestionLaboratorios from "./pages/GestionLaboratorios";
 import GestionReservas from "./pages/GestionReservas";
 import Laboratorios from "./pages/Laboratorios";
 import MisReservas from "./pages/MisReservas";
+import Quejas from "./pages/Quejas";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -50,6 +51,7 @@ const App = () => {
           <Route path="cuenta" element={<Cuenta />} />
           <Route path="laboratorios" element={<Laboratorios />} />
           <Route path="reservas" element={<MisReservas />} />
+          <Route path="quejas" element={<Quejas />} />
         </Route>
         <Route path="/verificar-codigo/:id" element={<VerificarCodigo />} />
         <Route path="/recuperar-contrasenia" element={<ChangePassword />} />
