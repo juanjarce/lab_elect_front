@@ -108,14 +108,12 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
             <Form.Control type="text" value={producto.cantidad} disabled />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Link DataSheet</Form.Label>
-            <a
-              href={producto.linkDataSheet}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {producto.linkDataSheet}
-            </a>
+          <Form.Label>Link DataSheet</Form.Label>
+            <div className="text-truncate" style={{ width: "100%" }}>
+              <a href={producto.linkDataSheet} target="_blank" rel="noopener noreferrer">
+                {producto.linkDataSheet}
+              </a>
+            </div>
           </Form.Group>
           <hr />
           <Form.Group>
