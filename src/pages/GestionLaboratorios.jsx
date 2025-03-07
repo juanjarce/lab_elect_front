@@ -10,15 +10,17 @@ import {
   Form,
   Spinner,
   Modal,
+  InputGroup,
 } from "react-bootstrap";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { Search } from "react-bootstrap-icons";
 import AgregarLaboratorioForm from "./AgregarLaboratorioForm";
 import ModificarLaboratorioForm from "./ModificarLaboratorioForm";
 import "./css/Laboratorios.css";
 
 const GestionLaboratorios = () => {
   const [laboratorios, setLaboratorios] = useState([]);
-  const [filteredLaboratorios, setFilteredLaboratorios] = useState([]);
+  const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [showAgregarModal, setShowAgregarModal] = useState(false);
@@ -26,16 +28,15 @@ const GestionLaboratorios = () => {
   const [laboratorioAEditar, setLaboratorioAEditar] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [laboratorioAEliminar, setLaboratorioAEliminar] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const pageSize = 100;
+  const pageSize = 32;
 
   /**
    * handle the load of laboratories info
    * @returns
    */
-  const cargarLaboratorios = async () => {
+  const cargarLaboratorios = async (page = 0, searchQuery = "") => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -44,34 +45,20 @@ const GestionLaboratorios = () => {
         return;
       }
       const response = await axios.get(
-        "https://labuq.catavento.co:10443/api/admin/laboratorios/info",
+        `https://labuq.catavento.co:10443/api/admin/laboratorios/info?page=${currentPage}&size=${pageSize}&search=${search}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       );
-      setLaboratorios(response.data.data);
-      setTotalPages(Math.ceil(response.data.data.length / pageSize));
+      setLaboratorios(response.data.data.content);
+      setTotalPages(response.data.data.totalPages);
     } catch (error) {
       console.error("Error al cargar laboratorios:", error);
     } finally {
       setLoading(false);
     }
-  };
-
-  /**
-   * handles the filters for searching labs
-   */
-  const aplicarFiltros = () => {
-    const term = searchTerm.toLowerCase();
-    const filtrados = laboratorios.filter(
-      (lab) =>
-        lab.nombre.toLowerCase().includes(term) ||
-        lab.descripcion.toLowerCase().includes(term),
-    );
-    setFilteredLaboratorios(filtrados);
-    setTotalPages(Math.ceil(filtrados.length / pageSize));
   };
 
   /**
@@ -135,31 +122,37 @@ const GestionLaboratorios = () => {
     setShowModificarModal(true);
   };
 
-  const laboratoriosPorPagina = filteredLaboratorios.slice(
-    currentPage * pageSize,
-    (currentPage + 1) * pageSize,
-  );
-
   useEffect(() => {
-    cargarLaboratorios();
-  }, []);
+    cargarLaboratorios(currentPage);
+  }, [currentPage]);
 
-  useEffect(() => {
-    aplicarFiltros();
-  }, [searchTerm, laboratorios]);
+    /**
+   * handles the search of a product
+   */
+    const handleSearch = () => {
+      setCurrentPage(0);
+      cargarLaboratorios(0);
+    };
 
   return (
     <Container fluid>
-      <Row className="mb-3">
-        <Col md={12}>
-          <Form.Control
-            type="text"
-            placeholder="Buscar laboratorio"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </Col>
-      </Row>
+      <Form className="mb-4">
+        <Row>
+          <Col xs={12}>
+           <InputGroup className="d-flex">
+              <Form.Control
+                type="text"
+                placeholder="Buscar por Nombre del Laboratorio o Descripción"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+             />
+              <Button variant="primary" onClick={handleSearch}>
+                <Search />
+              </Button>
+            </InputGroup>
+          </Col>
+        </Row>
+      </Form>
 
       <Button
         variant="success"
@@ -169,50 +162,50 @@ const GestionLaboratorios = () => {
         <i className="fas fa-plus"></i> Agregar Laboratorio
       </Button>
 
-      <Row>
-        <TransitionGroup component={null}>
-          {laboratoriosPorPagina.map((lab) => (
-            <CSSTransition key={lab.id} timeout={300} classNames="fade">
-              <Col md={3} sm={6} xs={12} className="mb-3">
-                <Card
-                  className="laboratorio-card fade-in"
-                  style={{ textAlign: "center", padding: "10px" }}
-                >
-                  <Card.Img
-                    variant="top"
-                    src={`data:image/png;base64,${lab.imagen}`}
-                    alt={lab.nombre}
-                    style={{ height: "120px", objectFit: "cover" }}
-                  />
-                  <Card.Body>
-                    <Card.Title>{lab.nombre}</Card.Title>
-                    <Card.Text>{lab.descripcion}</Card.Text>
-                    <Card.Text>Capacidad: {lab.capacidad}</Card.Text>
-                    <Button
-                      variant="warning"
-                      onClick={() => handleEditar(lab)}
-                      className="mr-2"
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => confirmarEliminacion(lab)}
-                    >
-                      Eliminar
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </CSSTransition>
-          ))}
-        </TransitionGroup>
-      </Row>
-
-      {loading && (
+      {loading ? (
         <div className="d-flex justify-content-center mt-3">
           <Spinner animation="border" />
         </div>
+        ) : (
+        <Row>
+          <TransitionGroup component={null}>
+            {laboratorios.map((lab) => (
+              <CSSTransition key={lab.id} timeout={300} classNames="fade">
+                <Col md={3} sm={6} xs={12} className="mb-3">
+                  <Card
+                    className="laboratorio-card fade-in"
+                    style={{ textAlign: "center", padding: "10px" }}
+                  >
+                    <Card.Img
+                      variant="top"
+                      src={`data:image/png;base64,${lab.imagen}`}
+                      alt={lab.nombre}
+                      style={{ height: "120px", objectFit: "cover" }}
+                    />
+                    <Card.Body>
+                      <Card.Title>{lab.nombre}</Card.Title>
+                      <Card.Text>{lab.descripcion}</Card.Text>
+                      <Card.Text>Capacidad: {lab.capacidad}</Card.Text>
+                      <Button
+                        variant="warning"
+                        onClick={() => handleEditar(lab)}
+                        className="mr-2"
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => confirmarEliminacion(lab)}
+                      >
+                        Eliminar
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </CSSTransition>
+            ))}
+          </TransitionGroup>
+        </Row>
       )}
 
       <div className="d-flex justify-content-center mt-3">
