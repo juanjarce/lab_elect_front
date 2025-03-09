@@ -39,8 +39,8 @@ const Login = () => {
     setError(null);
     setIsLoading(true);
     const url = isAdmin
-      ? "https://labuq.catavento.co:10443/api/autenticacion/login-admin"
-      : "https://labuq.catavento.co:10443/api/autenticacion/login-estudiante";
+      ? "https://labuq.catavento.co:10444/api/autenticacion/login-admin"
+      : "https://labuq.catavento.co:10444/api/autenticacion/login-estudiante";
     const payload = isAdmin
       ? { username: formData.username, password: formData.password }
       : { email: formData.username, password: formData.password };
@@ -60,7 +60,7 @@ const Login = () => {
       let id;
       if (isAdmin) {
         const idResponse = await fetch(
-          `https://labuq.catavento.co:10443/api/admin/id?username=${formData.username}`,
+          `https://labuq.catavento.co:10444/api/admin/id?username=${formData.username}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!idResponse.ok) {
@@ -71,7 +71,7 @@ const Login = () => {
         navigate(`/admin-dashboard/${id}`);
       } else {
         const idResponse = await fetch(
-          `https://labuq.catavento.co:10443/api/estudiantes/id-by-email?email=${formData.username}`,
+          `https://labuq.catavento.co:10444/api/estudiantes/id-by-email?email=${formData.username}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!idResponse.ok) {
