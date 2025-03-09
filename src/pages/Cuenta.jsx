@@ -235,7 +235,7 @@ const Cuenta = () => {
                     variant="danger"
                     onClick={handleDeleteAccount}
                     className="ms-3"
-                    disabled={isLoading}
+                    disabled={true}
                   >
                     {isLoading ? (
                       <Spinner animation="border" size="sm" />
