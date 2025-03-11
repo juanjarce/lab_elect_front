@@ -64,7 +64,7 @@ const AgregarLaboratorioForm = ({ show, onClose, onSave }) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "https://labuq.catavento.co:10443/api/admin/laboratorios/agregar",
+        "https://labuq.catavento.co:10444/api/admin/laboratorios/agregar",
         formData,
         {
           headers: {
