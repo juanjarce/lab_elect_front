@@ -13,9 +13,13 @@ const DetalleReservaEstudiante = ({
 
   if (!reserva) return null;
 
+  // Convertir la fecha de la reserva a un objeto Date
+  const fechaReserva = new Date(reserva.fecha);
+  const fechaActual = new Date();
+  const isDisabled = fechaActual > fechaReserva; // Deshabilitar si la fecha ya pasó
+
   /**
-   * handles the functionality to cancel a reservation
-   * @returns
+   * Maneja la cancelación de la reserva
    */
   const cancelarReserva = async () => {
     if (!window.confirm("¿Estás seguro de que quieres cancelar esta reserva?"))
@@ -27,14 +31,14 @@ const DetalleReservaEstudiante = ({
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { detalleAgendaId: reserva.id },
-        },
+        }
       );
       alert("Reserva cancelada exitosamente");
       onReservaCancelada();
       onHide();
     } catch (error) {
       alert("Error al cancelar la reserva");
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -78,7 +82,7 @@ const DetalleReservaEstudiante = ({
           variant="danger"
           className="w-100"
           onClick={cancelarReserva}
-          disabled={loading}
+          disabled={loading || isDisabled} // Se deshabilita si la fecha ya pasó o está en carga
         >
           {loading ? (
             <Spinner

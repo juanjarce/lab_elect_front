@@ -10,12 +10,12 @@ const Prestamos = () => {
   const { id } = useParams();
   const [prestamos, setPrestamos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [estadoFilter, setEstadoFilter] = useState("");
   const [selectedPrestamo, setSelectedPrestamo] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [showModal, setShowModal] = useState(false);
+
+  const pageSize = 30;
 
   /**
    * fetch the loans
@@ -30,7 +30,7 @@ const Prestamos = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `https://labuq.catavento.co:10443/api/estudiantes/${id}/prestamos?page=${currentPage}&size=5&token=${token}`,
+          `https://labuq.catavento.co:10443/api/estudiantes/${id}/prestamos?page=${currentPage}&size=${pageSize}&token=${token}`,
         );
         setPrestamos(response.data.content || []);
         setTotalPages(response.data.totalPages);
@@ -43,20 +43,6 @@ const Prestamos = () => {
 
     fetchPrestamos();
   }, [id, currentPage]);
-
-  /**
-   * handles the change on the search input
-   * @param {*} event
-   * @returns
-   */
-  const handleSearchChange = (event) => setSearchTerm(event.target.value);
-
-  /**
-   * handles the filter change for the loans
-   * @param {*} event
-   * @returns
-   */
-  const handleFilterChange = (event) => setEstadoFilter(event.target.value);
 
   /**
    * handles the selection of a loan
@@ -83,16 +69,6 @@ const Prestamos = () => {
    */
   const handlePageChange = (page) => setCurrentPage(page);
 
-  const filteredPrestamos = prestamos.filter((prestamo) => {
-    const matchesSearch =
-      prestamo.id.toString().includes(searchTerm) ||
-      prestamo.fechaPrestamo.includes(searchTerm);
-    const matchesEstado = estadoFilter
-      ? prestamo.estado === estadoFilter
-      : true;
-    return matchesSearch && matchesEstado;
-  });
-
   return (
     <CSSTransition in={!loading} timeout={500} classNames="fade" unmountOnExit>
       <div className="container mt-4">
@@ -103,43 +79,20 @@ const Prestamos = () => {
         ) : (
           <>
             <div className="d-flex mb-4">
-              <input
-                type="text"
-                className="form-control me-2"
-                placeholder="Buscar por ID o Fecha"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-              <button className="btn btn-outline-secondary">
-                <FaSearch />
-              </button>
-              <select
-                className="form-select ms-2"
-                value={estadoFilter}
-                onChange={handleFilterChange}
-              >
-                <option value="">Filtrar por Estado</option>
-                <option value="PRESTADO">PRESTADO</option>
-                <option value="DEVUELTO">DEVUELTO</option>
-              </select>
-              <button className="btn btn-outline-secondary ms-2">
-                <FaFilter />
-              </button>
             </div>
-
-            {filteredPrestamos.length === 0 ? (
+            {prestamos.length === 0 ? (
               <div>
                 No se encontró historial de préstamos para este estudiante.
               </div>
             ) : (
               <div className="row">
-                {filteredPrestamos.map((prestamo) => (
+                {prestamos.map((prestamo) => (
                   <div
                     key={prestamo.id}
-                    className="col-12 col-md-6 col-lg-4 mb-4"
+                    className="col-12 col-md-4 col-lg-4 mb-4"
                     onClick={() => handleSelectPrestamo(prestamo.id)}
                   >
-                    <div className="card shadow-sm producto-card">
+                    <div className="card shadow-sm producto-card" style={{ height: "180px" }}>
                       <div className="card-body bg-light">
                         <h5 className="card-title">
                           Préstamo ID: {prestamo.id}
