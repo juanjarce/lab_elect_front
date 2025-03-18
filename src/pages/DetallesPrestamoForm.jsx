@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Modal, Button, Alert, Spinner } from "react-bootstrap";
 import { FaCheckCircle } from "react-icons/fa";
+import { useParams } from "react-router-dom";
 
 const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
+  const { id } = useParams();
   const [detalles, setDetalles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,7 +56,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
     setIsSubmitting(true);
     try {
       const response = await axios.put(
-        `https://labuq.catavento.co:10443/api/admin/detalle/devolver/${detalleAConfirmar.id}`,
+        `https://labuq.catavento.co:10443/api/admin/detalle/devolver/${detalleAConfirmar.id}/${id}`,
         null,
         {
           headers: {

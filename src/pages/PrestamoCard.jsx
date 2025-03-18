@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Card, Button, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { FaCheckCircle } from "react-icons/fa"; // Icono para aprobar
@@ -6,6 +7,7 @@ import { CSSTransition } from "react-transition-group"; // Importa CSSTransition
 import "./css/PrestamoCard.css"; // Importa el archivo CSS
 
 const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
+  const { id } = useParams();
   const [estudianteNombre, setEstudianteNombre] = useState("");
   const [estudianteCedula, setEstudianteCedula] = useState("");
   const [inProp, setInProp] = useState(false);
@@ -24,7 +26,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
         return;
       }
       const response = await axios.put(
-        `https://labuq.catavento.co:10443/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}`,
+        `https://labuq.catavento.co:10443/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}/${id}`,
         null,
         {
           headers: {

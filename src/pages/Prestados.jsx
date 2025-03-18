@@ -4,11 +4,12 @@ import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
 import PrestamoCardEntregado from "./PrestamoCardEntregado";
 import DetallesPrestamoForm from "./DetallesPrestamoForm";
 import { Search } from "react-bootstrap-icons";
-import { debounce } from "lodash";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./css/PrestamoCardEntregado.css";
+import { useParams } from "react-router-dom";
 
 const Prestados = () => {
+  const { id } = useParams();
   const [prestamos, setPrestamos] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -88,7 +89,7 @@ const Prestados = () => {
       }
 
       const response = await axios.put(
-        `https://labuq.catavento.co:10443/api/admin/prestamos/devolver/${idPrestamo}`,
+        `https://labuq.catavento.co:10443/api/admin/prestamos/devolver/${idPrestamo}/${id}`,
         null,
         {
           headers: {
@@ -171,7 +172,7 @@ const Prestados = () => {
               </CSSTransition>
             ))
           ) : (
-            <p className="text-center">No hay préstamos en estado PRESTADO.</p>
+            <p className="text-center"></p>
           )}
         </TransitionGroup>
       )}
