@@ -71,7 +71,7 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
     const formDataToSend = { ...formData, imagen: formData.imagen };
     try {
       const response = await axios.post(
-        "https://labuq.catavento.co:10443/api/admin/productos/agregar",
+        "https://labuq.catavento.co:10444/api/admin/productos/agregar",
         formDataToSend,
         {
           headers: {
