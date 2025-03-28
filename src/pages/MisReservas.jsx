@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Card, Spinner, Alert, Container, Row, Col } from "react-bootstrap";
+import { Card, Spinner, Alert, Container, Row, Col, Pagination } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import DetalleReservaEstudiante from "./DetalleReservaEstudiante";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
@@ -13,7 +13,11 @@ const MisReservas = () => {
   const [error, setError] = useState(null);
   const [selectedReserva, setSelectedReserva] = useState(null);
   const [reload, setReload] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const token = localStorage.getItem("token");
+
+  const pageSize = 1;
 
   /**
    * handles the reservation cancelation
@@ -23,29 +27,40 @@ const MisReservas = () => {
     setReload((prev) => !prev);
   };
 
-  /**
-   * fetch the user reservations
-   * */
   useEffect(() => {
-    const fetchReservas = async () => {
-      try {
-        const response = await axios.get(
-          `https://labuq.catavento.co:10443/api/estudiantes/reservas/${id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        setReservas(response.data.data);
-      } catch (err) {
-        setError("Error al obtener las reservas");
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    cargarReservas(currentPage);
+  }, [currentPage]);
 
-    fetchReservas();
-  }, [id, token, reload]);
+  /**
+    * handles the load of reservas info
+    * @returns
+    */
+  const cargarReservas = async (page) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token no encontrado");
+        return;
+      }
+      const response = await axios.get(
+        `https://labuq.catavento.co:10443/api/estudiantes/reservas/${id}?page=${currentPage}&size=${pageSize}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      setReservas(response.data.data.content);
+      setTotalPages(response.data.data.totalPages);
+    } catch (error) {
+      console.error("Error al cargar las reservas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page); // Cambiar la página
+  };
 
   return (
     <Container className="mt-4">
@@ -82,6 +97,20 @@ const MisReservas = () => {
           ))}
         </TransitionGroup>
       )}
+
+      <div className="d-flex justify-content-center mt-3">
+        <Pagination>
+          {[...Array(totalPages).keys()].map((page) => (
+            <Pagination.Item
+              key={page}
+              active={page === currentPage}
+              onClick={() => handlePageChange(page)}
+            >
+              {page + 1}
+            </Pagination.Item>
+          ))}
+        </Pagination>
+      </div>
 
       <DetalleReservaEstudiante
         show={selectedReserva !== null}
