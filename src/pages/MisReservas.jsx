@@ -31,12 +31,9 @@ const MisReservas = () => {
     cargarReservas(currentPage);
   }, [currentPage, reload]);
 
-  /**
-    * handles the load of reservas info
-    * @returns
-    */
   const cargarReservas = async (page) => {
     setLoading(true);
+    setError(null); // Reiniciar el error antes de la petición
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -47,16 +44,24 @@ const MisReservas = () => {
         `https://labuq.catavento.co:10443/api/estudiantes/reservas/${id}?page=${currentPage}&size=${pageSize}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        },
+        }
       );
-      setReservas(response.data.data.content);
-      setTotalPages(response.data.data.totalPages);
+  
+      const data = response.data.data.content;
+      
+      if (Array.isArray(data)) {
+        setReservas(data);
+        setTotalPages(response.data.data.totalPages);
+      } else {
+        setReservas([]); // Si la respuesta no es válida, aseguramos que reservas sea un array vacío
+      }
     } catch (error) {
       console.error("Error al cargar las reservas:", error);
+      setError("Ocurrió un error al cargar las reservas."); // Mensaje de error claro
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const handlePageChange = (page) => {
     setCurrentPage(page); // Cambiar la página
