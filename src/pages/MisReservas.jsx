@@ -29,7 +29,7 @@ const MisReservas = () => {
 
   useEffect(() => {
     cargarReservas(currentPage);
-  }, [currentPage]);
+  }, [currentPage, reload]);
 
   /**
     * handles the load of reservas info
