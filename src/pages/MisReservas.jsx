@@ -17,7 +17,7 @@ const MisReservas = () => {
   const [totalPages, setTotalPages] = useState(0);
   const token = localStorage.getItem("token");
 
-  const pageSize = 1;
+  const pageSize = 32;
 
   /**
    * handles the reservation cancelation
