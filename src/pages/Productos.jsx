@@ -278,12 +278,14 @@ const Productos = () => {
                         variant="warning"
                         onClick={() => handleEditar(producto)}
                         className="mr-2"
+                        disabled
                       >
                         <i className="fas fa-edit"></i> Editar
                       </Button>
                       <Button
                        variant="danger"
                         onClick={() => confirmarEliminacion(producto)}
+                        disabled
                       >
                         <i className="fas fa-trash"></i> Eliminar
                       </Button>
