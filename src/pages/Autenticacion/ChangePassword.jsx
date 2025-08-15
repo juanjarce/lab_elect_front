@@ -36,7 +36,7 @@ const ChangePassword = () => {
     setIsLoadingCode(true);
     try {
       const idResponse = await fetch(
-        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/id-by-email?email=${formData.email}`,
       );
       if (!idResponse.ok) {
         throw new Error("Error al obtener el ID del estudiante");
@@ -44,7 +44,7 @@ const ChangePassword = () => {
       const { data } = await idResponse.json();
       const estudianteId = data.id;
       await fetch(
-        `http://localhost:8081/api/autenticacion/enviar-verificacion/${estudianteId}`,
+        `https://labuq.catavento.co:10443/api/autenticacion/enviar-verificacion/${estudianteId}`,
         { method: "POST" },
       );
       setIsVerificationSent(true);
@@ -71,7 +71,7 @@ const ChangePassword = () => {
     setIsLoadingSubmit(true);
     try {
       const idResponse = await fetch(
-        `http://localhost:8081/api/estudiantes/id-by-email?email=${formData.email}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/id-by-email?email=${formData.email}`,
       );
       if (!idResponse.ok) {
         throw new Error("El email no se encuentra registrado");
@@ -79,7 +79,7 @@ const ChangePassword = () => {
       const { data } = await idResponse.json();
       const estudianteId = data.id;
       const response = await fetch(
-        `http://localhost:8081/api/autenticacion/cambiar-contraseña/${estudianteId}`,
+        `https://labuq.catavento.co:10443/api/autenticacion/cambiar-contraseña/${estudianteId}`,
         {
           method: "PUT",
           headers: {

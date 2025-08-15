@@ -30,7 +30,7 @@ const Prestamos = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/estudiantes/${id}/prestamos?page=${currentPage}&size=${pageSize}&token=${token}`,
+          `https://labuq.catavento.co:10443/api/estudiantes/${id}/prestamos?page=${currentPage}&size=${pageSize}&token=${token}`,
         );
         setPrestamos(response.data.content || []);
         setTotalPages(response.data.totalPages);

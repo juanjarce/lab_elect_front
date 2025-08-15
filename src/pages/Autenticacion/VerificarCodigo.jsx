@@ -30,7 +30,7 @@ const VerificarCodigo = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8081/api/autenticacion/estudiantes/${id}/activar?verificationCode=${codigo}`,
+        `https://labuq.catavento.co:10443/api/autenticacion/estudiantes/${id}/activar?verificationCode=${codigo}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
