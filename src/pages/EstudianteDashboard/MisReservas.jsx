@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, Spinner, Alert, Container, Row, Col, Pagination } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import DetalleReservaEstudiante from "./DetalleReservaEstudiante";
+import DetalleReservaEstudiante from "../modal/DetalleReservaEstudiante";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "./css/MisReservas.css"; // Archivo de estilos para las animaciones
 

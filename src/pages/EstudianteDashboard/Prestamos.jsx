@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { FaSearch, FaFilter } from "react-icons/fa";
-import DetallesPrestamoFormSinEntrega from "./DetallesPrestamoFormSinEntrega";
+import DetallesPrestamoFormSinEntrega from "../forms/DetallesPrestamoFormSinEntrega";
 import { CSSTransition } from "react-transition-group"; // Importar para animaciones
 import "./css/Prestamos.css";
 

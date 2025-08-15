@@ -14,8 +14,8 @@ import {
   Button,
 } from "react-bootstrap";
 import { Filter, Search } from "react-bootstrap-icons";
-import ProductoCard from "./ProductoCard";
-import ProductoDetalleModal from "./ProductoDetalleModal";
+import ProductoCard from "../cards/ProductoCard";
+import ProductoDetalleModal from "../modal/ProductoDetalleModal";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 const ProductosPestaña = () => {

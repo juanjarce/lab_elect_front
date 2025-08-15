@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
-import PrestamoCardDevueltos from "./PrestamoCardDevueltos";
-import DetallesPrestamoForm from "./DetallesPrestamoForm";
+import PrestamoCardEntregado from "../cards/PrestamoCardEntregado";
+import DetallesPrestamoForm from "../modal/DetallesPrestamoForm";
 import { Search } from "react-bootstrap-icons";
-import { debounce } from "lodash";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import "./css/PrestamoCardDevueltos.css";
+import "../cards/css/PrestamoCardEntregado.css";
+import { useParams } from "react-router-dom";
 
-const Devueltos = () => {
+const Prestados = () => {
+  const { id } = useParams();
   const [prestamos, setPrestamos] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -19,7 +20,7 @@ const Devueltos = () => {
   const [selectedPrestamoId, setSelectedPrestamoId] = useState(null);
 
   /**
-   * handles the loans fetch
+   * fech all the loans
    * @param {*} page
    * @returns
    */
@@ -32,14 +33,14 @@ const Devueltos = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=99&search=${searchQuery}`,
+        `http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=99&search=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       );
-      if (response.data.status === "Exito") {
+      if (response.data.status === "Éxito") {
         const prestamosWithNames = await Promise.all(
           response.data.data.content.map(async (prestamo) => {
             try {
@@ -65,39 +66,53 @@ const Devueltos = () => {
         setPrestamos(prestamosWithNames);
         setTotalPages(response.data.data.totalPages);
       } else {
-        setError("No hay préstamos en estado DEVUELTO.");
+        setError("No hay préstamos en estado PRESTADO.");
       }
-    } catch (error) {
-      setError("Error al cargar los préstamos en estado DEVUELTO.");
-      console.log(error);
+    } catch (err) {
+      console.log(err);
+      setError("Error al cargar los préstamos en estado PRESTADO.");
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * handles the details by setting the selected prestamo and show modal
-   * @param {*} prestamoId
-   */
+  useEffect(() => {
+    fetchPrestamos(currentPage, search);
+  }, [currentPage]);
+
+  const handleEntregaPrestamo = async (idPrestamo) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token no encontrado");
+        return;
+      }
+
+      const response = await axios.put(
+        `http://localhost:8081/api/admin/prestamos/devolver/${idPrestamo}/${id}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      alert(response.data.message || "Préstamo entregado con éxito.");
+      fetchPrestamos(currentPage); // Recargar la lista tras entregar
+    } catch (err) {
+      alert(`${err.response?.data?.message}`);
+    }
+  };
+
   const handleVerDetalles = (prestamoId) => {
     setSelectedPrestamoId(prestamoId);
     setShowModal(true);
   };
 
-  /**
-   * handles the close modal by setting the show modal and prestamo
-   */
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedPrestamoId(null);
   };
-
-  /**
-   * handle the change of page
-   * */
-  useEffect(() => {
-    fetchPrestamos(currentPage, search);
-  }, [currentPage]);
 
   /**
   * handles the search with a button click
@@ -113,7 +128,7 @@ const Devueltos = () => {
 
   return (
     <div>
-      <h3>Préstamos Devueltos</h3>
+      <h3>Préstamos Prestados</h3>
 
       <Form className="mb-4">
         <Row>
@@ -136,9 +151,7 @@ const Devueltos = () => {
       {loading ? (
         <div className="d-flex justify-content-center my-4">
           <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">
-              Cargando préstamos devueltos...
-            </span>
+            <span className="visually-hidden">Cargando préstamos...</span>
           </div>
         </div>
       ) : (
@@ -151,9 +164,10 @@ const Devueltos = () => {
                 classNames="card-transition"
                 unmountOnExit
               >
-                <PrestamoCardDevueltos
+                <PrestamoCardEntregado
                   prestamo={prestamo}
                   onVerDetalles={handleVerDetalles}
+                  onEntregar={handleEntregaPrestamo}
                 />
               </CSSTransition>
             ))
@@ -163,7 +177,7 @@ const Devueltos = () => {
         </TransitionGroup>
       )}
 
-      {/* Pagination */}
+      {/* Paginación */}
       <div className="d-flex justify-content-center mt-4">
         <Button
           variant="secondary"
@@ -184,7 +198,7 @@ const Devueltos = () => {
         </Button>
       </div>
 
-      {/* Details modal */}
+      {/* Modal de Detalles */}
       <DetallesPrestamoForm
         prestamoId={selectedPrestamoId}
         show={showModal}
@@ -194,4 +208,4 @@ const Devueltos = () => {
   );
 };
 
-export default Devueltos;
+export default Prestados;

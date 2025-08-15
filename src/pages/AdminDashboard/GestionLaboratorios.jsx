@@ -14,8 +14,8 @@ import {
 } from "react-bootstrap";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { Search } from "react-bootstrap-icons";
-import AgregarLaboratorioForm from "./AgregarLaboratorioForm";
-import ModificarLaboratorioForm from "./ModificarLaboratorioForm";
+import AgregarLaboratorioForm from "../forms/AgregarLaboratorioForm";
+import ModificarLaboratorioForm from "../forms/ModificarLaboratorioForm";
 import "./css/Laboratorios.css";
 
 const GestionLaboratorios = () => {

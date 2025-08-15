@@ -14,9 +14,9 @@ import {
   Popover,
 } from "react-bootstrap";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import AgregarProductoForm from "./AgregarProductoForm";
+import AgregarProductoForm from "../forms/AgregarProductoForm";
 import { Filter, Search } from "react-bootstrap-icons";
-import ModificarProductoForm from "./ModificarProductoForm";
+import ModificarProductoForm from "../forms/ModificarProductoForm";
 import "./css/Productos.css";
 
 const Productos = () => {

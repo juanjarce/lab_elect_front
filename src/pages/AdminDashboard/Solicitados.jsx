@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
 import { Search } from "react-bootstrap-icons";
-import PrestamoCard from "./PrestamoCard";
-import DetallesPrestamoModal from "./DetallesPrestamoModal";
+import PrestamoCard from "../cards/PrestamoCard";
+import DetallesPrestamoModal from "../modal/DetallesPrestamoModal";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 const Solicitados = () => {

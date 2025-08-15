@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Card, Row, Col, Container, Form, Spinner, Button, Pagination, InputGroup } from "react-bootstrap";
 import { Search } from "react-bootstrap-icons";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "./css/Laboratorios.css";
-import ReservaFormularioEstudiante from "./ReservaFormularioEstudiante";
+import ReservaFormulario from "../forms/ReservaFormulario";
 
-const Laboratorios = () => {
-  const { id } = useParams();
+const GestionReservas = () => {
   const [laboratorios, setLaboratorios] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
@@ -17,11 +15,12 @@ const Laboratorios = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedLaboratorio, setSelectedLaboratorio] = useState(null);
   const [fecha, setFecha] = useState("");
+  const [agendas, setAgendas] = useState([]);
 
   const pageSize = 32;
 
   /**
-   * handles the load of labs info
+   * handle the load of labs info
    * @returns
    */
   const cargarLaboratorios = async () => {
@@ -33,7 +32,7 @@ const Laboratorios = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/estudiantes/laboratorios/info/${id}?page=${currentPage}&size=${pageSize}&search=${search}`,
+        `http://localhost:8081/api/admin/laboratorios/info?page=${currentPage}&size=${pageSize}&search=${search}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -48,7 +47,27 @@ const Laboratorios = () => {
   };
 
   /**
-   * handles the modal to open the form
+   * handles the load of labs agenda
+   * @returns
+   */
+  const cargarAgenda = async () => {
+    if (!selectedLaboratorio || !fecha) return;
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:8081/api/admin/agenda/${selectedLaboratorio.id}/${fecha}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      setAgendas(response.data.data || []);
+    } catch (error) {
+      console.error("Error al obtener la agenda:", error);
+    }
+  };
+
+  /**
+   * handles the modal form
    * @param {*} lab
    */
   const handleOpenFormulario = (lab) => {
@@ -57,12 +76,13 @@ const Laboratorios = () => {
   };
 
   /**
-   * handles the modal to close the form
+   * handles the modal form
    */
   const handleCloseFormulario = () => {
     setShowModal(false);
     setSelectedLaboratorio(null);
     setFecha("");
+    setAgendas([]);
   };
 
   useEffect(() => {
@@ -76,6 +96,12 @@ const Laboratorios = () => {
     setCurrentPage(0);
     cargarLaboratorios(0);
   };
+
+  useEffect(() => {
+    if (selectedLaboratorio && fecha) {
+      cargarAgenda();
+    }
+  }, [fecha]);
 
   return (
     <Container fluid>
@@ -120,7 +146,7 @@ const Laboratorios = () => {
                       variant="top"
                       src={`data:image/png;base64,${lab.imagen}`}
                       alt={lab.nombre}
-                      tyle={{ height: "120px", objectFit: "cover" }}
+                      style={{ height: "120px", objectFit: "cover" }}
                     />
                     <Card.Body>
                       <Card.Title>{lab.nombre}</Card.Title>
@@ -149,7 +175,7 @@ const Laboratorios = () => {
         </Pagination>
       </div>
 
-      <ReservaFormularioEstudiante
+      <ReservaFormulario
         show={showModal}
         onClose={handleCloseFormulario}
         laboratorio={selectedLaboratorio}
@@ -158,5 +184,4 @@ const Laboratorios = () => {
   );
 };
 
-export default Laboratorios;
-
+export default GestionReservas;

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Table, Alert } from "react-bootstrap";
-import DetalleFila from "./DetalleFila";
+import DetalleFila from "../tablas/DetalleFila";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "./css/Carrito.css";
 

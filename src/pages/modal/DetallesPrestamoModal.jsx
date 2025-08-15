@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Modal, Button } from "react-bootstrap";
-import TablaDetalles from "./TablaDetalles";
+import TablaDetalles from "../tablas/TablaDetalles";
 
 const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
   const [detalles, setDetalles] = useState([]);
