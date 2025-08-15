@@ -33,7 +33,7 @@ const Prestados = () => {
         return;
       }
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/admin/prestamos/prestados?page=${page}&size=99&search=${searchQuery}`,
+        `http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=99&search=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -45,7 +45,7 @@ const Prestados = () => {
           response.data.data.content.map(async (prestamo) => {
             try {
               const estudianteResponse = await axios.get(
-                `https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
               );
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;
@@ -89,7 +89,7 @@ const Prestados = () => {
       }
 
       const response = await axios.put(
-        `https://labuq.catavento.co:10443/api/admin/prestamos/devolver/${idPrestamo}/${id}`,
+        `http://localhost:8081/api/admin/prestamos/devolver/${idPrestamo}/${id}`,
         null,
         {
           headers: {

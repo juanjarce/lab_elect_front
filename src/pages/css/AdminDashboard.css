@@ -16,5 +16,36 @@
     transition: opacity 500ms;
   }
   
-  /* Estilos adicionales si los necesitas */
-  
+  .toggle-sidebar-btn {
+    background-color: #212529 !important; /* Azul Bootstrap */
+    border: none !important;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    color: white; /* Texto blanco */
+    border-radius: 0.25rem;
+  }
+
+  .toggle-sidebar-btn:hover {
+    background-color: #212529 !important; /* Azul más oscuro al pasar el ratón */
+  }
+
+  /* Sidebar fijo y a toda la altura de la página */
+.sidebar {
+  width: 250px;
+  min-height: 100vh; /* Siempre al menos toda la altura de la ventana */
+  background-color: #212529; /* Igual que bg-dark */
+}
+
+/* En pantallas grandes, sidebar fijo */
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  .main-content {
+    margin-left: 250px; /* Para que no se solape el contenido */
+  }
+}
+

@@ -45,7 +45,7 @@ const GestionLaboratorios = () => {
         return;
       }
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/admin/laboratorios/info?page=${currentPage}&size=${pageSize}&search=${search}`,
+        `http://localhost:8081/api/admin/laboratorios/info?page=${currentPage}&size=${pageSize}&search=${search}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@ const GestionLaboratorios = () => {
     setLoading(true);
     try {
       await axios.delete(
-        `https://labuq.catavento.co:10443/api/admin/laboratorios/eliminar/${laboratorioAEliminar.id}`,
+        `http://localhost:8081/api/admin/laboratorios/eliminar/${laboratorioAEliminar.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

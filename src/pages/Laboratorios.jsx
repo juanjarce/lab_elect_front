@@ -33,7 +33,7 @@ const Laboratorios = () => {
         return;
       }
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/estudiantes/laboratorios/info/${id}?page=${currentPage}&size=${pageSize}&search=${search}`,
+        `http://localhost:8081/api/estudiantes/laboratorios/info/${id}?page=${currentPage}&size=${pageSize}&search=${search}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },

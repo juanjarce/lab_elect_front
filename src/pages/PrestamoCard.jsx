@@ -26,7 +26,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
         return;
       }
       const response = await axios.put(
-        `https://labuq.catavento.co:10443/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}/${id}`,
+        `http://localhost:8081/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}/${id}`,
         null,
         {
           headers: {
@@ -51,7 +51,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
     const fetchEstudianteName = async () => {
       try {
         const response = await axios.get(
-          `https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+          `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
         );
         setEstudianteNombre(response.data.data.nombre);
         setEstudianteCedula(response.data.data.cedula);

@@ -53,7 +53,7 @@ const Register = () => {
     }
     try {
       const registerResponse = await fetch(
-        "https://labuq.catavento.co:10443/api/autenticacion/registrar-estudiante",
+        "http://localhost:8081/api/autenticacion/registrar-estudiante",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -74,7 +74,7 @@ const Register = () => {
         );
       }
       const idResponse = await fetch(
-        `https://labuq.catavento.co:10443/api/estudiantes/id?cedula=${formData.cedula}`,
+        `http://localhost:8081/api/estudiantes/id?cedula=${formData.cedula}`,
       );
       if (!idResponse.ok) {
         throw new Error("Error al obtener el ID del estudiante");
@@ -82,7 +82,7 @@ const Register = () => {
       const idData = await idResponse.json();
       const id = idData.data.id;
       const verifyResponse = await fetch(
-        `https://labuq.catavento.co:10443/api/autenticacion/enviar-verificacion/${id}`,
+        `http://localhost:8081/api/autenticacion/enviar-verificacion/${id}`,
         {
           method: "POST",
         },
