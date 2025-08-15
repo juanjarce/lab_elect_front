@@ -51,7 +51,7 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
         return;
       }
       await axios.put(
-        `https://labuq.catavento.co:10443/api/admin/productos/actualizar/${formData.id}`,
+        `http://localhost:8081/api/admin/productos/actualizar/${formData.id}`,
         formDataToSend,
         {
           headers: {

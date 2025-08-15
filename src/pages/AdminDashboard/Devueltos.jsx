@@ -32,7 +32,7 @@ const Devueltos = () => {
         return;
       }
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/admin/prestamos/devueltos?page=${page}&size=99&search=${searchQuery}`,
+        `http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=99&search=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -44,7 +44,7 @@ const Devueltos = () => {
           response.data.data.content.map(async (prestamo) => {
             try {
               const estudianteResponse = await axios.get(
-                `https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
               );
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;

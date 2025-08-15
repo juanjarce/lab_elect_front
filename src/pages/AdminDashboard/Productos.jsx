@@ -54,7 +54,7 @@ const Productos = () => {
         return;
       }
       const response = await axios.get(
-        `https://labuq.catavento.co:10443/api/admin/productos/filtrados?page=${currentPage}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
+        `http://localhost:8081/api/admin/productos/filtrados?page=${currentPage}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ const Productos = () => {
         return;
       }
       await axios.delete(
-        `https://labuq.catavento.co:10443/api/admin/productos/eliminar/${productoAEliminar.id}`,
+        `http://localhost:8081/api/admin/productos/eliminar/${productoAEliminar.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
