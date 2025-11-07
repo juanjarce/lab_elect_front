@@ -47,6 +47,25 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
    * @returns
    */
   const handleReservar = async (agendaId) => {
+    
+    // Crear fecha local correctamente
+    const [year, month, day] = fecha.split("-").map(Number);
+    const fechaReserva = new Date(year, month - 1, day);
+    const fechaActual = new Date();
+
+    // Normalizar ambas fechas al inicio del día
+    fechaReserva.setHours(0, 0, 0, 0);
+    fechaActual.setHours(0, 0, 0, 0);
+
+    console.log("Fecha actual:", fechaActual);
+    console.log("Fecha de reserva:", fechaReserva);
+
+    // Verificar que la fecha sea estrictamente futura
+    if (fechaReserva <= fechaActual) {
+      alert("No puedes realizar reservas para hoy ni fechas pasadas.");
+      return;
+    }
+
     const confirmacion = window.confirm(
       "¿Está seguro de que quiere reservar en este espacio?",
     );
