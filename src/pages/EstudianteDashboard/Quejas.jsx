@@ -53,7 +53,7 @@ const Quejas = () => {
       };
 
       const response = await axios.post(
-        "https://labuq.catavento.co:10443/api/estudiantes/correos/quejas",
+        "http://localhost:8081/api/estudiantes/correos/quejas",
         requestBody,
         {
           headers: {
