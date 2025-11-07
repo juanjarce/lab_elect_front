@@ -17,7 +17,7 @@ const DetalleReservaFormulario = ({ show, onClose, agenda }) => {
     setError(null);
     try {
       const response = await axios.get(
-        `http://localhost:8081/api/admin/agenda/${agenda.id}`,
+        `https://labuq.catavento.co:10443/api/admin/agenda/${agenda.id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -35,7 +35,7 @@ const DetalleReservaFormulario = ({ show, onClose, agenda }) => {
         detallesData.map(async (detalle) => {
           try {
             const estudianteResponse = await axios.get(
-              `http://localhost:8081/api/admin/estudiante/info?id=${detalle.estudianteId}`,
+              `https://labuq.catavento.co:10443/api/admin/estudiante/info?id=${detalle.estudianteId}`,
               {
                 headers: { Authorization: `Bearer ${token}` },
               },

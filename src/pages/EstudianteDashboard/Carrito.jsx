@@ -22,7 +22,7 @@ const Carrito = () => {
     }
     setLoading(true);
     axios
-      .get(`http://localhost:8081/api/estudiantes/detalles/${id}`, {
+      .get(`https://labuq.catavento.co:10443/api/estudiantes/detalles/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -49,7 +49,7 @@ const Carrito = () => {
     }
     axios
       .delete(
-        `http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/detalles/eliminar/${idDetalle}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },

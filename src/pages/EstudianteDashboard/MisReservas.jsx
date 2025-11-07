@@ -41,7 +41,7 @@ const MisReservas = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/estudiantes/reservas/${id}?page=${currentPage}&size=${pageSize}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/reservas/${id}?page=${currentPage}&size=${pageSize}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

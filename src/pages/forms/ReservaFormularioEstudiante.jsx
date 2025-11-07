@@ -28,7 +28,7 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8081/api/estudiantes/agenda/${id}/${laboratorio.id}/${fecha}`,
+        `https://labuq.catavento.co:10443/api/estudiantes/agenda/${id}/${laboratorio.id}/${fecha}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -47,7 +47,7 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
    * @returns
    */
   const handleReservar = async (agendaId) => {
-    
+
     // Crear fecha local correctamente
     const [year, month, day] = fecha.split("-").map(Number);
     const fechaReserva = new Date(year, month - 1, day);
@@ -56,9 +56,6 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
     // Normalizar ambas fechas al inicio del día
     fechaReserva.setHours(0, 0, 0, 0);
     fechaActual.setHours(0, 0, 0, 0);
-
-    console.log("Fecha actual:", fechaActual);
-    console.log("Fecha de reserva:", fechaReserva);
 
     // Verificar que la fecha sea estrictamente futura
     if (fechaReserva <= fechaActual) {
@@ -77,7 +74,7 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
     setLoadingReserva(true);
     try {
       const response = await axios.post(
-        "http://localhost:8081/api/estudiantes/reserva/reservar",
+        "https://labuq.catavento.co:10443/api/estudiantes/reserva/reservar",
         {
           agendaId: agendaId,
           estudianteId: id,
