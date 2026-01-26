@@ -38,7 +38,7 @@ const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
         return;
       }
       await axios.put(
-        `https://labuq.catavento.co:10443/api/admin/laboratorios/actualizar/${formData.id}`,
+        `https://labuq.catavento.co/services/api/admin/laboratorios/actualizar/${formData.id}`,
         formDataToSend,
         {
           headers: {

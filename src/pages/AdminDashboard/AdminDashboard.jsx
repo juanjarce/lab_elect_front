@@ -29,7 +29,7 @@ const AdminDashboard = () => {
       const token = localStorage.getItem("token");
       if (token) {
         await axios.put(
-          `https://labuq.catavento.co:10443/api/admin/logout/${id}`,
+          `https://labuq.catavento.co/services/api/admin/logout/${id}`,
           null,
           { headers: { Authorization: `Bearer ${token}` } }
         );
