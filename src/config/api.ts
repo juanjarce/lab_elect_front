@@ -1,1 +1,1 @@
-export const API_BASE_URL = "https://labuq.catavento.co/services";
+export const API_BASE_URL = "http://localhost:8081";
