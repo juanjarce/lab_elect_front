@@ -5,6 +5,7 @@ import { Search } from "react-bootstrap-icons";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "./css/Laboratorios.css";
 import ReservaFormulario from "../forms/ReservaFormulario";
+import { API_BASE_URL } from "./../../config/api";
 
 const GestionReservas = () => {
   const [laboratorios, setLaboratorios] = useState([]);
@@ -32,7 +33,7 @@ const GestionReservas = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/admin/laboratorios/info?page=${currentPage}&size=${pageSize}&search=${search}`,
+        `${API_BASE_URL}/api/admin/laboratorios/info?page=${currentPage}&size=${pageSize}&search=${search}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -55,7 +56,7 @@ const GestionReservas = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8081/api/admin/agenda/${selectedLaboratorio.id}/${fecha}`,
+        `${API_BASE_URL}/api/admin/agenda/${selectedLaboratorio.id}/${fecha}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Modal, Button } from "react-bootstrap";
 import TablaDetalles from "../tablas/TablaDetalles";
+import { API_BASE_URL } from "./../../config/api";
 
 const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
   const [detalles, setDetalles] = useState([]);
@@ -22,7 +23,7 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
             return;
           }
           const response = await axios.get(
-            `http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`,
+            `${API_BASE_URL}/api/admin/prestamos/${prestamoId}/detalles`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -45,7 +46,7 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
           try {
             // do the delete request (idk why, I am comming  crazy)
             const response = await axios.delete(
-              `http://localhost:8081/api/admin/prestamos/eliminar/${prestamoId}`,
+              `${API_BASE_URL}/api/admin/prestamos/eliminar/${prestamoId}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -81,7 +82,7 @@ const DetallesPrestamoModal = ({ prestamoId, show, onClose }) => {
           return;
         }
         await axios.delete(
-          `http://localhost:8081/api/admin/detalles/eliminar/${idDetallePrestamo}`,
+          `${API_BASE_URL}/api/admin/detalles/eliminar/${idDetallePrestamo}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

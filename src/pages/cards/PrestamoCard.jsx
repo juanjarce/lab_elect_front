@@ -5,6 +5,7 @@ import axios from "axios";
 import { FaCheckCircle } from "react-icons/fa"; // Icono para aprobar
 import { CSSTransition } from "react-transition-group"; // Importa CSSTransition
 import "./css/PrestamoCard.css"; // Importa el archivo CSS
+import { API_BASE_URL } from "./../../config/api";
 
 const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
   const { id } = useParams();
@@ -26,7 +27,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
         return;
       }
       const response = await axios.put(
-        `http://localhost:8081/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}/${id}`,
+        `${API_BASE_URL}/api/admin/prestamos/aprobar/${prestamo.id}/${prestamo.idEstudiante}/${id}`,
         null,
         {
           headers: {
@@ -51,7 +52,7 @@ const PrestamoCard = ({ prestamo, onVerDetalles, onAprobar }) => {
     const fetchEstudianteName = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+          `${API_BASE_URL}/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
         );
         setEstudianteNombre(response.data.data.nombre);
         setEstudianteCedula(response.data.data.cedula);

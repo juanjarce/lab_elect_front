@@ -8,6 +8,7 @@ import {
   FaEnvelope,
   FaLock,
 } from "react-icons/fa";
+import { API_BASE_URL } from "./../../config/api";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -53,7 +54,7 @@ const Register = () => {
     }
     try {
       const registerResponse = await fetch(
-        "http://localhost:8081/api/autenticacion/registrar-estudiante",
+        `${API_BASE_URL}/api/autenticacion/registrar-estudiante`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -74,7 +75,7 @@ const Register = () => {
         );
       }
       const idResponse = await fetch(
-        `http://localhost:8081/api/estudiantes/id?cedula=${formData.cedula}`,
+        `${API_BASE_URL}/api/estudiantes/id?cedula=${formData.cedula}`,
       );
       if (!idResponse.ok) {
         throw new Error("Error al obtener el ID del estudiante");
@@ -82,7 +83,7 @@ const Register = () => {
       const idData = await idResponse.json();
       const id = idData.data.id;
       const verifyResponse = await fetch(
-        `http://localhost:8081/api/autenticacion/enviar-verificacion/${id}`,
+        `${API_BASE_URL}/api/autenticacion/enviar-verificacion/${id}`,
         {
           method: "POST",
         },

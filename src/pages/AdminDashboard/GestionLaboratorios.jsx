@@ -17,6 +17,7 @@ import { Search } from "react-bootstrap-icons";
 import AgregarLaboratorioForm from "../forms/AgregarLaboratorioForm";
 import ModificarLaboratorioForm from "../forms/ModificarLaboratorioForm";
 import "./css/Laboratorios.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const GestionLaboratorios = () => {
   const [laboratorios, setLaboratorios] = useState([]);
@@ -45,7 +46,7 @@ const GestionLaboratorios = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/admin/laboratorios/info?page=${currentPage}&size=${pageSize}&search=${search}`,
+        `${API_BASE_URL}/api/admin/laboratorios/info?page=${currentPage}&size=${pageSize}&search=${search}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,7 +85,7 @@ const GestionLaboratorios = () => {
     setLoading(true);
     try {
       await axios.delete(
-        `http://localhost:8081/api/admin/laboratorios/eliminar/${laboratorioAEliminar.id}`,
+        `${API_BASE_URL}/api/admin/laboratorios/eliminar/${laboratorioAEliminar.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

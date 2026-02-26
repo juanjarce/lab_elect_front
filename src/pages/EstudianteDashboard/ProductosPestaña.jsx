@@ -17,6 +17,7 @@ import { Filter, Search } from "react-bootstrap-icons";
 import ProductoCard from "../cards/ProductoCard";
 import ProductoDetalleModal from "../modal/ProductoDetalleModal";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { API_BASE_URL } from "./../../config/api";
 
 const ProductosPestaña = () => {
   const { id } = useParams();
@@ -52,7 +53,7 @@ const ProductosPestaña = () => {
     setCargando(true);
     try {
       const response = await axios.get(
-        `http://localhost:8081/api/estudiantes/productos/filtrados?page=${page}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
+        `${API_BASE_URL}/api/estudiantes/productos/filtrados?page=${page}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setProductos(response.data.data.content);

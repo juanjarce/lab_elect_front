@@ -3,6 +3,7 @@ import { Modal, Button, Form, Spinner, Alert } from "react-bootstrap";
 import axios from "axios";
 import DetalleReservaFormulario from "./DetalleReservaFormulario";
 import "./css/ReservaFormulario.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const ReservaFormulario = ({ show, onClose, laboratorio }) => {
   const [fecha, setFecha] = useState("");
@@ -32,7 +33,7 @@ const ReservaFormulario = ({ show, onClose, laboratorio }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8081/api/admin/agenda/${laboratorio.id}/${fecha}`,
+        `${API_BASE_URL}/api/admin/agenda/${laboratorio.id}/${fecha}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -67,7 +68,7 @@ const ReservaFormulario = ({ show, onClose, laboratorio }) => {
     setMensaje(null);
     try {
       const response = await axios.post(
-        "http://localhost:8081/api/admin/agenda/crear",
+        `${API_BASE_URL}/api/admin/agenda/crear`,
         {
           laboratorioId: laboratorio.id,
           fecha: fechaNueva,

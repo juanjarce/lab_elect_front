@@ -5,6 +5,7 @@ import { FaSearch, FaFilter } from "react-icons/fa";
 import DetallesPrestamoFormSinEntrega from "../forms/DetallesPrestamoFormSinEntrega";
 import { CSSTransition } from "react-transition-group"; // Importar para animaciones
 import "./css/Prestamos.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const Prestamos = () => {
   const { id } = useParams();
@@ -30,7 +31,7 @@ const Prestamos = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/estudiantes/${id}/prestamos?page=${currentPage}&size=${pageSize}&token=${token}`,
+          `${API_BASE_URL}/api/estudiantes/${id}/prestamos?page=${currentPage}&size=${pageSize}&token=${token}`,
         );
         setPrestamos(response.data.content || []);
         setTotalPages(response.data.totalPages);

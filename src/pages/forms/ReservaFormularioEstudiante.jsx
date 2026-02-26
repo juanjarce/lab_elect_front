@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Modal, Button, Form, Spinner, Alert } from "react-bootstrap";
 import axios from "axios";
 import "./css/ReservaFormulario.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
   const { id } = useParams();
@@ -28,7 +29,7 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8081/api/estudiantes/agenda/${id}/${laboratorio.id}/${fecha}`,
+        `${API_BASE_URL}/api/estudiantes/agenda/${id}/${laboratorio.id}/${fecha}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -74,7 +75,7 @@ const ReservaFormularioEstudiante = ({ show, onClose, laboratorio }) => {
     setLoadingReserva(true);
     try {
       const response = await axios.post(
-        "http://localhost:8081/api/estudiantes/reserva/reservar",
+        `${API_BASE_URL}/api/estudiantes/reserva/reservar`,
         {
           agendaId: agendaId,
           estudianteId: id,

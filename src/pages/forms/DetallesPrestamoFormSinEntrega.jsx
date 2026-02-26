@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Modal, Button, Spinner } from "react-bootstrap";
+import { API_BASE_URL } from "./../../config/api";
 
 const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
   const [detalles, setDetalles] = useState([]);
@@ -21,7 +22,7 @@ const DetallesPrestamoFormSinEntrega = ({ prestamoId, show, onClose }) => {
             return;
           }
           const response = await axios.get(
-            `http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`,
+            `${API_BASE_URL}/api/admin/prestamos/${prestamoId}/detalles`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

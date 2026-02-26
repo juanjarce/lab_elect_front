@@ -3,6 +3,7 @@ import { Card } from "react-bootstrap";
 import axios from "axios";
 import { CSSTransition } from "react-transition-group";
 import "./css/PrestamoCardDevueltos.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
   const [estudianteNombre, setEstudianteNombre] = useState("");
@@ -16,7 +17,7 @@ const PrestamoCardDevueltos = ({ prestamo, onVerDetalles }) => {
     const fetchEstudianteName = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+          `${API_BASE_URL}/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
         );
         setEstudianteNombre(response.data.data.nombre);
         setEstudianteCedula(response.data.data.cedula);

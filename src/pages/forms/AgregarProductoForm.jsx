@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { API_BASE_URL } from "./../../config/api";
 
 const AgregarProductoForm = ({ show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -71,7 +72,7 @@ const AgregarProductoForm = ({ show, onClose, onSave }) => {
     const formDataToSend = { ...formData, imagen: formData.imagen };
     try {
       const response = await axios.post(
-        "http://localhost:8081/api/admin/productos/agregar",
+        `${API_BASE_URL}/api/admin/productos/agregar`,
         formDataToSend,
         {
           headers: {

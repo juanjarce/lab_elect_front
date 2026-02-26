@@ -3,6 +3,7 @@ import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { FaCartPlus } from "react-icons/fa"; // Ícono de carrito
 import axios from "axios";
 import { Spinner } from "react-bootstrap"; // Agregar esta línea
+import { API_BASE_URL } from "./../../config/api";
 
 const ProductoDetalleModal = ({ producto, id, onClose }) => {
   const [cantidadDisponible, setCantidadDisponible] = useState(null);
@@ -20,7 +21,7 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
       setLoadingCantidad(true);
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/estudiantes/productos/${producto.id}/cantidad-disponible`,
+          `${API_BASE_URL}/api/estudiantes/productos/${producto.id}/cantidad-disponible`,
         );
         if (response.data.status === "Exito") {
           setCantidadDisponible(response.data.data.cantDisponible);
@@ -54,7 +55,7 @@ const ProductoDetalleModal = ({ producto, id, onClose }) => {
     }
     try {
       await axios.post(
-        `http://localhost:8081/api/estudiantes/producto/agregar/${id}/${producto.id}?cantidad=${cantidadSeleccionada}`,
+        `${API_BASE_URL}/api/estudiantes/producto/agregar/${id}/${producto.id}?cantidad=${cantidadSeleccionada}`,
         null,
         {
           headers: { Authorization: `Bearer ${token}` },

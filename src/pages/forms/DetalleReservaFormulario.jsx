@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Table, Button, Spinner, Alert } from "react-bootstrap";
 import axios from "axios";
+import { API_BASE_URL } from "./../../config/api";
 
 const DetalleReservaFormulario = ({ show, onClose, agenda }) => {
   const [detalles, setDetalles] = useState([]);
@@ -17,7 +18,7 @@ const DetalleReservaFormulario = ({ show, onClose, agenda }) => {
     setError(null);
     try {
       const response = await axios.get(
-        `http://localhost:8081/api/admin/agenda/${agenda.id}`,
+        `${API_BASE_URL}/api/admin/agenda/${agenda.id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -35,7 +36,7 @@ const DetalleReservaFormulario = ({ show, onClose, agenda }) => {
         detallesData.map(async (detalle) => {
           try {
             const estudianteResponse = await axios.get(
-              `http://localhost:8081/api/admin/estudiante/info?id=${detalle.estudianteId}`,
+              `${API_BASE_URL}/api/admin/estudiante/info?id=${detalle.estudianteId}`,
               {
                 headers: { Authorization: `Bearer ${token}` },
               },

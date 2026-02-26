@@ -7,6 +7,7 @@ import { Search } from "react-bootstrap-icons";
 import { debounce } from "lodash";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "../cards/css/PrestamoCardDevueltos.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const Devueltos = () => {
   const [prestamos, setPrestamos] = useState([]);
@@ -32,7 +33,7 @@ const Devueltos = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/admin/prestamos/devueltos?page=${page}&size=99&search=${searchQuery}`,
+        `${API_BASE_URL}/api/admin/prestamos/devueltos?page=${page}&size=99&search=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -44,7 +45,7 @@ const Devueltos = () => {
           response.data.data.content.map(async (prestamo) => {
             try {
               const estudianteResponse = await axios.get(
-                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+                `${API_BASE_URL}/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
               );
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;

@@ -5,6 +5,7 @@ import { Table, Alert } from "react-bootstrap";
 import DetalleFila from "../tablas/DetalleFila";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "./css/Carrito.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const Carrito = () => {
   const { id } = useParams();
@@ -22,7 +23,7 @@ const Carrito = () => {
     }
     setLoading(true);
     axios
-      .get(`http://localhost:8081/api/estudiantes/detalles/${id}`, {
+      .get(`${API_BASE_URL}/api/estudiantes/detalles/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -49,7 +50,7 @@ const Carrito = () => {
     }
     axios
       .delete(
-        `http://localhost:8081/api/estudiantes/detalles/eliminar/${idDetalle}`,
+        `${API_BASE_URL}/api/estudiantes/detalles/eliminar/${idDetalle}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },

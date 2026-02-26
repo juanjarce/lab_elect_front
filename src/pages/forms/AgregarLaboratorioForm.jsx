@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { API_BASE_URL } from "./../../config/api";
 
 const AgregarLaboratorioForm = ({ show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -64,7 +65,7 @@ const AgregarLaboratorioForm = ({ show, onClose, onSave }) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:8081/api/admin/laboratorios/agregar",
+        `${API_BASE_URL}/api/admin/laboratorios/agregar`,
         formData,
         {
           headers: {

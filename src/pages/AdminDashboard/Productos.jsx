@@ -18,6 +18,7 @@ import AgregarProductoForm from "../forms/AgregarProductoForm";
 import { Filter, Search } from "react-bootstrap-icons";
 import ModificarProductoForm from "../forms/ModificarProductoForm";
 import "./css/Productos.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
@@ -54,7 +55,7 @@ const Productos = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/admin/productos/filtrados?page=${currentPage}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
+        `${API_BASE_URL}/api/admin/productos/filtrados?page=${currentPage}&size=${pageSize}&nombre=${searchNombre}&categoria=${searchCategoria}&ubicacion=${ubicacion}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -93,7 +94,7 @@ const Productos = () => {
         return;
       }
       await axios.delete(
-        `http://localhost:8081/api/admin/productos/eliminar/${productoAEliminar.id}`,
+        `${API_BASE_URL}/api/admin/productos/eliminar/${productoAEliminar.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

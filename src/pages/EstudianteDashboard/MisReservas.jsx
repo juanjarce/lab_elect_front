@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import DetalleReservaEstudiante from "../modal/DetalleReservaEstudiante";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "./css/MisReservas.css"; // Archivo de estilos para las animaciones
+import { API_BASE_URL } from "./../../config/api";
 
 const MisReservas = () => {
   const { id } = useParams();
@@ -41,7 +42,7 @@ const MisReservas = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/estudiantes/reservas/${id}?page=${currentPage}&size=${pageSize}`,
+        `${API_BASE_URL}/api/estudiantes/reservas/${id}?page=${currentPage}&size=${pageSize}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

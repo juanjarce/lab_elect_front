@@ -11,6 +11,7 @@ import { FaSignOutAlt } from "react-icons/fa";
 import axios from "axios";
 import { CSSTransition } from "react-transition-group";
 import "./css/EstudianteDashboard.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const EstudianteDashboard = () => {
   const { id } = useParams();
@@ -28,7 +29,7 @@ const EstudianteDashboard = () => {
       const token = localStorage.getItem("token");
       if (token) {
         const response = await axios.put(
-          `http://localhost:8081/api/estudiantes/logout/${id}`,
+          `${API_BASE_URL}/api/estudiantes/logout/${id}`,
           null,
           { headers: { Authorization: `Bearer ${token}` } },
         );

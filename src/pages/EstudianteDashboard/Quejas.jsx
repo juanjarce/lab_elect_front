@@ -2,6 +2,7 @@ import { useState, useRef } from "react"; // Importa useRef
 import axios from "axios";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
+import { API_BASE_URL } from "./../../config/api";
 
 const Quejas = () => {
   const { id } = useParams();
@@ -53,7 +54,7 @@ const Quejas = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:8081/api/estudiantes/correos/quejas",
+        `${API_BASE_URL}/api/estudiantes/correos/quejas`,
         requestBody,
         {
           headers: {

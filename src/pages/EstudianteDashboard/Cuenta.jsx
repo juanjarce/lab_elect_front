@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import { CSSTransition } from "react-transition-group";
 import "./css/Cuenta.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const Cuenta = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const Cuenta = () => {
 
     setIsLoading(true);
     axios
-      .get(`http://localhost:8081/api/estudiantes/informacion-cuenta/${id}`, {
+      .get(`${API_BASE_URL}/api/estudiantes/informacion-cuenta/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -81,7 +82,7 @@ const Cuenta = () => {
     }
     try {
       const response = await axios.put(
-        `http://localhost:8081/api/estudiantes/actualizar/${id}`,
+        `${API_BASE_URL}/api/estudiantes/actualizar/${id}`,
         formData,
         {
           headers: {
@@ -117,7 +118,7 @@ const Cuenta = () => {
         return;
       }
       const response = await axios.delete(
-        `http://localhost:8081/api/estudiantes/eliminar/${id}`,
+        `${API_BASE_URL}/api/estudiantes/eliminar/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

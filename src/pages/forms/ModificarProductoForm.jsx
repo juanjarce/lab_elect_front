@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
+import { API_BASE_URL } from "./../../config/api";
 
 const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
   const [formData, setFormData] = useState({
@@ -51,7 +52,7 @@ const ModificarProductoForm = ({ show, onClose, onSave, producto }) => {
         return;
       }
       await axios.put(
-        `http://localhost:8081/api/admin/productos/actualizar/${formData.id}`,
+        `${API_BASE_URL}/api/admin/productos/actualizar/${formData.id}`,
         formDataToSend,
         {
           headers: {

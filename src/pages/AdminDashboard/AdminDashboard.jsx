@@ -4,6 +4,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CSSTransition } from "react-transition-group";
 import "./css/AdminDashboard.css";
+import { API_BASE_URL } from "./../../config/api";
 
 const AdminDashboard = () => {
   const { id } = useParams();
@@ -29,7 +30,7 @@ const AdminDashboard = () => {
       const token = localStorage.getItem("token");
       if (token) {
         await axios.put(
-          `http://localhost:8081/api/admin/logout/${id}`,
+          `${API_BASE_URL}/api/admin/logout/${id}`,
           null,
           { headers: { Authorization: `Bearer ${token}` } }
         );

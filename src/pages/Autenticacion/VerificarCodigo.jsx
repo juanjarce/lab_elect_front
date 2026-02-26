@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { API_BASE_URL } from "./../../config/api";
 
 const VerificarCodigo = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const VerificarCodigo = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8081/api/autenticacion/estudiantes/${id}/activar?verificationCode=${codigo}`,
+        `${API_BASE_URL}/api/autenticacion/estudiantes/${id}/activar?verificationCode=${codigo}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

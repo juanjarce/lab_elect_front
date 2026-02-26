@@ -6,6 +6,7 @@ import { Search } from "react-bootstrap-icons";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "../AdminDashboard/css/Laboratorios.css";
 import ReservaFormularioEstudiante from "../forms/ReservaFormularioEstudiante";
+import { API_BASE_URL } from "./../../config/api";
 
 const Laboratorios = () => {
   const { id } = useParams();
@@ -33,7 +34,7 @@ const Laboratorios = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/estudiantes/laboratorios/info/${id}?page=${currentPage}&size=${pageSize}&search=${search}`,
+        `${API_BASE_URL}/api/estudiantes/laboratorios/info/${id}?page=${currentPage}&size=${pageSize}&search=${search}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },

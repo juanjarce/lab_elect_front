@@ -7,6 +7,7 @@ import { Search } from "react-bootstrap-icons";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "../cards/css/PrestamoCardEntregado.css";
 import { useParams } from "react-router-dom";
+import { API_BASE_URL } from "./../../config/api";
 
 const Prestados = () => {
   const { id } = useParams();
@@ -33,7 +34,7 @@ const Prestados = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:8081/api/admin/prestamos/prestados?page=${page}&size=99&search=${searchQuery}`,
+        `${API_BASE_URL}/api/admin/prestamos/prestados?page=${page}&size=99&search=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -45,7 +46,7 @@ const Prestados = () => {
           response.data.data.content.map(async (prestamo) => {
             try {
               const estudianteResponse = await axios.get(
-                `http://localhost:8081/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
+                `${API_BASE_URL}/api/admin/estudiante/info?id=${prestamo.idEstudiante}`,
               );
               const nombre = estudianteResponse.data.data.nombre;
               const cedula = estudianteResponse.data.data.cedula;
@@ -89,7 +90,7 @@ const Prestados = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:8081/api/admin/prestamos/devolver/${idPrestamo}/${id}`,
+        `${API_BASE_URL}/api/admin/prestamos/devolver/${idPrestamo}/${id}`,
         null,
         {
           headers: {

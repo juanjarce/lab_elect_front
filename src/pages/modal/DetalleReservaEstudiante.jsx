@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import axios from "axios";
+import { API_BASE_URL } from "./../../config/api";
 
 const DetalleReservaEstudiante = ({
   show,
@@ -27,7 +28,7 @@ const DetalleReservaEstudiante = ({
     setLoading(true);
     try {
       await axios.delete(
-        `http://localhost:8081/api/estudiantes/reserva/cancelar/${reserva.estudianteId}`,
+        `${API_BASE_URL}/api/estudiantes/reserva/cancelar/${reserva.estudianteId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { detalleAgendaId: reserva.id },

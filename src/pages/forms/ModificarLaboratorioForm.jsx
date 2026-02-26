@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
+import { API_BASE_URL } from "./../../config/api";
 
 const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
   const [formData, setFormData] = useState({
@@ -38,7 +39,7 @@ const ModificarLaboratorioForm = ({ show, onClose, onSave, laboratorio }) => {
         return;
       }
       await axios.put(
-        `http://localhost:8081/api/admin/laboratorios/actualizar/${formData.id}`,
+        `${API_BASE_URL}/api/admin/laboratorios/actualizar/${formData.id}`,
         formDataToSend,
         {
           headers: {

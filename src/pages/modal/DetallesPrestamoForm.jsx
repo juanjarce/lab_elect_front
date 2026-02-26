@@ -3,6 +3,7 @@ import axios from "axios";
 import { Modal, Button, Alert, Spinner } from "react-bootstrap";
 import { FaCheckCircle } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import { API_BASE_URL } from "./../../config/api";
 
 const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
   const { id } = useParams();
@@ -27,7 +28,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
             return;
           }
           const response = await axios.get(
-            `http://localhost:8081/api/admin/prestamos/${prestamoId}/detalles`,
+            `${API_BASE_URL}/api/admin/prestamos/${prestamoId}/detalles`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -56,7 +57,7 @@ const DetallesPrestamoForm = ({ prestamoId, show, onClose }) => {
     setIsSubmitting(true);
     try {
       const response = await axios.put(
-        `http://localhost:8081/api/admin/detalle/devolver/${detalleAConfirmar.id}/${id}`,
+        `${API_BASE_URL}/api/admin/detalle/devolver/${detalleAConfirmar.id}/${id}`,
         null,
         {
           headers: {
