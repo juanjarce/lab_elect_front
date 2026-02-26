@@ -28,7 +28,7 @@ const EstudianteDashboard = () => {
       const token = localStorage.getItem("token");
       if (token) {
         const response = await axios.put(
-          `https://labuq.catavento.co/services/api/estudiantes/logout/${id}`,
+          `http://localhost:8081/api/estudiantes/logout/${id}`,
           null,
           { headers: { Authorization: `Bearer ${token}` } },
         );
